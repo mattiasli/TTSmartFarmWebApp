@@ -1,0 +1,11 @@
+# Private preparation worksheets (may contain plaintext credentials).
+/private-setup/
+# Also protect loose service worksheets, including the existing empty file.
+/*_information.txt
+/*_info.txt
+/* information.txt
+/* info.txt
+# Local backend/frontend environment files; example files remain trackable.
+**/.env
+**/.env.local
+**/.env.*.local

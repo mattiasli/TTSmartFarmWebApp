@@ -1,0 +1,10 @@
+# Exclude credentials when this folder is the Docker build context.
+private-setup/
+*_information.txt
+*_info.txt
+* information.txt
+* info.txt
+**/.env
+**/.env.local
+**/.env.*.local
+.git/

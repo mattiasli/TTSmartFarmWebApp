@@ -1,0 +1,9 @@
+# Exclude private preparation data from CLI uploads of this folder.
+private-setup/**
+*_information.txt
+*_info.txt
+* information.txt
+* info.txt
+**/.env
+**/.env.local
+**/.env.*.local
