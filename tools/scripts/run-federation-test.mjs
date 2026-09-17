@@ -1,7 +1,8 @@
 import { access } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertPortFree, killTree, spawnNpm, waitForUrl } from './process.mjs';
+import { assertPortFree, killTree, spawnNode, spawnNpm, waitForUrl } from './process.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const remoteDist = path.join(root, 'apps/automations-remote/dist');
@@ -53,7 +54,19 @@ process.on('SIGINT', () => {
 try {
   await waitForUrl(remoteUrl);
   await waitForUrl('http://127.0.0.1:4173');
-  await run(['exec', 'playwright', 'test', '--config', 'playwright.config.ts']);
+  const playwrightCli = path.join(root, 'node_modules/@playwright/test/cli.js');
+  if (!existsSync(playwrightCli)) {
+    throw new Error('Playwright CLI is missing. Run npm ci first.');
+  }
+  await new Promise((resolve, reject) => {
+    const child = spawnNode([playwrightCli, 'test', '--config', path.join(root, 'playwright.config.ts')], {
+      cwd: root,
+    });
+    child.on('exit', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`playwright test exited ${code}`));
+    });
+  });
 } finally {
   stop();
 }

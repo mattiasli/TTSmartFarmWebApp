@@ -45,6 +45,25 @@ export function spawnNpm(args, { cwd, env, prefix } = {}) {
   return child;
 }
 
+export function spawnNode(args, { cwd, env, prefix } = {}) {
+  const child = spawn(process.execPath, args, {
+    cwd,
+    env: { ...process.env, ...env, FORCE_COLOR: '1' },
+    stdio: ['ignore', 'pipe', 'pipe'],
+    windowsHide: true,
+  });
+  const write = (chunk, stream) => {
+    const text = chunk.toString();
+    for (const line of text.split(/\r?\n/)) {
+      if (line.length === 0) continue;
+      stream.write(prefix ? `[${prefix}] ${line}\n` : `${line}\n`);
+    }
+  };
+  child.stdout?.on('data', (chunk) => write(chunk, process.stdout));
+  child.stderr?.on('data', (chunk) => write(chunk, process.stderr));
+  return child;
+}
+
 export function killTree(child) {
   if (!child?.pid) return;
   if (process.platform === 'win32') {
