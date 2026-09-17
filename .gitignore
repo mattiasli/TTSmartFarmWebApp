@@ -9,3 +9,31 @@
 **/.env
 **/.env.local
 **/.env.*.local
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+# Test and local tooling artifacts
+test-results/
+playwright-report/
+playwright/.cache/
+blob-report/
+.vitest/
+**/@mf-types/
+
+# Hosting / container local state
+.vercel/
+.railway/
+docker-data/
+.infra/
+
+# Logs and OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db

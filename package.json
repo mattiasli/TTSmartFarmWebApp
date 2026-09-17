@@ -1,0 +1,49 @@
+{
+  "name": "smartfarm-remote-web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SmartFarm Remote web application: Fluent dashboard, federated automation editor, and persistent Railway controller.",
+  "type": "module",
+  "engines": {
+    "node": "24.21.0",
+    "npm": "11.19.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tools/simulator"
+  ],
+  "scripts": {
+    "dev": "node tools/scripts/dev.mjs",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --pretty false",
+    "test:unit": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:federation": "node tools/scripts/run-federation-test.mjs",
+    "test:e2e": "playwright test --config playwright.e2e.config.ts",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "db:migrate": "npm run db:migrate -w @smartfarm/api",
+    "db:seed:local": "npm run db:seed:local -w @smartfarm/api",
+    "simulator": "npm run start -w @smartfarm/simulator",
+    "check:client-secrets": "node tools/scripts/check-client-secrets.mjs",
+    "check:contracts": "vitest run packages/domain packages/contracts",
+    "preview:host": "npm run preview -w @smartfarm/dashboard",
+    "preview:remote": "npm run preview -w @smartfarm/automations-remote"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.13.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.12.0",
+    "jsdom": "30.1.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.1"
+  }
+}

@@ -8,3 +8,9 @@ private-setup/
 **/.env.local
 **/.env.*.local
 .git/
+node_modules/
+**/dist/
+coverage/
+playwright-report/
+test-results/
+docker-data/
