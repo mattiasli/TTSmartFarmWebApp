@@ -19,6 +19,7 @@ type ProbeProps = Partial<AutomationPanelPropsV1> & {
 
 export function AutomationPanel({ farmName = 'TT SmartFarm', onNotify }: ProbeProps) {
   const [count, setCount] = useState(0);
+  const [open, setOpen] = useState(false);
 
   return (
     <div data-testid="federation-probe">
@@ -29,7 +30,7 @@ export function AutomationPanel({ farmName = 'TT SmartFarm', onNotify }: ProbePr
       <Button data-testid="increment-hook" onClick={() => setCount((value) => value + 1)}>
         Increment
       </Button>
-      <Dialog>
+      <Dialog open={open} onOpenChange={(_, data) => setOpen(data.open)}>
         <DialogTrigger disableButtonEnhancement>
           <Button appearance="primary" data-testid="open-dialog">
             Open editor preview
@@ -43,15 +44,16 @@ export function AutomationPanel({ farmName = 'TT SmartFarm', onNotify }: ProbePr
               {automationPanelContract.contractVersion}.
             </DialogContent>
             <DialogActions>
-              <DialogTrigger disableButtonEnhancement>
-                <Button
-                  appearance="primary"
-                  data-testid="notify-host"
-                  onClick={() => onNotify?.('Remote dialog used a React hook and notified the host.')}
-                >
-                  Notify host
-                </Button>
-              </DialogTrigger>
+              <Button
+                appearance="primary"
+                data-testid="notify-host"
+                onClick={() => {
+                  onNotify?.('Remote dialog used a React hook and notified the host.');
+                  setOpen(false);
+                }}
+              >
+                Notify host
+              </Button>
             </DialogActions>
           </DialogBody>
         </DialogSurface>

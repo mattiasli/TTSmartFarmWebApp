@@ -19,9 +19,7 @@ export function App() {
         <Dashboard />
         <section className="section">
           <Title3>Automation editor</Title3>
-          <Text as="p" data-testid="host-message">
-            {hostMessage}
-          </Text>
+          <p data-testid="federation-host-message">{hostMessage}</p>
           <RemoteBoundary onRetry={() => setRemoteKey((value) => value + 1)}>
             <Suspense fallback={<Text>Loading automation editor…</Text>}>
               <AutomationPanel

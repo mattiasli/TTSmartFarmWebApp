@@ -61,6 +61,8 @@ body {
   gap: 8px;
 }
 
-.host-message {
+.host-message,
+[data-testid='federation-host-message'] {
   min-height: 1.5rem;
+  margin: 0;
 }
