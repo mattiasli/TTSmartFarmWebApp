@@ -1,3 +1,4 @@
+import type { AutomationRuntimeView, AutomationSettings } from './automations';
 import type { CommandDto } from './commands';
 import type { FarmMode } from './realtime';
 import type { WireTelemetry } from './telemetry';
@@ -51,6 +52,11 @@ export type FarmSnapshot = {
   lcd: { line1: string; line2: string; remote: boolean };
   pendingCommands: CommandDto[];
   permissions: { canControl: boolean; canView: boolean };
+  automations: {
+    revision: number;
+    settings: AutomationSettings;
+    runtime: AutomationRuntimeView;
+  };
 };
 
 export type SessionDto = {

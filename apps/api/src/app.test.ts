@@ -47,5 +47,31 @@ describe('api health and local commands', () => {
     expect(snapshot.statusCode).toBe(200);
     expect(snapshot.json().readings.fan).toBe(true);
     expect(snapshot.json().simulation).toBe(true);
+    expect(snapshot.json().automations.runtime.masterEnabled).toBe(false);
+  });
+
+  it('starts paused and can start automations on the server', async () => {
+    const app = await buildApp(loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: 'simulator' }));
+    apps.push(app);
+    const login = await app.inject({ method: 'POST', url: '/api/v1/local/login' });
+    const csrf = login.json().csrfToken as string;
+    const cookie = login.cookies.find((entry) => entry.name === 'smartfarm_session');
+    const headers = {
+      'x-csrf-token': csrf,
+      cookie: `smartfarm_session=${cookie?.value}`,
+    };
+    const before = await app.inject({
+      method: 'GET',
+      url: `/api/v1/farms/${LOCAL_FARM_ID}/snapshot`,
+      headers,
+    });
+    expect(before.json().automations.runtime.masterEnabled).toBe(false);
+    const started = await app.inject({
+      method: 'POST',
+      url: `/api/v1/farms/${LOCAL_FARM_ID}/automations/start`,
+      headers,
+    });
+    expect(started.statusCode).toBe(200);
+    expect(started.json().automations.runtime.masterEnabled).toBe(true);
   });
 });

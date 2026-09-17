@@ -22,7 +22,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { FarmCommandRequest, FarmSnapshot } from '@smartfarm/contracts';
-import { ensureSession, fetchSnapshot, sendCommand } from './api';
+import { ensureSession, fetchSnapshot, pauseAutomations, sendCommand, startAutomations } from './api';
 
 function formatValue(value: number | boolean | null | undefined, unit = '') {
   if (value === null || value === undefined) return 'Unavailable';
@@ -81,6 +81,15 @@ export function Dashboard() {
 
   const command = useMutation({
     mutationFn: (body: FarmCommandRequest) => sendCommand(body),
+    onSuccess: async () => {
+      setError(null);
+      await queryClient.invalidateQueries({ queryKey: ['snapshot'] });
+    },
+    onError: (err: Error) => setError(err.message),
+  });
+
+  const automations = useMutation({
+    mutationFn: (action: 'start' | 'pause') => (action === 'start' ? startAutomations() : pauseAutomations()),
     onSuccess: async () => {
       setError(null);
       await queryClient.invalidateQueries({ queryKey: ['snapshot'] });
@@ -167,6 +176,39 @@ export function Dashboard() {
           <SensorCard label="Button" value={formatValue(readings?.button)} />
           <SensorCard label="RSSI" value={formatValue(readings?.rssiDbm, ' dBm')} />
         </div>
+      </section>
+
+      <section className="section">
+        <Title3>Automations</Title3>
+        <Text as="p" data-testid="automation-master">
+          {snapshot?.automations.runtime.masterEnabled
+            ? 'Running on the server. Closing this tab does not pause them.'
+            : snapshot?.automations.runtime.pausedReason || 'Paused — start explicitly.'}
+        </Text>
+        <div className="control-row">
+          <Button
+            appearance="primary"
+            data-testid="start-automations"
+            disabled={!snapshot?.permissions.canControl || automations.isPending}
+            onClick={() => automations.mutate('start')}
+          >
+            Start automations
+          </Button>
+          <Button
+            data-testid="pause-automations"
+            disabled={!snapshot?.permissions.canControl || automations.isPending}
+            onClick={() => automations.mutate('pause')}
+          >
+            Pause
+          </Button>
+        </div>
+        <ul className="rule-list">
+          {(['irrigation', 'alarm', 'rain', 'cooling', 'lighting'] as const).map((rule) => (
+            <li key={rule}>
+              <strong>{rule}</strong>: {snapshot?.automations.runtime.messages[rule] ?? '—'}
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="section">

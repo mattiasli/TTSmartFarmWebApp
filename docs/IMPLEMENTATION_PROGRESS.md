@@ -6,14 +6,14 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 Source SHA / working-tree scope: local nested git in `smartFarmRemoteWebApp/` (HEAD `aca4fec` at session start). Dedicated GitHub remote: `https://github.com/mattiasli/TTSmartFarmWebApp`. Parent farm repository files were not modified.
 
-Completed package IDs: P00, P01, P03 protocol tests, P04 in-memory + loopback MQTT simulator, P05 SQL migrations (Postgres optional), local command API, P10 sensor/control dashboard against the simulator.
+Completed package IDs: P00, P01, P03, P04, P05 (SQL present), P09 server automation engine, P10 sensors/controls plus host Pause/Start.
 
 Tests run and actual results:
 
 - `npm run typecheck` — pass
 - `npm run lint` — pass
-- `npm run test:unit` — 32 passed including loopback MQTT telemetry and API fan command
-- `npm run test:federation` — 1 passed (production host 4173 + remote 4174)
+- `npm run test:unit` — 46 passed including irrigation/cooling/lighting/pause/stale/guard engine cases
+- `npm run test:federation` — 1 passed locally; GitHub Actions green on `510e2b6`
 
 Built/deployed artifact identifiers: local only. Remote entry `apps/automations-remote/dist/remoteEntry.js`. Host `apps/dashboard/dist`.
 
@@ -25,7 +25,7 @@ Missing inputs (names only, never secret values): Railway/Vercel deployment acce
 
 GitHub: `origin` is `https://github.com/mattiasli/TTSmartFarmWebApp.git`. Scaffold commit `4e7a3dd` was pushed to `master`.
 
-Next concrete task: GitHub OAuth/sessions in Postgres (P06), MQTT controller lock (P07), then the full automation engine (P09). Hosted P02 still waits on Vercel/Railway. Docker Desktop was not running; Postgres migrations exist but local demo uses in-memory stores.
+Next concrete task: GitHub OAuth/sessions in Postgres (P06) and the federated automation editor (P11). Hosted P02 still waits on Vercel/Railway. Docker Desktop was not running; Postgres migrations exist but local demo uses in-memory stores. Live pumping stays disabled.
 
 ### P00 notes
 

@@ -61,6 +61,13 @@ body {
   gap: 8px;
 }
 
+.rule-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 4px;
+}
+
 .host-message,
 [data-testid='federation-host-message'] {
   min-height: 1.5rem;

@@ -1,18 +1,23 @@
 import {
+  DEFAULT_AUTOMATIONS,
   LOCAL_FARM_ID,
   LOCAL_FARM_NAME,
   farmCommandRequestSchema,
+  type AutomationSettings,
   type CommandDto,
   type FarmCommandRequest,
   type FarmSnapshot,
+  type RuleId,
 } from '@smartfarm/contracts';
 import {
+  AutomationEngine,
   assertCommandPolicy,
   CommandPolicyError,
   isFresh,
   mapFarmCommand,
   normalizeTelemetry,
   telemetryAgeMs,
+  validateMqttCommand,
 } from '@smartfarm/domain';
 import type { AppConfig } from './config';
 import type { FarmLink } from './farm-link';
@@ -23,19 +28,36 @@ export class FarmController {
   private commands = new Map<string, CommandDto>();
   private idempotency = new Map<string, CommandDto>();
   private pumpTimer: ReturnType<typeof setTimeout> | null = null;
+  private driveTimer: ReturnType<typeof setInterval> | null = null;
+  private settingsRevision = 1;
+  readonly engine: AutomationEngine;
 
   constructor(
     readonly config: AppConfig,
     readonly link: FarmLink,
     private readonly now = () => Date.now(),
-  ) {}
+  ) {
+    this.engine = new AutomationEngine({
+      settings: DEFAULT_AUTOMATIONS,
+      clock: this.now,
+      send: async (control, payload) => {
+        const mapped = validateMqttCommand(control, payload);
+        await this.link.publish(mapped.topic, mapped.payload);
+        if (control === 'pump' && payload === 'pulse') this.armPumpBackupStop();
+      },
+    });
+    this.driveTimer = setInterval(() => this.drive(), 250);
+    this.drive();
+  }
 
   snapshot(): FarmSnapshot {
+    this.drive();
     const latest = this.link.latest();
     const age = latest ? telemetryAgeMs(latest.receivedAtMs, this.now()) : null;
     const fresh = isFresh(age);
     const brokerReady = this.link.transport === 'memory' ? true : this.link.ready;
     const status = !latest || !brokerReady ? 'offline' : fresh ? 'live' : 'stale';
+    const runtime = this.engine.runtime();
     return {
       protocolVersion: 1,
       farmId: this.config.FARM_ID,
@@ -57,7 +79,41 @@ export class FarmController {
         ['accepted', 'publishing', 'sent'].includes(command.status),
       ),
       permissions: { canControl: true, canView: true },
+      automations: {
+        revision: this.settingsRevision,
+        settings: this.engine.settings,
+        runtime,
+      },
     };
+  }
+
+  startAutomations() {
+    this.drive();
+    this.engine.start();
+    return this.snapshot();
+  }
+
+  pauseAutomations(reason = 'Paused by you') {
+    this.engine.pause(reason);
+    return this.snapshot();
+  }
+
+  resumeRule(rule: RuleId) {
+    this.engine.resumeRule(rule);
+    this.drive();
+    return this.snapshot();
+  }
+
+  resetWatering() {
+    this.engine.resetWatering();
+    return this.snapshot();
+  }
+
+  configure(settings: AutomationSettings) {
+    this.engine.configure(settings);
+    this.settingsRevision += 1;
+    this.drive();
+    return this.snapshot();
   }
 
   async command(request: FarmCommandRequest, idempotencyKey: string): Promise<CommandDto> {
@@ -78,6 +134,7 @@ export class FarmController {
       telemetry: latest?.data ?? null,
     });
     const mapped = mapFarmCommand(parsed);
+    this.engine.takeManual(mapped.control);
     const dto: CommandDto = {
       id: crypto.randomUUID(),
       action: parsed.type,
@@ -102,7 +159,15 @@ export class FarmController {
 
   async close() {
     if (this.pumpTimer) clearTimeout(this.pumpTimer);
+    if (this.driveTimer) clearInterval(this.driveTimer);
     await this.link.close();
+  }
+
+  private drive() {
+    const latest = this.link.latest();
+    const age = latest ? telemetryAgeMs(latest.receivedAtMs, this.now()) : null;
+    if (latest) this.engine.sample(latest.data);
+    this.engine.tick(isFresh(age));
   }
 
   private armPumpBackupStop() {

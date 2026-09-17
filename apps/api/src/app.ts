@@ -1,7 +1,14 @@
 import cookie from '@fastify/cookie';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
-import { LOCAL_FARM_ID, farmCommandRequestSchema, type SessionDto } from '@smartfarm/contracts';
+import {
+  LOCAL_FARM_ID,
+  RULE_IDS,
+  automationSettingsSchema,
+  farmCommandRequestSchema,
+  type RuleId,
+  type SessionDto,
+} from '@smartfarm/contracts';
 import { CommandPolicyError, isLoopbackAddress } from '@smartfarm/domain';
 import { loadConfig, redactedConfig, type AppConfig } from './config';
 import { FarmController } from './controller';
@@ -180,6 +187,80 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
       }
       if (error instanceof ZodError) {
         return sendError(reply, 400, 'VALIDATION', error.issues[0]?.message ?? 'Invalid command.', id);
+      }
+      throw error;
+    }
+  });
+
+  function requireOperator(request: FastifyRequest, reply: FastifyReply, id: string) {
+    const session = currentSession(request);
+    if (!session) {
+      void sendError(reply, 401, 'UNAUTHENTICATED', 'Sign in required.', id);
+      return null;
+    }
+    if (!requireOrigin(request, reply, id)) return null;
+    if (request.headers['x-csrf-token'] !== session.csrf) {
+      void sendError(reply, 403, 'CSRF', 'CSRF token mismatch.', id);
+      return null;
+    }
+    if (session.role === 'viewer') {
+      void sendError(reply, 403, 'FORBIDDEN', 'Viewers cannot change automations.', id);
+      return null;
+    }
+    const { farmId } = request.params as { farmId: string };
+    if (farmId !== config.FARM_ID) {
+      void sendError(reply, 404, 'NOT_FOUND', 'Farm not found.', id);
+      return null;
+    }
+    return session;
+  }
+
+  app.post('/api/v1/farms/:farmId/automations/start', async (request, reply) => {
+    const id = requestId();
+    if (!requireOperator(request, reply, id)) return;
+    try {
+      return controller.startAutomations();
+    } catch (error) {
+      return sendError(reply, 422, 'AUTOMATION', error instanceof Error ? error.message : 'Cannot start.', id);
+    }
+  });
+
+  app.post('/api/v1/farms/:farmId/automations/pause', async (request, reply) => {
+    const id = requestId();
+    if (!requireOperator(request, reply, id)) return;
+    return controller.pauseAutomations();
+  });
+
+  app.post('/api/v1/farms/:farmId/automations/resume-rule', async (request, reply) => {
+    const id = requestId();
+    if (!requireOperator(request, reply, id)) return;
+    const body = request.body as { rule?: string };
+    if (!body?.rule || !RULE_IDS.includes(body.rule as RuleId)) {
+      return sendError(reply, 400, 'VALIDATION', 'Unknown automation.', id);
+    }
+    controller.resumeRule(body.rule as RuleId);
+    return controller.snapshot();
+  });
+
+  app.post('/api/v1/farms/:farmId/automations/reset-watering', async (request, reply) => {
+    const id = requestId();
+    if (!requireOperator(request, reply, id)) return;
+    try {
+      return controller.resetWatering();
+    } catch (error) {
+      return sendError(reply, 422, 'AUTOMATION', error instanceof Error ? error.message : 'Cannot reset.', id);
+    }
+  });
+
+  app.put('/api/v1/farms/:farmId/automations/settings', async (request, reply) => {
+    const id = requestId();
+    if (!requireOperator(request, reply, id)) return;
+    try {
+      const settings = automationSettingsSchema.parse(request.body);
+      return controller.configure(settings);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return sendError(reply, 400, 'VALIDATION', error.issues[0]?.message ?? 'Invalid settings.', id);
       }
       throw error;
     }

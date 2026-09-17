@@ -44,3 +44,17 @@ export function sendCommand(command: FarmCommandRequest) {
     body: JSON.stringify(command),
   });
 }
+
+export function startAutomations() {
+  return request<FarmSnapshot>(`/api/v1/farms/${LOCAL_FARM_ID}/automations/start`, {
+    method: 'POST',
+    headers: { 'Idempotency-Key': crypto.randomUUID() },
+  });
+}
+
+export function pauseAutomations() {
+  return request<FarmSnapshot>(`/api/v1/farms/${LOCAL_FARM_ID}/automations/pause`, {
+    method: 'POST',
+    headers: { 'Idempotency-Key': crypto.randomUUID() },
+  });
+}
