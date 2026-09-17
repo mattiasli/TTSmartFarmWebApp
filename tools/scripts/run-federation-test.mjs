@@ -35,10 +35,12 @@ await access(path.join(hostDist, 'index.html'));
 const remote = spawnNpm(['run', 'preview', '-w', '@smartfarm/automations-remote'], {
   cwd: root,
   prefix: 'preview-remote',
+  detached: true,
 });
 const host = spawnNpm(['run', 'preview', '-w', '@smartfarm/dashboard'], {
   cwd: root,
   prefix: 'preview-host',
+  detached: true,
 });
 
 const stop = () => {
@@ -51,6 +53,7 @@ process.on('SIGINT', () => {
   process.exit(1);
 });
 
+let exitCode = 0;
 try {
   await waitForUrl(remoteUrl);
   await waitForUrl('http://127.0.0.1:4173');
@@ -67,6 +70,10 @@ try {
       else reject(new Error(`playwright test exited ${code}`));
     });
   });
+} catch (error) {
+  exitCode = 1;
+  console.error(error);
 } finally {
   stop();
+  process.exit(exitCode);
 }

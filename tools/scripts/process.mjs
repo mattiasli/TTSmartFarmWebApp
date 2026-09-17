@@ -15,22 +15,18 @@ export function resolveNpmCli() {
   return candidates.find((candidate) => existsSync(candidate)) ?? null;
 }
 
-export function spawnNpm(args, { cwd, env, prefix } = {}) {
+export function spawnNpm(args, { cwd, env, prefix, detached = false } = {}) {
   const npmCli = resolveNpmCli();
+  const options = {
+    cwd,
+    env: { ...process.env, ...env, FORCE_COLOR: '1' },
+    stdio: ['ignore', 'pipe', 'pipe'],
+    windowsHide: true,
+    detached: Boolean(detached) && process.platform !== 'win32',
+  };
   const child = npmCli
-    ? spawn(process.execPath, [npmCli, ...args], {
-        cwd,
-        env: { ...process.env, ...env, FORCE_COLOR: '1' },
-        stdio: ['ignore', 'pipe', 'pipe'],
-        windowsHide: true,
-      })
-    : spawn('npm', args, {
-        cwd,
-        env: { ...process.env, ...env, FORCE_COLOR: '1' },
-        stdio: ['ignore', 'pipe', 'pipe'],
-        shell: process.platform === 'win32',
-        windowsHide: true,
-      });
+    ? spawn(process.execPath, [npmCli, ...args], options)
+    : spawn('npm', args, { ...options, shell: process.platform === 'win32' });
 
   const write = (chunk, stream) => {
     const text = chunk.toString();
@@ -66,6 +62,8 @@ export function spawnNode(args, { cwd, env, prefix } = {}) {
 
 export function killTree(child) {
   if (!child?.pid) return;
+  child.stdout?.destroy();
+  child.stderr?.destroy();
   if (process.platform === 'win32') {
     spawn('taskkill', ['/pid', String(child.pid), '/t', '/f'], {
       stdio: 'ignore',
@@ -73,7 +71,15 @@ export function killTree(child) {
     });
     return;
   }
-  child.kill('SIGTERM');
+  try {
+    process.kill(-child.pid, 'SIGKILL');
+  } catch {
+    try {
+      child.kill('SIGKILL');
+    } catch {
+      // Already exited.
+    }
+  }
 }
 
 export function assertPortFree(port) {
