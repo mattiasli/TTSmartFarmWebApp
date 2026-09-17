@@ -5,7 +5,9 @@ import { Dashboard } from './Dashboard';
 import { RemoteBoundary } from './RemoteBoundary';
 
 const AutomationPanel = lazy(() => import('smartfarm_automations/AutomationPanel'));
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 0, refetchOnWindowFocus: false } },
+});
 
 export function App() {
   const [hostMessage, setHostMessage] = useState('Waiting for the federated editor.');
@@ -17,7 +19,9 @@ export function App() {
         <Dashboard />
         <section className="section">
           <Title3>Automation editor</Title3>
-          <Text as="p">{hostMessage}</Text>
+          <Text as="p" data-testid="host-message">
+            {hostMessage}
+          </Text>
           <RemoteBoundary onRetry={() => setRemoteKey((value) => value + 1)}>
             <Suspense fallback={<Text>Loading automation editor…</Text>}>
               <AutomationPanel

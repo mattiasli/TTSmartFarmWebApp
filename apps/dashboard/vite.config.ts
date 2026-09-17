@@ -6,23 +6,26 @@ import { federationShared } from '../../tools/scripts/federation-shared.mjs';
 const remoteEntry =
   process.env.VITE_AUTOMATIONS_REMOTE_URL ?? 'http://127.0.0.1:5174/remoteEntry.js';
 
-export default defineConfig({
+export default defineConfig(({ isPreview }) => ({
   server: {
     host: '127.0.0.1',
     port: 5173,
     strictPort: true,
     origin: 'http://127.0.0.1:5173',
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:3001',
-        changeOrigin: true,
-      },
-    },
+    proxy: isPreview
+      ? undefined
+      : {
+          '/api': {
+            target: 'http://127.0.0.1:3001',
+            changeOrigin: true,
+          },
+        },
   },
   preview: {
     host: '127.0.0.1',
     port: 4173,
     strictPort: true,
+    proxy: {},
   },
   build: {
     target: 'es2022',
@@ -47,4 +50,4 @@ export default defineConfig({
     }),
     react(),
   ],
-});
+}));

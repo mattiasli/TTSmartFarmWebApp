@@ -69,6 +69,7 @@ export function Dashboard() {
   const sessionQuery = useQuery({
     queryKey: ['session'],
     queryFn: ensureSession,
+    retry: 0,
   });
 
   const snapshotQuery = useQuery({
@@ -170,7 +171,7 @@ export function Dashboard() {
 
       <section className="section">
         <Title3>Controls</Title3>
-        <Text as="p" data-testid="host-message">
+        <Text as="p" data-testid="control-status">
           {pending ? 'Waiting for the farm to confirm a command.' : 'Ready for manual commands.'}
         </Text>
         <div className="control-row">
