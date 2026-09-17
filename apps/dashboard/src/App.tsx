@@ -1,6 +1,6 @@
 import { Text, Title3 } from '@fluentui/react-components';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Dashboard } from './Dashboard';
 import { RemoteBoundary } from './RemoteBoundary';
 
@@ -12,6 +12,15 @@ const queryClient = new QueryClient({
 export function App() {
   const [hostMessage, setHostMessage] = useState('Waiting for the federated editor.');
   const [remoteKey, setRemoteKey] = useState(0);
+
+  useEffect(() => {
+    const onRemoteNotify = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail;
+      if (typeof detail === 'string') setHostMessage(detail);
+    };
+    window.addEventListener('smartfarm-federation-notify', onRemoteNotify);
+    return () => window.removeEventListener('smartfarm-federation-notify', onRemoteNotify);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

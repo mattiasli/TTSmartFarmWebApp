@@ -48,7 +48,9 @@ export function AutomationPanel({ farmName = 'TT SmartFarm', onNotify }: ProbePr
                 appearance="primary"
                 data-testid="notify-host"
                 onClick={() => {
-                  onNotify?.('Remote dialog used a React hook and notified the host.');
+                  const message = 'Remote dialog used a React hook and notified the host.';
+                  onNotify?.(message);
+                  window.dispatchEvent(new CustomEvent('smartfarm-federation-notify', { detail: message }));
                   setOpen(false);
                 }}
               >
