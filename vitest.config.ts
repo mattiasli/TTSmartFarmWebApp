@@ -6,6 +6,7 @@ export default defineConfig({
       'packages/**/*.test.ts',
       'apps/**/*.test.ts',
       'tools/simulator/src/**/*.test.ts',
+      'tools/scripts/**/*.test.mjs',
     ],
     exclude: ['**/dist/**', '**/node_modules/**', 'tests/federation/**', 'tests/e2e/**'],
     environment: 'node',

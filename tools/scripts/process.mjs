@@ -1,16 +1,36 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
 
-const npmCli = path.join(path.dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js');
+export function resolveNpmCli() {
+  const fromEnv = process.env.npm_execpath;
+  if (fromEnv?.endsWith('.js') && existsSync(fromEnv)) return fromEnv;
+
+  const nodeDir = path.dirname(process.execPath);
+  const candidates = [
+    path.join(nodeDir, 'node_modules/npm/bin/npm-cli.js'),
+    path.join(nodeDir, '../lib/node_modules/npm/bin/npm-cli.js'),
+  ];
+  return candidates.find((candidate) => existsSync(candidate)) ?? null;
+}
 
 export function spawnNpm(args, { cwd, env, prefix } = {}) {
-  const child = spawn(process.execPath, [npmCli, ...args], {
-    cwd,
-    env: { ...process.env, ...env, FORCE_COLOR: '1' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-    windowsHide: true,
-  });
+  const npmCli = resolveNpmCli();
+  const child = npmCli
+    ? spawn(process.execPath, [npmCli, ...args], {
+        cwd,
+        env: { ...process.env, ...env, FORCE_COLOR: '1' },
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
+      })
+    : spawn('npm', args, {
+        cwd,
+        env: { ...process.env, ...env, FORCE_COLOR: '1' },
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell: process.platform === 'win32',
+        windowsHide: true,
+      });
 
   const write = (chunk, stream) => {
     const text = chunk.toString();
