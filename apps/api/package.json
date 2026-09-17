@@ -8,8 +8,8 @@
     "build": "tsc --noEmit -p tsconfig.json --pretty false",
     "start": "tsx src/main.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json --pretty false",
-    "db:migrate": "node -e \"console.log('Migrations are implemented in P05.')\"",
-    "db:seed:local": "node -e \"console.log('Local seed is implemented in P05.')\""
+    "db:migrate": "tsx src/db/run-migrate.ts",
+    "db:seed:local": "tsx src/db/run-migrate.ts"
   },
   "dependencies": {
     "@fastify/cookie": "11.1.2",
@@ -18,10 +18,14 @@
     "@fastify/websocket": "11.3.0",
     "@smartfarm/contracts": "0.1.0",
     "@smartfarm/domain": "0.1.0",
+    "@smartfarm/simulator": "0.1.0",
     "fastify": "5.12.5",
+    "mqtt": "5.16.0",
+    "pg": "8.23.0",
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@types/pg": "8.23.1",
     "tsx": "4.23.13"
   }
 }

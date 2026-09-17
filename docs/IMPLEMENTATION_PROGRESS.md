@@ -6,13 +6,13 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 Source SHA / working-tree scope: local nested git in `smartFarmRemoteWebApp/` (HEAD `aca4fec` at session start). Dedicated GitHub remote: `https://github.com/mattiasli/TTSmartFarmWebApp`. Parent farm repository files were not modified.
 
-Completed package IDs: P00, P01. P03 protocol parser/commands/settings/freshness/normalization tests are in place. P04 farm model started (in-memory, no MQTT broker yet).
+Completed package IDs: P00, P01, P03 protocol tests, P04 in-memory + loopback MQTT simulator, P05 SQL migrations (Postgres optional), local command API, P10 sensor/control dashboard against the simulator.
 
 Tests run and actual results:
 
 - `npm run typecheck` — pass
 - `npm run lint` — pass
-- `npm run test:unit` — 24 passed
+- `npm run test:unit` — 32 passed including loopback MQTT telemetry and API fan command
 - `npm run test:federation` — 1 passed (production host 4173 + remote 4174)
 
 Built/deployed artifact identifiers: local only. Remote entry `apps/automations-remote/dist/remoteEntry.js`. Host `apps/dashboard/dist`.
@@ -23,7 +23,9 @@ Known limitations / failed gates: G00 and G01 passed locally. G02 hosted topolog
 
 Missing inputs (names only, never secret values): Railway/Vercel deployment access not required for local work. GitHub OAuth app not registered yet. GitHub push credentials were not used in this session.
 
-Next concrete task and its prerequisite: finish remaining P03 protocol cases and local simulator (P04). Hosted P02 waits on Vercel/Railway access.
+GitHub: `origin` is `https://github.com/mattiasli/TTSmartFarmWebApp.git`. Scaffold commit `4e7a3dd` was pushed to `master`.
+
+Next concrete task: GitHub OAuth/sessions in Postgres (P06), MQTT controller lock (P07), then the full automation engine (P09). Hosted P02 still waits on Vercel/Railway. Docker Desktop was not running; Postgres migrations exist but local demo uses in-memory stores.
 
 ### P00 notes
 

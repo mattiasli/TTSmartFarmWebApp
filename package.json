@@ -27,6 +27,7 @@
     "db:migrate": "npm run db:migrate -w @smartfarm/api",
     "db:seed:local": "npm run db:seed:local -w @smartfarm/api",
     "simulator": "npm run start -w @smartfarm/simulator",
+    "broker": "npm run broker -w @smartfarm/simulator",
     "check:client-secrets": "node tools/scripts/check-client-secrets.mjs",
     "check:contracts": "vitest run packages/domain packages/contracts",
     "preview:host": "npm run preview -w @smartfarm/dashboard",

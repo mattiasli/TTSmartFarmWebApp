@@ -3,13 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/farm-model.ts",
+      "default": "./src/farm-model.ts"
+    }
+  },
   "scripts": {
     "start": "tsx src/main.ts",
+    "broker": "tsx src/main.ts --broker",
     "typecheck": "tsc --noEmit -p tsconfig.json --pretty false"
   },
   "dependencies": {
     "@smartfarm/contracts": "0.1.0",
-    "@smartfarm/domain": "0.1.0"
+    "@smartfarm/domain": "0.1.0",
+    "aedes": "1.2.0",
+    "mqtt": "5.16.0"
   },
   "devDependencies": {
     "tsx": "4.23.13"

@@ -20,6 +20,13 @@ describe('SimulatedFarm', () => {
     expect(farm.snapshot().pump).toBe(0);
   });
 
+  it('applies the empty-tank scenario before a pulse is attempted', () => {
+    const farm = new SimulatedFarm();
+    farm.applyScenario('empty-tank');
+    expect(farm.snapshot().water).toBe(8);
+    expect(farm.snapshot().pumpBlocked).toBe(1);
+  });
+
   it('clears a short beep without requiring a later buzz=1 packet', () => {
     const farm = new SimulatedFarm();
     farm.applyCommand('smartfarm/cmd/buzzer', '880', 0);

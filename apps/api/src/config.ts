@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LOCAL_FARM_ID, LOCAL_FARM_NAME } from '@smartfarm/contracts';
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -6,7 +7,13 @@ const schema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
   HOST: z.string().default('127.0.0.1'),
   PUBLIC_APP_ORIGIN: z.string().default('http://127.0.0.1:5173'),
+  ALLOWED_BROWSER_ORIGINS: z.string().default('http://127.0.0.1:5173,http://localhost:5173'),
   FARM_MODE: z.enum(['simulator', 'live']).default('simulator'),
+  FARM_ID: z.string().uuid().default(LOCAL_FARM_ID),
+  FARM_NAME: z.string().default(LOCAL_FARM_NAME),
+  SIMULATOR_TRANSPORT: z.enum(['memory', 'mqtt']).default('memory'),
+  SIMULATOR_MQTT_URL: z.string().default('mqtt://127.0.0.1:1883'),
+  DATABASE_URL: z.string().optional(),
   LIVE_COMMANDS_ENABLED: z
     .string()
     .optional()
@@ -20,13 +27,22 @@ const schema = z.object({
 export type AppConfig = z.infer<typeof schema>;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
+  if ((env.APP_ENV ?? 'local') === 'production' && (env.FARM_MODE ?? 'simulator') === 'simulator') {
+    throw new Error('Production cannot run in simulator mode.');
+  }
   return schema.parse({
     NODE_ENV: env.NODE_ENV ?? 'development',
     APP_ENV: env.APP_ENV ?? 'local',
     PORT: env.PORT ?? '3001',
     HOST: env.HOST ?? '127.0.0.1',
     PUBLIC_APP_ORIGIN: env.PUBLIC_APP_ORIGIN ?? 'http://127.0.0.1:5173',
+    ALLOWED_BROWSER_ORIGINS: env.ALLOWED_BROWSER_ORIGINS,
     FARM_MODE: env.FARM_MODE ?? 'simulator',
+    FARM_ID: env.FARM_ID ?? LOCAL_FARM_ID,
+    FARM_NAME: env.FARM_NAME ?? LOCAL_FARM_NAME,
+    SIMULATOR_TRANSPORT: env.SIMULATOR_TRANSPORT ?? 'memory',
+    SIMULATOR_MQTT_URL: env.SIMULATOR_MQTT_URL ?? 'mqtt://127.0.0.1:1883',
+    DATABASE_URL: env.DATABASE_URL,
     LIVE_COMMANDS_ENABLED: env.LIVE_COMMANDS_ENABLED ?? 'false',
     LIVE_PUMP_ENABLED: env.LIVE_PUMP_ENABLED ?? 'false',
   });
@@ -39,5 +55,7 @@ export function redactedConfig(config: AppConfig) {
     liveCommandsEnabled: config.LIVE_COMMANDS_ENABLED,
     livePumpEnabled: config.LIVE_PUMP_ENABLED,
     publicAppOrigin: config.PUBLIC_APP_ORIGIN,
+    simulatorTransport: config.SIMULATOR_TRANSPORT,
+    databaseConfigured: Boolean(config.DATABASE_URL),
   };
 }

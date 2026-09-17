@@ -1,5 +1,5 @@
 import { HEALTHY_TELEMETRY_FIXTURE, type WireTelemetry } from '@smartfarm/contracts';
-import { validateMqttCommand } from '@smartfarm/domain';
+import { scenarioTelemetry, validateMqttCommand } from '@smartfarm/domain';
 
 const PUMP_MAX_MS = 4000;
 const BEEP_MS = 400;
@@ -13,6 +13,11 @@ export class SimulatedFarm {
 
   constructor(initial: WireTelemetry = { ...HEALTHY_TELEMETRY_FIXTURE }) {
     this.data = { ...initial };
+  }
+
+  applyScenario(name: string) {
+    this.data = scenarioTelemetry(name);
+    this.tick(0);
   }
 
   applyCommand(topic: string, payload: string, nowMs: number) {

@@ -1,10 +1,11 @@
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
+import path from 'node:path';
 
-export const npmBin = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const npmCli = path.join(path.dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js');
 
 export function spawnNpm(args, { cwd, env, prefix } = {}) {
-  const child = spawn(npmBin, args, {
+  const child = spawn(process.execPath, [npmCli, ...args], {
     cwd,
     env: { ...process.env, ...env, FORCE_COLOR: '1' },
     stdio: ['ignore', 'pipe', 'pipe'],

@@ -28,6 +28,17 @@ On Windows PowerShell, use `npm.cmd` if `npm.ps1` is blocked by execution policy
 
 The dashboard proxies `/api` to the local API.
 
+Default `npm run dev` uses an in-memory simulated farm inside the API, so Docker is not required for sensors and controls. Optional MQTT loop:
+
+```text
+npm run broker
+npm run simulator
+```
+
+Then set `SIMULATOR_TRANSPORT=mqtt` for the API. Docker Compose Postgres/Mosquitto remains the preferred integration stack when Docker Desktop is running.
+
+Local login is loopback-only (`POST /api/v1/local/login`). The dashboard does this automatically in local mode.
+
 ## Ports
 
 | Service | Port |

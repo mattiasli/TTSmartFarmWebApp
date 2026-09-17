@@ -10,11 +10,55 @@ body {
 }
 
 .page {
-  max-width: 960px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 24px 16px 48px;
   display: grid;
-  gap: 16px;
+  gap: 24px;
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+}
+
+.status-row,
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.sensor-grid.stale {
+  opacity: 0.72;
+}
+
+.sensor-card {
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.sensor-label,
+.sensor-hint {
+  display: block;
+}
+
+.sensor-value {
+  display: block;
+  font-size: 1.25rem;
+}
+
+.lcd-fields {
+  display: grid;
+  gap: 8px;
 }
 
 .host-message {

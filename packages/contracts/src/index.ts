@@ -3,3 +3,4 @@ export * from './commands';
 export * from './automations';
 export * from './realtime';
 export * from './federation';
+export * from './snapshot';
