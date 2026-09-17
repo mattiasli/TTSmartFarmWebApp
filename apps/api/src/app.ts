@@ -257,13 +257,24 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     if (!requireOperator(request, reply, id)) return;
     try {
       const settings = automationSettingsSchema.parse(request.body);
-      return controller.configure(settings);
+      const match = request.headers['if-match'];
+      const expected = typeof match === 'string' && match !== '' ? Number(match) : undefined;
+      return controller.configure(settings, expected);
     } catch (error) {
       if (error instanceof ZodError) {
         return sendError(reply, 400, 'VALIDATION', error.issues[0]?.message ?? 'Invalid settings.', id);
       }
+      if (error instanceof Error && (error as Error & { code?: string }).code === 'REVISION') {
+        return sendError(reply, 409, 'REVISION', error.message, id);
+      }
       throw error;
     }
+  });
+
+  app.post('/api/v1/farms/:farmId/automations/sync-guard', async (request, reply) => {
+    const id = requestId();
+    if (!requireOperator(request, reply, id)) return;
+    return controller.syncGuard();
   });
 
   return app;

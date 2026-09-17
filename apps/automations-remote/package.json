@@ -12,6 +12,7 @@
   "dependencies": {
     "@fluentui/react-components": "9.74.7",
     "@smartfarm/contracts": "0.1.0",
+    "@smartfarm/domain": "0.1.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

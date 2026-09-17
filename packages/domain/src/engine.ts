@@ -108,6 +108,13 @@ export class AutomationEngine {
     this.evaluate();
   }
 
+  syncGuard() {
+    this.guardDirty = true;
+    delete this.faults.guard;
+    this.pending.delete('pumpguard');
+    this.evaluate();
+  }
+
   start() {
     if (!this.fresh) throw new Error('Wait for fresh farm readings before starting automations.');
     this.enabled = true;

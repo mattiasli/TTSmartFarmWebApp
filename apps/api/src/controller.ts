@@ -109,9 +109,20 @@ export class FarmController {
     return this.snapshot();
   }
 
-  configure(settings: AutomationSettings) {
+  configure(settings: AutomationSettings, expectedRevision?: number) {
+    if (expectedRevision !== undefined && expectedRevision !== this.settingsRevision) {
+      const error = new Error('Settings were updated elsewhere. Reload and apply again.');
+      (error as Error & { code: string }).code = 'REVISION';
+      throw error;
+    }
     this.engine.configure(settings);
     this.settingsRevision += 1;
+    this.drive();
+    return this.snapshot();
+  }
+
+  syncGuard() {
+    this.engine.syncGuard();
     this.drive();
     return this.snapshot();
   }

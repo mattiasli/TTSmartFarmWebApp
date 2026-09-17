@@ -74,4 +74,37 @@ describe('api health and local commands', () => {
     expect(started.statusCode).toBe(200);
     expect(started.json().automations.runtime.masterEnabled).toBe(true);
   });
+
+  it('rejects a stale automation settings revision', async () => {
+    const app = await buildApp(loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: 'simulator' }));
+    apps.push(app);
+    const login = await app.inject({ method: 'POST', url: '/api/v1/local/login' });
+    const csrf = login.json().csrfToken as string;
+    const cookie = login.cookies.find((entry) => entry.name === 'smartfarm_session');
+    const headers = {
+      'content-type': 'application/json',
+      'x-csrf-token': csrf,
+      cookie: `smartfarm_session=${cookie?.value}`,
+    };
+    const snap = await app.inject({
+      method: 'GET',
+      url: `/api/v1/farms/${LOCAL_FARM_ID}/snapshot`,
+      headers,
+    });
+    const settings = snap.json().automations.settings;
+    const first = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/farms/${LOCAL_FARM_ID}/automations/settings`,
+      headers: { ...headers, 'if-match': '1' },
+      payload: { ...settings, soilDry: 40 },
+    });
+    expect(first.statusCode).toBe(200);
+    const stale = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/farms/${LOCAL_FARM_ID}/automations/settings`,
+      headers: { ...headers, 'if-match': '1' },
+      payload: { ...settings, soilDry: 41 },
+    });
+    expect(stale.statusCode).toBe(409);
+  });
 });

@@ -1,7 +1,9 @@
 import {
   LOCAL_FARM_ID,
+  type AutomationSettings,
   type FarmCommandRequest,
   type FarmSnapshot,
+  type RuleId,
   type SessionDto,
 } from '@smartfarm/contracts';
 
@@ -54,6 +56,39 @@ export function startAutomations() {
 
 export function pauseAutomations() {
   return request<FarmSnapshot>(`/api/v1/farms/${LOCAL_FARM_ID}/automations/pause`, {
+    method: 'POST',
+    headers: { 'Idempotency-Key': crypto.randomUUID() },
+  });
+}
+
+export function saveAutomationSettings(draft: AutomationSettings, expectedRevision: number) {
+  return request<FarmSnapshot>(`/api/v1/farms/${LOCAL_FARM_ID}/automations/settings`, {
+    method: 'PUT',
+    headers: {
+      'Idempotency-Key': crypto.randomUUID(),
+      'If-Match': String(expectedRevision),
+    },
+    body: JSON.stringify(draft),
+  });
+}
+
+export function resumeAutomationRule(rule: RuleId) {
+  return request<FarmSnapshot>(`/api/v1/farms/${LOCAL_FARM_ID}/automations/resume-rule`, {
+    method: 'POST',
+    headers: { 'Idempotency-Key': crypto.randomUUID() },
+    body: JSON.stringify({ rule }),
+  });
+}
+
+export function resetWatering() {
+  return request<FarmSnapshot>(`/api/v1/farms/${LOCAL_FARM_ID}/automations/reset-watering`, {
+    method: 'POST',
+    headers: { 'Idempotency-Key': crypto.randomUUID() },
+  });
+}
+
+export function syncGuard() {
+  return request<FarmSnapshot>(`/api/v1/farms/${LOCAL_FARM_ID}/automations/sync-guard`, {
     method: 'POST',
     headers: { 'Idempotency-Key': crypto.randomUUID() },
   });
