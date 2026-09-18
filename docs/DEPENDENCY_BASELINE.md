@@ -6,8 +6,10 @@ Pin exact direct dependency versions. Do not treat `latest` ranges as the soluti
 
 | Tool | Version |
 |---|---|
-| Node | 24.21.0 |
-| npm | 11.19.0 |
+| Node | 24.21.0 local/CI; Vercel currently supplies 24.19.0 |
+| npm | 11.19.0 local/CI; Vercel currently supplies 11.17.0 |
+
+`package.json` `engines` allow Node `>=24.19.0 <25` and npm `>=11.17.0 <12` so hosted installs are not blocked on an exact patch. `.node-version` stays `24.21.0` for local and GitHub Actions.
 
 ## Selected runtime set
 
