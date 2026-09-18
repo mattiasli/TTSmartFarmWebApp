@@ -7,6 +7,7 @@ Known public origins for this staging pass:
 - Host: `https://smartfarm-host.vercel.app`
 - Automations remote: `https://smartfarm-automations.vercel.app`
 - Railway project: `smartfarm-staging` (Postgres linked to `_default-service`)
+- Railway API: `https://default-service-production.up.railway.app`
 
 ## 1. GitHub OAuth app
 
@@ -41,7 +42,7 @@ Variables (in addition to the existing `DATABASE_URL` reference):
 | `LIVE_PUMP_ENABLED` | `false` |
 | `PUBLIC_APP_ORIGIN` | `https://smartfarm-host.vercel.app` |
 | `ALLOWED_BROWSER_ORIGINS` | `https://smartfarm-host.vercel.app` |
-| `PUBLIC_WS_URL` | `wss://<railway-public-host>/ws` |
+| `PUBLIC_WS_URL` | `wss://default-service-production.up.railway.app/ws` |
 | `BOOTSTRAP_ADMIN_GITHUB_ID` | `43301236` |
 | `BOOTSTRAP_ADMIN_USERNAME` | `mattiasli` |
 | `GITHUB_OAUTH_CLIENT_ID` | from the OAuth app |
@@ -51,7 +52,7 @@ Do **not** set `HIVEMQ_*`. Do not set `FARM_MODE=live`.
 
 `PORT` is assigned by Railway. The process listens on `0.0.0.0`. Health check path is `/health/ready`. Startup runs migrations, then seeds the bootstrap admin.
 
-After deploy, `GET https://<railway-public-host>/health/ready` should return JSON with `farmMode: "simulator"`.
+After deploy, `GET https://default-service-production.up.railway.app/health/ready` should return JSON with `farmMode: "simulator"`.
 
 ## 3. Vercel host project (`smartfarm-host`)
 
@@ -64,11 +65,11 @@ Environment variables (Production):
 | `VITE_APP_ENV` | `staging` |
 | `VITE_API_BASE` | `/api` |
 | `VITE_AUTOMATIONS_REMOTE_URL` | `https://smartfarm-automations.vercel.app/remoteEntry.js` |
-| `VITE_REALTIME_URL` | `wss://<railway-public-host>/ws` |
+| `VITE_REALTIME_URL` | `wss://default-service-production.up.railway.app/ws` |
 
 No `DATABASE_URL`, HiveMQ, or OAuth secret on Vercel.
 
-After the Railway public host is known, `apps/dashboard/vercel.json` must rewrite `/api/:path*` to `https://<railway-public-host>/api/:path*` **before** the SPA fallback. Redeploy the host after that change.
+`apps/dashboard/vercel.json` rewrites `/api/:path*` to `https://default-service-production.up.railway.app/api/:path*` **before** the SPA fallback. Redeploy the host after pulling this commit.
 
 ## 4. Vercel remote project (`smartfarm-automations`)
 

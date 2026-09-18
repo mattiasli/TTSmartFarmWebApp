@@ -4,7 +4,7 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Session 2026-09-18 (P13 start)
 
-Railway project `smartfarm-staging` has Postgres linked. Vercel host `https://smartfarm-host.vercel.app` and remote `https://smartfarm-automations.vercel.app` exist. Added root `Dockerfile` / `railway.toml` and [docs/DEPLOYMENT.md](DEPLOYMENT.md). Live commands/pump stay false. G02 still needs Railway public domain, OAuth client on Railway, and the host `/api` rewrite.
+Railway project `smartfarm-staging` has Postgres linked. Public API host is `default-service-production.up.railway.app`. Vercel host `https://smartfarm-host.vercel.app` and remote `https://smartfarm-automations.vercel.app` exist. Host `/api` rewrite now targets that Railway origin. Live commands/pump stay false. G02 still needs a healthy Railway deploy, OAuth on Railway, and host env/redeploy.
 
 ## Session 2026-09-18 (P12)
 

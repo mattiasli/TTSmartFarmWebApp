@@ -4,7 +4,7 @@
   "buildCommand": "cd ../.. && npm run build -w @smartfarm/dashboard",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://REPLACE_RAILWAY_API/api/:path*" },
+    { "source": "/api/:path*", "destination": "https://default-service-production.up.railway.app/api/:path*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
