@@ -6,6 +6,8 @@ import type { WireTelemetry } from './telemetry';
 export const LOCAL_FARM_ID = '11111111-1111-4111-8111-111111111111';
 export const LOCAL_FARM_NAME = 'TT SmartFarm';
 
+export type ControllerOwnership = 'owner' | 'waiting_for_owner' | 'draining';
+
 export type ConnectionView = {
   controllerReady: boolean;
   brokerReady: boolean;
@@ -13,6 +15,9 @@ export type ConnectionView = {
   telemetryAgeMs: number | null;
   transport: 'memory' | 'mqtt';
   status: 'live' | 'stale' | 'offline';
+  ownership: ControllerOwnership;
+  controllerEpoch: string;
+  mqttEpoch: string | null;
 };
 
 export type NormalizedReadings = {

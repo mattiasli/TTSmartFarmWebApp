@@ -19,6 +19,7 @@ import { SessionService, type RequestSession } from './auth/session';
 import { loadConfig, redactedConfig, type AppConfig } from './config';
 import { FarmController } from './controller';
 import {
+  DedicatedControllerLock,
   FarmStore,
   IdempotencyConflictError,
   LastAdminError,
@@ -66,11 +67,16 @@ export async function createDeps(config: AppConfig): Promise<AppDeps> {
   const store = new FarmStore(pool);
   await seedLocal(pool, { farmId: config.FARM_ID, farmName: config.FARM_NAME });
   const saved = await store.getConfig(config.FARM_ID);
+  const lockKey = await store.getFarmLockKey(config.FARM_ID);
+  const lock = new DedicatedControllerLock(config.DATABASE_URL, lockKey);
+  const controller = new FarmController(config, link, () => Date.now(), store, {
+    settings: saved?.settings,
+    revision: saved?.revision,
+    lock,
+  });
+  await controller.becomeOwner();
   return {
-    controller: new FarmController(config, link, () => Date.now(), store, {
-      settings: saved?.settings,
-      revision: saved?.revision,
-    }),
+    controller,
     memorySessions: new MemorySessionStore(),
     store,
     pool,
@@ -215,9 +221,16 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   app.get('/health/live', async () => ({ status: 'ok' }));
   app.get('/health/ready', async () => ({
     status: 'ready',
-    controller: 'running',
+    controller: controller.ownership,
     ...redactedConfig(config),
   }));
+
+  app.get('/api/v1/diagnostics', async (request, reply) => {
+    const id = requestId();
+    const session = await requireSession(request, reply, id);
+    if (!session) return;
+    return controller.diagnostics();
+  });
 
   registerGithubOAuth(app, config, sessions, store, resolved.githubFetch);
   await registerRealtime(app, hub, sessions, store, config, origins);

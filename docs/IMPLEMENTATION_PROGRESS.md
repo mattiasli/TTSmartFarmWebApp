@@ -2,6 +2,30 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Session 2026-09-18 (P07)
+
+Source SHA / working-tree scope: `master` at `4354afd` plus local P07 changes.
+
+Completed this session: **P07** controller ownership, MQTT epochs, drain, and diagnostics.
+
+Notes:
+
+- Dedicated Postgres advisory lock is acquired at API start. A second process stays `/health/ready` with `waiting_for_owner` and mutations return 503 `CONTROLLER_UNAVAILABLE`.
+- `/health/ready` does not wait for lock ownership or farm telemetry.
+- MQTT reconnects mint a new epoch, drop current telemetry, and pause automations until explicit resume.
+- Retained telemetry is ignored. Age 4000 ms is stale.
+- Drain pauses automations, attempts a bounded pump off while still owner, then releases the lock.
+- Live commands/pump remain disabled.
+
+Tests run and actual results:
+
+- `npm run typecheck` — pass
+- `npm run lint` — pass
+- `npm run test:unit` — 59 passed
+- `npm run test:integration` — 21 passed including two-process lock exclusion
+
+Next concrete task: **P08** durable command confirmation (state match, stop supersession, uncertain results) against the local broker.
+
 ## Session 2026-09-18 (P06)
 
 Source SHA / working-tree scope: `master` at `396f16c` plus local P06 changes.

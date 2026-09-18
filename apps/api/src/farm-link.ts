@@ -11,15 +11,21 @@ export type LatestTelemetry = {
 export type FarmLink = {
   transport: 'memory' | 'mqtt';
   ready: boolean;
+  mqttEpoch: string;
   lcd: { line1: string; line2: string; remote: boolean };
   latest(): LatestTelemetry | null;
   publish(topic: string, payload: string): Promise<void>;
   close(): Promise<void>;
 };
 
+function newEpoch() {
+  return crypto.randomUUID();
+}
+
 export class MemoryFarmLink implements FarmLink {
   readonly transport = 'memory' as const;
   ready = true;
+  mqttEpoch = newEpoch();
   farm = new SimulatedFarm();
   private started = Date.now();
   private current: LatestTelemetry | null = null;
@@ -55,9 +61,48 @@ export class MemoryFarmLink implements FarmLink {
   }
 }
 
+export class ScriptedFarmLink implements FarmLink {
+  readonly transport = 'mqtt' as const;
+  ready = true;
+  mqttEpoch = newEpoch();
+  lcd = { line1: 'Scripted', line2: '', remote: false };
+  private current: LatestTelemetry | null = null;
+  published: Array<{ topic: string; payload: string; epoch: string }> = [];
+
+  latest() {
+    return this.current;
+  }
+
+  inject(data: WireTelemetry, receivedAtMs = Date.now(), retain = false) {
+    if (retain) return;
+    this.current = { data, receivedAtMs };
+  }
+
+  disconnect() {
+    this.ready = false;
+    this.current = null;
+  }
+
+  reconnect() {
+    this.ready = true;
+    this.mqttEpoch = newEpoch();
+    this.current = null;
+  }
+
+  async publish(topic: string, payload: string) {
+    if (!this.ready) throw new Error('MQTT client is not ready.');
+    this.published.push({ topic, payload, epoch: this.mqttEpoch });
+  }
+
+  async close() {
+    this.ready = false;
+  }
+}
+
 export class MqttFarmLink implements FarmLink {
   readonly transport = 'mqtt' as const;
   ready = false;
+  mqttEpoch = newEpoch();
   lcd = { line1: 'Smart Farm MQTT', line2: 'Starting...', remote: false };
   private current: LatestTelemetry | null = null;
   private client: MqttClient;
@@ -65,12 +110,15 @@ export class MqttFarmLink implements FarmLink {
   constructor(url: string) {
     const parsed = assertLoopbackMqttUrl(url);
     this.client = mqtt.connect(parsed.toString(), {
-      clientId: `smartfarm-web-local-${Math.random().toString(16).slice(2)}`,
+      clientId: `smartfarm-web-${this.mqttEpoch.slice(0, 8)}`,
       clean: true,
       queueQoSZero: false,
       protocolVersion: 4,
+      reconnectPeriod: 2000,
     });
     this.client.on('connect', () => {
+      this.mqttEpoch = newEpoch();
+      this.current = null;
       this.ready = true;
       this.client.subscribe(TELEMETRY_TOPIC, { qos: 0 });
     });
