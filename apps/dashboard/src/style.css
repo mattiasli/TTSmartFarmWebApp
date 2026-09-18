@@ -73,3 +73,66 @@ body {
   min-height: 1.5rem;
   margin: 0;
 }
+
+.host-bar,
+.host-nav,
+.host-emergency {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.host-nav a {
+  color: inherit;
+  text-underline-offset: 4px;
+}
+
+.host-nav a[aria-current='page'] {
+  font-weight: 600;
+}
+
+.diagnostics {
+  overflow: auto;
+  max-height: 240px;
+  font-size: 0.85rem;
+}
+
+.lcd-preview {
+  margin: 0;
+  font-family: ui-monospace, Consolas, monospace;
+  white-space: pre;
+}
+
+.history-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  min-height: 84px;
+}
+
+.history-bar {
+  flex: 1;
+  min-width: 4px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+@media (max-width: 360px) {
+  .page {
+    padding: 12px 8px 32px;
+  }
+
+  .host-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

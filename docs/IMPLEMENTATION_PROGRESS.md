@@ -2,6 +2,28 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Session 2026-09-18 (P10)
+
+Source SHA / working-tree scope: `master` at `1a1a9ca` plus local P10 changes.
+
+Completed this session: **P10** host routes, live snapshot UI, history/events APIs, and host Pause/All off.
+
+Notes:
+
+- Host routes cover login, dashboard, automations, history, settings, access-denied, and not-found. `/` still includes Dashboard plus the federated editor so G01/`host-all-off` stay on the home page.
+- Live client uses a one-shot WS ticket with HTTP poll fallback; envelope epoch/sequence filtering is unit-tested. WS snapshots overlay session permissions so viewers cannot inherit controller `canControl`.
+- Sensors, pending vs reported actuator labels, LCD n/16 dialog, history table/chart, paginated events, diagnostics/members, and host-owned Start/Pause/All off are in the Fluent host.
+- Memory sessions mint realtime tickets. History/events return empty arrays without PostgreSQL. Live commands/pump remain disabled.
+
+Tests run and actual results:
+
+- `npm run typecheck` — pass
+- `npm run lint` — pass
+- `npm run test:unit` — 93 passed
+- `npm run test:integration` — 25 passed
+
+Next concrete task: **P11** federated automation editor polish (G06). Live pumping stays disabled.
+
 ## Session 2026-09-18 (P09)
 
 Source SHA / working-tree scope: `master` at `7ba4b8e` plus local P09 changes.

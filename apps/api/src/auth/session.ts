@@ -66,7 +66,7 @@ export class SessionService {
     const memory = this.memory.get(token);
     if (!memory) return null;
     return {
-      id: null,
+      id: memory.id,
       userId: null,
       githubId: null,
       tokenHash: memory.tokenHash,
@@ -118,7 +118,7 @@ export class SessionService {
     created.session.farmId = this.config.FARM_ID || LOCAL_FARM_ID;
     setSessionCookie(reply, this.config, created.token);
     return {
-      id: null,
+      id: created.session.id,
       userId: null,
       githubId: null,
       tokenHash: created.session.tokenHash,

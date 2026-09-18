@@ -73,3 +73,23 @@ export type SessionDto = {
   username: string | null;
   githubLoginEnabled: boolean;
 };
+
+export type HistorySeriesPointDto = {
+  bucket: string;
+  min: number | null;
+  max: number | null;
+  avg: number | null;
+  count: number;
+};
+
+export type FarmEventDto = {
+  id: string;
+  category: string;
+  severity: 'debug' | 'info' | 'warning' | 'error';
+  details: Record<string, unknown>;
+  createdAt: string;
+  commandId: string | null;
+};
+
+export const HISTORY_SERIES = ['t', 'h', 'soil', 'water', 'light', 'steam', 'dist', 'rssi'] as const;
+export type HistorySeries = (typeof HISTORY_SERIES)[number];

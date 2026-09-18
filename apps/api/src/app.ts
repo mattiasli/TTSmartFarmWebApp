@@ -3,11 +3,13 @@ import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
 import type pg from 'pg';
 import { ZodError } from 'zod';
 import {
+  HISTORY_SERIES,
   LOCAL_FARM_ID,
   RULE_IDS,
   automationSettingsSchema,
   farmCommandRequestSchema,
   type FarmSnapshot,
+  type HistorySeries,
   type RuleId,
   type SessionDto,
 } from '@smartfarm/contracts';
@@ -23,6 +25,7 @@ import {
   FarmStore,
   IdempotencyConflictError,
   LastAdminError,
+  QueryWindowError,
   RevisionConflictError,
   createPool,
   seedLocal,
@@ -115,7 +118,14 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
       .map((value) => value.trim())
       .filter(Boolean),
   );
-  const hub = new RealtimeHub(config, sessions, store, () => controller.snapshot(), origins);
+  const hub = new RealtimeHub(
+    config,
+    sessions,
+    store,
+    () => controller.snapshot(),
+    origins,
+    memorySessions,
+  );
   hub.start();
 
   app.addHook('onClose', async () => {
@@ -242,7 +252,7 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   });
 
   registerGithubOAuth(app, config, sessions, store, resolved.githubFetch);
-  await registerRealtime(app, hub, sessions, store, config, origins);
+  await registerRealtime(app, hub, sessions, store, config, origins, memorySessions);
 
   app.get('/api/v1/session', async (request) => sessionDto(await currentSession(request)));
 
@@ -307,6 +317,8 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
           : crypto.randomUUID();
       const actor = session.userId ? `user:${session.userId}` : `user:${session.username}`;
       const command = await controller.command(parsed, idempotencyKey, actor);
+      hub.publish('command', command, farmId);
+      hub.publish('snapshot', withPermissions(controller.snapshot(), session), farmId);
       return reply.status(202).send(command);
     } catch (error) {
       if (error instanceof CommandPolicyError) {
@@ -325,10 +337,13 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   app.post('/api/v1/farms/:farmId/automations/start', async (request, reply) => {
     const id = requestId();
     const { farmId } = request.params as { farmId: string };
-    if (!(await requireRole(request, reply, id, farmId, 'operator'))) return;
+    const session = await requireRole(request, reply, id, farmId, 'operator');
+    if (!session) return;
     try {
-      const session = await currentSession(request);
-      return withPermissions(controller.startAutomations(), session!);
+      const next = withPermissions(controller.startAutomations(), session);
+      hub.publish('automation', next.automations, farmId);
+      hub.publish('snapshot', next, farmId);
+      return next;
     } catch (error) {
       return sendError(reply, 422, 'AUTOMATION', error instanceof Error ? error.message : 'Cannot start.', id);
     }
@@ -339,7 +354,10 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     const { farmId } = request.params as { farmId: string };
     const session = await requireRole(request, reply, id, farmId, 'operator');
     if (!session) return;
-    return withPermissions(controller.pauseAutomations(), session);
+    const next = withPermissions(controller.pauseAutomations(), session);
+    hub.publish('automation', next.automations, farmId);
+    hub.publish('snapshot', next, farmId);
+    return next;
   });
 
   app.post('/api/v1/farms/:farmId/automations/resume-rule', async (request, reply) => {
@@ -352,7 +370,9 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
       return sendError(reply, 400, 'VALIDATION', 'Unknown automation.', id);
     }
     controller.resumeRule(body.rule as RuleId);
-    return withPermissions(controller.snapshot(), session);
+    const next = withPermissions(controller.snapshot(), session);
+    hub.publish('snapshot', next, farmId);
+    return next;
   });
 
   app.post('/api/v1/farms/:farmId/automations/reset-watering', async (request, reply) => {
@@ -361,7 +381,9 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     const session = await requireRole(request, reply, id, farmId, 'operator');
     if (!session) return;
     try {
-      return withPermissions(controller.resetWatering(), session);
+      const next = withPermissions(controller.resetWatering(), session);
+      hub.publish('snapshot', next, farmId);
+      return next;
     } catch (error) {
       return sendError(reply, 422, 'AUTOMATION', error instanceof Error ? error.message : 'Cannot reset.', id);
     }
@@ -376,7 +398,9 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
       const settings = automationSettingsSchema.parse(request.body);
       const match = request.headers['if-match'];
       const expected = typeof match === 'string' && match !== '' ? Number(match) : undefined;
-      return withPermissions(await controller.configure(settings, expected), session);
+      const next = withPermissions(await controller.configure(settings, expected), session);
+      hub.publish('snapshot', next, farmId);
+      return next;
     } catch (error) {
       if (error instanceof ZodError) {
         return sendError(reply, 400, 'VALIDATION', error.issues[0]?.message ?? 'Invalid settings.', id);
@@ -393,7 +417,9 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     const { farmId } = request.params as { farmId: string };
     const session = await requireRole(request, reply, id, farmId, 'operator');
     if (!session) return;
-    return withPermissions(controller.syncGuard(), session);
+    const next = withPermissions(controller.syncGuard(), session);
+    hub.publish('snapshot', next, farmId);
+    return next;
   });
 
   app.get('/api/v1/farms/:farmId/members', async (request, reply) => {
@@ -448,6 +474,94 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
       if (error instanceof LastAdminError) return sendError(reply, 409, error.code, error.message, id);
       throw error;
     }
+  });
+
+  app.get('/api/v1/farms/:farmId/history', async (request, reply) => {
+    const id = requestId();
+    const { farmId } = request.params as { farmId: string };
+    const session = await requireFarm(request, reply, id, farmId);
+    if (!session) return;
+    const query = request.query as { from?: string; to?: string; path?: string; bucketSeconds?: string };
+    const path = query.path ?? 't';
+    if (!HISTORY_SERIES.includes(path as HistorySeries)) {
+      return sendError(reply, 400, 'VALIDATION', 'Unsupported history series.', id);
+    }
+    const to = query.to ? new Date(query.to) : new Date();
+    const from = query.from ? new Date(query.from) : new Date(to.getTime() - 60 * 60 * 1000);
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+      return sendError(reply, 400, 'VALIDATION', 'Invalid history range.', id);
+    }
+    if (!store) {
+      return { path, from: from.toISOString(), to: to.toISOString(), points: [] };
+    }
+    try {
+      const points = await store.queryHistory({
+        farmId,
+        from,
+        to,
+        path,
+        bucketSeconds: query.bucketSeconds ? Number(query.bucketSeconds) : undefined,
+      });
+      return {
+        path,
+        from: from.toISOString(),
+        to: to.toISOString(),
+        points: points.map((point) => ({
+          bucket: point.bucket.toISOString(),
+          min: point.min,
+          max: point.max,
+          avg: point.avg,
+          count: point.count,
+        })),
+      };
+    } catch (error) {
+      if (error instanceof QueryWindowError) return sendError(reply, 400, error.code, error.message, id);
+      throw error;
+    }
+  });
+
+  app.get('/api/v1/farms/:farmId/events', async (request, reply) => {
+    const id = requestId();
+    const { farmId } = request.params as { farmId: string };
+    const session = await requireFarm(request, reply, id, farmId);
+    if (!session) return;
+    const query = request.query as { cursor?: string; limit?: string; category?: string };
+    if (!store) {
+      const pending = controller.snapshot().pendingCommands.map((command) => ({
+        id: command.id,
+        category: `command.${command.status}`,
+        severity: 'info' as const,
+        details: { action: command.action, reason: command.reason },
+        createdAt: command.requestedAt,
+        commandId: command.id,
+      }));
+      return { events: pending, nextCursor: null };
+    }
+    let cursor: { createdAt: string; id: string } | null = null;
+    if (query.cursor) {
+      try {
+        cursor = JSON.parse(query.cursor) as { createdAt: string; id: string };
+      } catch {
+        return sendError(reply, 400, 'VALIDATION', 'Invalid event cursor.', id);
+      }
+    }
+    const page = await store.listEvents({
+      farmId,
+      limit: query.limit ? Number(query.limit) : 50,
+      cursor,
+      category: query.category,
+    });
+    return {
+      events: page.events.map((event) => ({
+        id: event.id,
+        category: event.category,
+        severity: event.severity,
+        details: event.details,
+        createdAt: event.createdAt.toISOString(),
+        commandId: event.commandId,
+      })),
+      nextCursor: page.nextCursor,
+    };
   });
 
   return app;

@@ -9,6 +9,7 @@ import {
 } from '@smartfarm/contracts';
 import type { AppConfig } from '../config';
 import { AuthRecordExpiredError, randomToken, type FarmStore } from '../db';
+import type { MemorySessionStore } from '../sessions';
 import type { SessionService } from './session';
 
 const AUTH_TIMEOUT_MS = 5_000;
@@ -33,6 +34,7 @@ export class RealtimeHub {
   private sequence = 0;
   readonly serverEpoch = crypto.randomUUID();
   private heartbeat: ReturnType<typeof setInterval> | null = null;
+  private snapshotTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private readonly config: AppConfig,
@@ -40,13 +42,21 @@ export class RealtimeHub {
     private readonly store: FarmStore | null,
     private readonly snapshot: () => FarmSnapshot,
     private readonly origins: Set<string>,
+    private readonly memorySessions: MemorySessionStore | null = null,
   ) {}
 
   start() {
     this.heartbeat = setInterval(() => this.tick(), HEARTBEAT_MS);
+    this.heartbeat.unref?.();
+    this.snapshotTimer = setInterval(() => {
+      if (![...this.clients].some((client) => client.authed)) return;
+      this.publish('snapshot', this.snapshot());
+    }, 800);
+    this.snapshotTimer.unref?.();
   }
 
   async close() {
+    if (this.snapshotTimer) clearInterval(this.snapshotTimer);
     if (this.heartbeat) clearInterval(this.heartbeat);
     for (const client of this.clients) {
       try {
@@ -163,25 +173,35 @@ export class RealtimeHub {
           this.closeClient(client, 4401, 'auth_frame');
           return;
         }
-        if (!this.store) {
-          this.closeClient(client, 4401, 'tickets_require_database');
-          return;
+        let sessionId: string;
+        let farmId: string;
+        if (this.store) {
+          const ticket = await this.store.consumeWsTicket(parsed.ticket, client.origin);
+          const session = await this.store.getSessionById(ticket.sessionId);
+          if (!session || session.revokedAt || session.expiresAt.getTime() <= Date.now()) {
+            this.closeClient(client, 4401, 'session_invalid');
+            return;
+          }
+          sessionId = session.id;
+          farmId = ticket.farmId;
+        } else {
+          const ticket = this.memorySessions?.consumeTicket(parsed.ticket, client.origin);
+          if (!ticket) {
+            this.closeClient(client, 4401, 'ticket');
+            return;
+          }
+          sessionId = ticket.sessionId;
+          farmId = ticket.farmId;
         }
-        const ticket = await this.store.consumeWsTicket(parsed.ticket, client.origin);
-        const session = await this.store.getSessionById(ticket.sessionId);
-        if (!session || session.revokedAt || session.expiresAt.getTime() <= Date.now()) {
-          this.closeClient(client, 4401, 'session_invalid');
-          return;
-        }
-        if (this.sessionCount(session.id) >= MAX_SOCKETS_PER_SESSION) {
+        if (this.sessionCount(sessionId) >= MAX_SOCKETS_PER_SESSION) {
           this.closeClient(client, 4401, 'socket_limit');
           return;
         }
         client.authed = true;
-        client.sessionId = session.id;
-        client.farmId = ticket.farmId;
+        client.sessionId = sessionId;
+        client.farmId = farmId;
         clearTimeout(timer);
-        this.publish('snapshot', this.snapshot(), ticket.farmId);
+        this.publish('snapshot', this.snapshot(), farmId);
       } catch (error) {
         this.closeClient(client, 4401, error instanceof AuthRecordExpiredError ? 'ticket' : 'auth_failed');
       }
@@ -203,6 +223,7 @@ export async function registerRealtime(
   store: FarmStore | null,
   config: AppConfig,
   origins: Set<string>,
+  memorySessions: MemorySessionStore | null = null,
 ) {
   await app.register(websocket);
   app.get('/ws', { websocket: true }, (socket, request) => {
@@ -235,26 +256,45 @@ export async function registerRealtime(
         error: { code: 'NOT_FOUND', message: 'Farm not found.', requestId: crypto.randomUUID() },
       });
     }
-    if (!store || !session.id) {
+    if (!session.id) {
       return reply.status(503).send({
         error: {
           code: 'TICKETS_UNAVAILABLE',
-          message: 'Realtime tickets require PostgreSQL sessions.',
+          message: 'Realtime tickets require a session id.',
           requestId: crypto.randomUUID(),
         },
       });
     }
-    const rawTicket = randomToken(32);
-    const ticket = await store.createWsTicket({
-      sessionId: session.id,
-      farmId,
-      origin,
-      rawTicket,
-    });
+    let rawTicket: string;
+    let expiresAt: Date;
+    if (store) {
+      rawTicket = randomToken(32);
+      const ticket = await store.createWsTicket({
+        sessionId: session.id,
+        farmId,
+        origin,
+        rawTicket,
+      });
+      expiresAt = ticket.expiresAt;
+    } else {
+      const memory = memorySessions?.getById(session.id);
+      if (!memory || !memorySessions) {
+        return reply.status(503).send({
+          error: {
+            code: 'TICKETS_UNAVAILABLE',
+            message: 'Realtime tickets require a session.',
+            requestId: crypto.randomUUID(),
+          },
+        });
+      }
+      const created = memorySessions.createTicket(memory, origin);
+      rawTicket = created.raw;
+      expiresAt = created.expiresAt;
+    }
     reply.header('cache-control', 'private, no-store');
     return {
       ticket: rawTicket,
-      expiresAt: ticket.expiresAt.toISOString(),
+      expiresAt: expiresAt.toISOString(),
       wsUrl: config.PUBLIC_WS_URL,
     };
   });

@@ -2,7 +2,10 @@ import {
   LOCAL_FARM_ID,
   type AutomationSettings,
   type FarmCommandRequest,
+  type FarmEventDto,
   type FarmSnapshot,
+  type HistorySeries,
+  type HistorySeriesPointDto,
   type RuleId,
   type SessionDto,
 } from '@smartfarm/contracts';
@@ -98,5 +101,51 @@ export function syncGuard() {
   return request<FarmSnapshot>(`/api/v1/farms/${LOCAL_FARM_ID}/automations/sync-guard`, {
     method: 'POST',
     headers: { 'Idempotency-Key': crypto.randomUUID() },
+  });
+}
+
+export function createRealtimeTicket() {
+  return request<{ ticket: string; expiresAt: string; wsUrl: string }>('/api/v1/realtime/tickets', {
+    method: 'POST',
+    body: JSON.stringify({ farmId: LOCAL_FARM_ID }),
+  });
+}
+
+export function fetchHistory(path: HistorySeries, from: string, to: string) {
+  const params = new URLSearchParams({ path, from, to });
+  return request<{ path: string; from: string; to: string; points: HistorySeriesPointDto[] }>(
+    `/api/v1/farms/${LOCAL_FARM_ID}/history?${params}`,
+  );
+}
+
+export function fetchEvents(cursor?: string | null) {
+  const params = new URLSearchParams();
+  if (cursor) params.set('cursor', cursor);
+  const suffix = params.size ? `?${params}` : '';
+  return request<{ events: FarmEventDto[]; nextCursor: { createdAt: string; id: string } | null }>(
+    `/api/v1/farms/${LOCAL_FARM_ID}/events${suffix}`,
+  );
+}
+
+export function fetchMembers() {
+  return request<{
+    members: Array<{ githubId: string; username: string; role: string; allowlisted: boolean }>;
+  }>(`/api/v1/farms/${LOCAL_FARM_ID}/members`);
+}
+
+export function fetchDiagnostics() {
+  return request<Record<string, unknown>>('/api/v1/diagnostics');
+}
+
+export function setMemberRole(githubId: string, role: 'viewer' | 'operator' | 'admin') {
+  return request(`/api/v1/farms/${LOCAL_FARM_ID}/members/${encodeURIComponent(githubId)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ role }),
+  });
+}
+
+export function removeMember(githubId: string) {
+  return request(`/api/v1/farms/${LOCAL_FARM_ID}/members/${encodeURIComponent(githubId)}`, {
+    method: 'DELETE',
   });
 }
