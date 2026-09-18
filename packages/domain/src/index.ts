@@ -1,6 +1,7 @@
 export * from './parse-telemetry';
 export * from './commands';
 export * from './settings';
+export * from './draft';
 export * from './freshness';
 export * from './normalize';
 export * from './loopback';

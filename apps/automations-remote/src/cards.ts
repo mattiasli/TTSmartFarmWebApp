@@ -15,7 +15,7 @@ export type CardDef = {
 export const CARDS: CardDef[] = [
   {
     rule: 'irrigation',
-    title: 'A little drink',
+    title: 'Water thirsty soil',
     description: 'One pulse, then time to soak in.',
     fields: [
       { key: 'soilDry', label: 'Water below soil moisture', unit: '%' },
@@ -25,7 +25,7 @@ export const CARDS: CardDef[] = [
   },
   {
     rule: 'alarm',
-    title: 'Mind the reservoir',
+    title: 'Watch the water tank',
     description: 'A short beep and LCD warning. Tank protection stays on even if this alarm is off.',
     fields: [
       { key: 'tankLow', label: 'Tank low at', unit: '%' },
@@ -35,7 +35,7 @@ export const CARDS: CardDef[] = [
   },
   {
     rule: 'rain',
-    title: 'Let the rain help',
+    title: 'Wait out the rain',
     description: 'Pause automatic watering when the roof plate detects rain (800 or above).',
     fields: [{ key: 'rainDelay', label: 'Wait after rain clears', unit: 's' }],
   },

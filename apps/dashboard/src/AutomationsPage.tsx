@@ -4,9 +4,10 @@ import { lazy, Suspense, useState } from 'react';
 import type { AutomationPanelPropsV1, FarmSnapshot } from '@smartfarm/contracts';
 import { resetWatering, resumeAutomationRule, saveAutomationSettings, syncGuard } from './api';
 import { useFarmLiveContext } from './FarmLiveContext';
+import { loadAutomationPanel } from './loadAutomationPanel';
 import { RemoteBoundary } from './RemoteBoundary';
 
-const AutomationPanel = lazy(() => import('smartfarm_automations/AutomationPanel'));
+const AutomationPanel = lazy(() => loadAutomationPanel());
 
 function mapReadings(snapshot: FarmSnapshot): AutomationPanelPropsV1['readings'] {
   const r = snapshot.readings;

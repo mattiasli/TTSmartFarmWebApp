@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  Input,
   Slider,
   Switch,
   Text,
@@ -12,7 +13,15 @@ import {
   type AutomationPanelPropsV1,
   type AutomationSettings,
 } from '@smartfarm/contracts';
-import { editAutomationSetting } from '@smartfarm/domain';
+import {
+  applyDraftNumber,
+  classifyLighting,
+  draftCanApply,
+  isStaleSaveResponse,
+  nextDraftFromServer,
+  parseDraftNumber,
+  type NumericAutomationKey,
+} from '@smartfarm/domain';
 import { CARDS, rangeFor, type FieldKey } from './cards';
 import { FederationProbe } from './FederationProbe';
 
@@ -27,45 +36,108 @@ function sameSettings(a: AutomationSettings, b: AutomationSettings) {
 export function AutomationPanel(props: Props) {
   const settings = props.settings ?? DEFAULT_AUTOMATIONS;
   const [draft, setDraft] = useState<AutomationSettings>(settings);
+  const [texts, setTexts] = useState<Partial<Record<FieldKey, string>>>({});
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<NumericAutomationKey, string>>>({});
   const [error, setError] = useState<string | null>(null);
+  const [conflict, setConflict] = useState(false);
   const [busy, setBusy] = useState(false);
   const revisionRef = useRef<number | undefined>(props.settingsRevision);
+  const latestRevisionRef = useRef<number | undefined>(props.settingsRevision);
   const dirty = useMemo(() => !sameSettings(draft, settings), [draft, settings]);
+  const incomplete = Object.values(texts).some((value) => value === '');
+  const canEdit = props.permissions?.canEdit !== false;
+  const canApply = canEdit && dirty && !busy && draftCanApply(draft, fieldErrors, incomplete);
+
+  useEffect(() => {
+    latestRevisionRef.current = props.settingsRevision;
+  }, [props.settingsRevision]);
 
   useEffect(() => {
     if (!props.settings || props.settingsRevision == null) return;
-    if (revisionRef.current === props.settingsRevision) return;
-    revisionRef.current = props.settingsRevision;
-    setDraft((current) => (dirty ? current : (props.settings ?? current)));
-  }, [props.settings, props.settingsRevision, dirty]);
-  const canEdit = props.permissions?.canEdit !== false;
-
-  function setNumber(key: FieldKey, raw: number) {
-    try {
-      setDraft(editAutomationSetting(draft, key, raw));
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid value.');
+    const next = nextDraftFromServer({
+      dirty,
+      draft,
+      server: props.settings,
+      previousRevision: revisionRef.current,
+      nextRevision: props.settingsRevision,
+    });
+    if (next.acceptRevision) {
+      revisionRef.current = props.settingsRevision;
+      setDraft(next.draft);
+      setTexts({});
+      setFieldErrors({});
+      setConflict(false);
+      return;
     }
+    if (next.conflict) setConflict(true);
+  }, [props.settings, props.settingsRevision, dirty, draft]);
+
+  function commitNumber(key: FieldKey, value: number) {
+    const edited = applyDraftNumber(draft, key, value);
+    setDraft(edited.settings);
+    setFieldErrors(edited.fieldErrors);
+    setTexts((current) => {
+      const next = { ...current };
+      delete next[key];
+      if (edited.settings.fanOff !== draft.fanOff) delete next.fanOff;
+      if (edited.settings.fanOn !== draft.fanOn) delete next.fanOn;
+      if (edited.settings.lightOff !== draft.lightOff) delete next.lightOff;
+      if (edited.settings.lightOn !== draft.lightOn) delete next.lightOn;
+      return next;
+    });
+    setError(null);
+  }
+
+  function onNumberText(key: FieldKey, raw: string) {
+    setTexts((current) => ({ ...current, [key]: raw }));
+    const parsed = parseDraftNumber(raw);
+    if (parsed.status === 'empty') {
+      setFieldErrors((current) => ({ ...current, [key]: undefined }));
+      return;
+    }
+    if (parsed.status === 'invalid') {
+      setFieldErrors((current) => ({ ...current, [key]: parsed.message }));
+      return;
+    }
+    commitNumber(key, parsed.value);
   }
 
   async function apply() {
-    if (!props.onSave || props.settingsRevision == null) {
-      setError('The host has not provided a save callback.');
+    if (!props.onSave || props.settingsRevision == null || !canApply) {
+      setError(canEdit ? 'Fix the highlighted fields before applying.' : 'Viewers cannot change automations.');
       return;
     }
+    const startedRevision = props.settingsRevision;
     setBusy(true);
     try {
-      const result = await props.onSave(draft, props.settingsRevision);
+      const result = await props.onSave(draft, startedRevision);
+      if (isStaleSaveResponse(startedRevision, latestRevisionRef.current ?? startedRevision)) {
+        return;
+      }
       revisionRef.current = result.revision;
       setDraft(result.settings);
+      setTexts({});
+      setFieldErrors({});
+      setConflict(false);
       setError(null);
       props.onNotify?.('Remote dialog used a React hook and notified the host.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save settings.');
+      const message = err instanceof Error ? err.message : 'Could not save settings.';
+      setError(/revision|conflict|409/i.test(message) ? 'Settings changed elsewhere. Reload or review your draft.' : message);
+      if (/revision|conflict|409/i.test(message)) setConflict(true);
     } finally {
       setBusy(false);
     }
+  }
+
+  function reloadServer() {
+    if (!props.settings) return;
+    setDraft(props.settings);
+    revisionRef.current = props.settingsRevision;
+    setTexts({});
+    setFieldErrors({});
+    setConflict(false);
+    setError(null);
   }
 
   return (
@@ -74,13 +146,16 @@ export function AutomationPanel(props: Props) {
         <>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             <Title3>Thresholds</Title3>
-            <Button appearance="primary" disabled={!dirty || !canEdit || busy} onClick={() => void apply()}>
+            <Button appearance="primary" disabled={!canApply} onClick={() => void apply()}>
               Apply
             </Button>
             <Button
               disabled={!dirty || busy}
               onClick={() => {
                 setDraft(settings);
+                setTexts({});
+                setFieldErrors({});
+                setConflict(false);
                 setError(null);
               }}
             >
@@ -88,6 +163,19 @@ export function AutomationPanel(props: Props) {
             </Button>
             {dirty ? <Text>Unsaved edits — Apply to send them to the server.</Text> : null}
           </div>
+          {props.runtime && !props.runtime.masterEnabled ? (
+            <Text role="status" data-testid="editor-master-paused">
+              Automations are paused on the server. Rule toggles here do not start them.
+            </Text>
+          ) : null}
+          {conflict ? (
+            <Text role="alert" data-testid="settings-conflict">
+              Settings changed elsewhere. Reload the saved values or review your draft and Apply again.
+              <Button size="small" onClick={reloadServer}>
+                Reload saved settings
+              </Button>
+            </Text>
+          ) : null}
           {error ? (
             <Text role="alert" style={{ color: '#c50f1f' }}>
               {error}
@@ -114,9 +202,11 @@ export function AutomationPanel(props: Props) {
                 </div>
                 <Text>{card.description}</Text>
                 <Text weight="semibold">{props.runtime?.messages[card.rule] ?? 'Paused'}</Text>
+                <CardReadings card={card.rule} readings={props.readings} draft={draft} runtime={props.runtime} />
                 {card.fields.map((field) => {
                   const [min, max] = rangeFor(field.key);
                   const value = Number(draft[field.key]);
+                  const text = texts[field.key];
                   return (
                     <label key={field.key} style={{ display: 'grid', gap: 4 }}>
                       <Text>
@@ -128,8 +218,22 @@ export function AutomationPanel(props: Props) {
                         max={max}
                         value={value}
                         disabled={!canEdit}
-                        onChange={(_, data) => setNumber(field.key, data.value)}
+                        aria-label={field.label}
+                        onChange={(_, data) => commitNumber(field.key, data.value)}
                       />
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        value={text ?? String(value)}
+                        disabled={!canEdit}
+                        aria-label={`${field.label} number`}
+                        onChange={(_, data) => onNumberText(field.key, data.value)}
+                      />
+                      {fieldErrors[field.key] ? (
+                        <Text role="alert" size={200}>
+                          {fieldErrors[field.key]}
+                        </Text>
+                      ) : null}
                     </label>
                   );
                 })}
@@ -171,5 +275,59 @@ export function AutomationPanel(props: Props) {
       )}
       <FederationProbe onNotify={props.onNotify} />
     </div>
+  );
+}
+
+function CardReadings({
+  card,
+  readings,
+  draft,
+  runtime,
+}: {
+  card: (typeof CARDS)[number]['rule'];
+  readings: Props['readings'];
+  draft: AutomationSettings;
+  runtime: Props['runtime'];
+}) {
+  if (!readings) return null;
+  if (card === 'irrigation') {
+    return (
+      <Text size={200}>
+        Soil {readings.soilPct ?? 'unavailable'}% · pump {readings.pump == null ? 'unknown' : readings.pump ? 'on' : 'off'}
+      </Text>
+    );
+  }
+  if (card === 'alarm') {
+    return (
+      <Text size={200}>
+        Tank {readings.waterPct ?? 'unavailable'}% · guard {runtime?.guardConfirmed ? 'confirmed' : 'pending'}
+        {runtime?.alarmActive ? ' · warning owns the LCD' : ''}
+      </Text>
+    );
+  }
+  if (card === 'rain') {
+    return (
+      <Text size={200}>
+        {readings.rain == null ? 'Rain unknown' : readings.rain ? 'Rain detected' : 'Dry'}
+        {readings.steamRaw == null ? '' : ` · plate ${readings.steamRaw}`}
+      </Text>
+    );
+  }
+  if (card === 'cooling') {
+    return (
+      <Text size={200}>
+        {readings.dhtHealthy === false
+          ? 'DHT11 unavailable — cooling waits for a valid temperature.'
+          : `Temperature ${readings.temperatureC ?? 'unavailable'}°C`}
+      </Text>
+    );
+  }
+  const lighting =
+    readings.lightRaw == null ? null : classifyLighting(readings.lightRaw, draft.lightOn, draft.lightOff);
+  return (
+    <Text size={200} data-testid="lighting-class">
+      Roof light {readings.lightRaw ?? 'unavailable'} · {lighting ?? 'unknown'}
+      {readings.pir ? ' · motion' : ''}
+    </Text>
   );
 }

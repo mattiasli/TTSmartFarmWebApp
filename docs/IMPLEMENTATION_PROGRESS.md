@@ -2,6 +2,28 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Session 2026-09-18 (P11)
+
+Source SHA / working-tree scope: `master` at `0d2e409` plus local P11 changes.
+
+Completed this session: **P11** federated editor draft UX, companion thresholds, contract/timeout loader, and G06 helper coverage.
+
+Notes:
+
+- Five cards use friendly titles, slider + number inputs, current readings/reasons, Apply/Cancel, and a master-paused banner. Empty number fields stay incomplete instead of snapping.
+- Companion fan/light edits keep a one-unit gap. Invalid tank pairs remain editable and block Apply. Dirty drafts survive same-revision telemetry; a newer revision shows a conflict with reload.
+- Host loads the remote with an 8 s timeout and rejects an unsupported contract major before render. Host Pause/All off stay outside the remote. Night-light 2559 vs 3380/3560 classifies immediately as dark.
+- Live commands/pump remain disabled.
+
+Tests run and actual results:
+
+- `npm run typecheck` — pass
+- `npm run lint` — pass
+- `npm run test:unit` — 105 passed
+- `npm run test:integration` — 25 passed
+
+Next concrete task: **P12** CI, documentation, and operational checks. Live pumping stays disabled.
+
 ## Session 2026-09-18 (P10)
 
 Source SHA / working-tree scope: `master` at `1a1a9ca` plus local P10 changes.
