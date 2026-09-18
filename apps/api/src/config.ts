@@ -14,6 +14,9 @@ const schema = z.object({
   SIMULATOR_TRANSPORT: z.enum(['memory', 'mqtt']).default('memory'),
   SIMULATOR_MQTT_URL: z.string().default('mqtt://127.0.0.1:1883'),
   DATABASE_URL: z.string().optional(),
+  PUBLIC_WS_URL: z.string().default('ws://127.0.0.1:3001/ws'),
+  GITHUB_OAUTH_CLIENT_ID: z.string().optional(),
+  GITHUB_OAUTH_CLIENT_SECRET: z.string().optional(),
   LIVE_COMMANDS_ENABLED: z
     .string()
     .optional()
@@ -30,6 +33,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if ((env.APP_ENV ?? 'local') === 'production' && (env.FARM_MODE ?? 'simulator') === 'simulator') {
     throw new Error('Production cannot run in simulator mode.');
   }
+  if ((env.APP_ENV ?? 'local') === 'production' && !env.GITHUB_OAUTH_CLIENT_ID) {
+    throw new Error('Production requires GITHUB_OAUTH_CLIENT_ID.');
+  }
   return schema.parse({
     NODE_ENV: env.NODE_ENV ?? 'development',
     APP_ENV: env.APP_ENV ?? 'local',
@@ -43,6 +49,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     SIMULATOR_TRANSPORT: env.SIMULATOR_TRANSPORT ?? 'memory',
     SIMULATOR_MQTT_URL: env.SIMULATOR_MQTT_URL ?? 'mqtt://127.0.0.1:1883',
     DATABASE_URL: env.DATABASE_URL,
+    PUBLIC_WS_URL: env.PUBLIC_WS_URL ?? 'ws://127.0.0.1:3001/ws',
+    GITHUB_OAUTH_CLIENT_ID: env.GITHUB_OAUTH_CLIENT_ID,
+    GITHUB_OAUTH_CLIENT_SECRET: env.GITHUB_OAUTH_CLIENT_SECRET,
     LIVE_COMMANDS_ENABLED: env.LIVE_COMMANDS_ENABLED ?? 'false',
     LIVE_PUMP_ENABLED: env.LIVE_PUMP_ENABLED ?? 'false',
   });
@@ -57,5 +66,6 @@ export function redactedConfig(config: AppConfig) {
     publicAppOrigin: config.PUBLIC_APP_ORIGIN,
     simulatorTransport: config.SIMULATOR_TRANSPORT,
     databaseConfigured: Boolean(config.DATABASE_URL),
+    githubOAuthConfigured: Boolean(config.GITHUB_OAUTH_CLIENT_ID),
   };
 }

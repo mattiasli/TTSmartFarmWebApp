@@ -29,10 +29,17 @@ export async function ensureSession(): Promise<SessionDto> {
     csrfToken = session.csrfToken;
     return session;
   }
-  if (!session.localLogin) throw new Error('Sign in is required.');
-  const login = await request<SessionDto>('/api/v1/local/login', { method: 'POST' });
-  csrfToken = login.csrfToken;
-  return login;
+  if (session.localLogin) {
+    const login = await request<SessionDto>('/api/v1/local/login', { method: 'POST' });
+    csrfToken = login.csrfToken;
+    return login;
+  }
+  return session;
+}
+
+export function logout() {
+  csrfToken = null;
+  return request<{ ok: boolean }>('/api/v1/logout', { method: 'POST' });
 }
 
 export function fetchSnapshot() {

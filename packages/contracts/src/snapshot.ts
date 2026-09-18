@@ -65,4 +65,6 @@ export type SessionDto = {
   csrfToken: string | null;
   farmId: string | null;
   role: 'viewer' | 'operator' | 'admin' | null;
+  username: string | null;
+  githubLoginEnabled: boolean;
 };

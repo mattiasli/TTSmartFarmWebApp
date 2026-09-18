@@ -7,15 +7,28 @@ import {
   RULE_IDS,
   automationSettingsSchema,
   farmCommandRequestSchema,
+  type FarmSnapshot,
   type RuleId,
   type SessionDto,
 } from '@smartfarm/contracts';
-import { CommandPolicyError, isLoopbackAddress } from '@smartfarm/domain';
+import { CommandPolicyError } from '@smartfarm/domain';
+import { registerGithubOAuth } from './auth/oauth';
+import { RealtimeHub, registerRealtime } from './auth/realtime';
+import { clearSessionCookie } from './auth/cookies';
+import { SessionService, type RequestSession } from './auth/session';
 import { loadConfig, redactedConfig, type AppConfig } from './config';
 import { FarmController } from './controller';
-import { FarmStore, IdempotencyConflictError, RevisionConflictError, createPool, seedLocal } from './db';
+import {
+  FarmStore,
+  IdempotencyConflictError,
+  LastAdminError,
+  RevisionConflictError,
+  createPool,
+  seedLocal,
+  type FarmRole,
+} from './db';
 import { createFarmLink } from './farm-link';
-import { MemorySessionStore, SESSION_COOKIE } from './sessions';
+import { MemorySessionStore } from './sessions';
 
 function requestId() {
   return crypto.randomUUID();
@@ -33,9 +46,10 @@ function sendError(
 
 export type AppDeps = {
   controller: FarmController;
-  sessions: MemorySessionStore;
+  memorySessions: MemorySessionStore;
   store: FarmStore | null;
   pool: pg.Pool | null;
+  githubFetch?: typeof fetch;
 };
 
 export async function createDeps(config: AppConfig): Promise<AppDeps> {
@@ -43,7 +57,7 @@ export async function createDeps(config: AppConfig): Promise<AppDeps> {
   if (!config.DATABASE_URL) {
     return {
       controller: new FarmController(config, link),
-      sessions: new MemorySessionStore(),
+      memorySessions: new MemorySessionStore(),
       store: null,
       pool: null,
     };
@@ -57,7 +71,7 @@ export async function createDeps(config: AppConfig): Promise<AppDeps> {
       settings: saved?.settings,
       revision: saved?.revision,
     }),
-    sessions: new MemorySessionStore(),
+    memorySessions: new MemorySessionStore(),
     store,
     pool,
   };
@@ -65,40 +79,70 @@ export async function createDeps(config: AppConfig): Promise<AppDeps> {
 
 export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps) {
   const resolved = deps ?? (await createDeps(config));
-  const { controller, sessions } = resolved;
+  const { controller, memorySessions, store } = resolved;
+  const sessions = new SessionService(config, memorySessions, store);
   const app = Fastify({
     logger: {
       level: config.NODE_ENV === 'production' ? 'info' : 'warn',
-      redact: ['req.headers.authorization', 'req.headers.cookie', 'password', 'HIVEMQ_PASSWORD'],
+      redact: [
+        'req.headers.authorization',
+        'req.headers.cookie',
+        'password',
+        'HIVEMQ_PASSWORD',
+        'GITHUB_OAUTH_CLIENT_SECRET',
+      ],
     },
   });
   await app.register(cookie);
-
-  app.addHook('onClose', async () => {
-    await controller.close();
-    await resolved.pool?.end();
-  });
 
   const origins = new Set(
     config.ALLOWED_BROWSER_ORIGINS.split(',')
       .map((value) => value.trim())
       .filter(Boolean),
   );
+  const hub = new RealtimeHub(config, sessions, store, () => controller.snapshot(), origins);
+  hub.start();
 
-  function currentSession(request: FastifyRequest) {
-    return sessions.get(request.cookies[SESSION_COOKIE]);
+  app.addHook('onClose', async () => {
+    await hub.close();
+    await controller.close();
+    await resolved.pool?.end();
+  });
+
+  app.addHook('onSend', async (_request, reply, payload) => {
+    if (String(reply.getHeader('cache-control') ?? '') === '') {
+      reply.header('cache-control', 'private, no-store');
+    }
+    return payload;
+  });
+
+  function sessionDto(session: RequestSession | null): SessionDto {
+    return session
+      ? {
+          authenticated: true,
+          localLogin: session.localLogin,
+          csrfToken: session.csrf,
+          farmId: session.farmId,
+          role: session.role,
+          username: session.username,
+          githubLoginEnabled: Boolean(config.GITHUB_OAUTH_CLIENT_ID && store),
+        }
+      : {
+          authenticated: false,
+          localLogin: config.APP_ENV === 'local',
+          csrfToken: null,
+          farmId: null,
+          role: null,
+          username: null,
+          githubLoginEnabled: Boolean(config.GITHUB_OAUTH_CLIENT_ID && store),
+        };
   }
 
-  function requireLocalLoopback(request: FastifyRequest, reply: FastifyReply, id: string) {
-    if (config.APP_ENV !== 'local' && config.NODE_ENV !== 'test') {
-      void sendError(reply, 404, 'NOT_FOUND', 'Not found.', id);
-      return false;
-    }
-    if (!isLoopbackAddress(request.ip) && config.NODE_ENV !== 'test') {
-      void sendError(reply, 403, 'FORBIDDEN', 'Local login is loopback-only.', id);
-      return false;
-    }
-    return true;
+  function withPermissions(snapshot: FarmSnapshot, session: RequestSession): FarmSnapshot {
+    return {
+      ...snapshot,
+      permissions: { canView: true, canControl: session.role !== 'viewer' },
+    };
   }
 
   function requireOrigin(request: FastifyRequest, reply: FastifyReply, id: string) {
@@ -111,6 +155,63 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     return true;
   }
 
+  async function currentSession(request: FastifyRequest) {
+    return sessions.get(request);
+  }
+
+  async function requireSession(request: FastifyRequest, reply: FastifyReply, id: string) {
+    const session = await currentSession(request);
+    if (!session) {
+      void sendError(reply, 401, 'UNAUTHENTICATED', 'Sign in required.', id);
+      return null;
+    }
+    return session;
+  }
+
+  async function requireFarm(
+    request: FastifyRequest,
+    reply: FastifyReply,
+    id: string,
+    farmId: string,
+    mutate = false,
+  ) {
+    const session = await requireSession(request, reply, id);
+    if (!session) return null;
+    if (farmId !== config.FARM_ID && farmId !== LOCAL_FARM_ID) {
+      void sendError(reply, 404, 'NOT_FOUND', 'Farm not found.', id);
+      return null;
+    }
+    if (session.farmId !== config.FARM_ID && farmId !== session.farmId) {
+      void sendError(reply, 404, 'NOT_FOUND', 'Farm not found.', id);
+      return null;
+    }
+    if (mutate) {
+      if (!requireOrigin(request, reply, id)) return null;
+      if (request.headers['x-csrf-token'] !== session.csrf) {
+        void sendError(reply, 403, 'CSRF', 'CSRF token mismatch.', id);
+        return null;
+      }
+    }
+    return session;
+  }
+
+  async function requireRole(
+    request: FastifyRequest,
+    reply: FastifyReply,
+    id: string,
+    farmId: string,
+    min: FarmRole,
+  ) {
+    const session = await requireFarm(request, reply, id, farmId, true);
+    if (!session) return null;
+    const rank = { viewer: 0, operator: 1, admin: 2 };
+    if (rank[session.role] < rank[min]) {
+      void sendError(reply, 403, 'FORBIDDEN', 'Insufficient role.', id);
+      return null;
+    }
+    return session;
+  }
+
   app.get('/health/live', async () => ({ status: 'ok' }));
   app.get('/health/ready', async () => ({
     status: 'ready',
@@ -118,57 +219,36 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     ...redactedConfig(config),
   }));
 
-  app.get('/api/v1/session', async (request) => {
-    const session = currentSession(request);
-    const body: SessionDto = session
-      ? {
-          authenticated: true,
-          localLogin: config.APP_ENV === 'local',
-          csrfToken: session.csrf,
-          farmId: session.farmId,
-          role: session.role,
-        }
-      : {
-          authenticated: false,
-          localLogin: config.APP_ENV === 'local',
-          csrfToken: null,
-          farmId: null,
-          role: null,
-        };
-    return body;
-  });
+  registerGithubOAuth(app, config, sessions, store, resolved.githubFetch);
+  await registerRealtime(app, hub, sessions, store, config, origins);
+
+  app.get('/api/v1/session', async (request) => sessionDto(await currentSession(request)));
 
   app.post('/api/v1/local/login', async (request, reply) => {
     const id = requestId();
-    if (!requireLocalLoopback(request, reply, id)) return;
+    if (config.APP_ENV === 'production' || (config.NODE_ENV !== 'test' && config.APP_ENV !== 'local')) {
+      return sendError(reply, 404, 'NOT_FOUND', 'Not found.', id);
+    }
+    if (!sessions.localLoginAllowed(request)) {
+      return sendError(reply, 403, 'FORBIDDEN', 'Local login is loopback-only.', id);
+    }
     if (!requireOrigin(request, reply, id)) return;
-    const created = sessions.createLocalOperator();
-    reply.setCookie(SESSION_COOKIE, created.token, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: false,
-    });
-    const body: SessionDto = {
-      authenticated: true,
-      localLogin: true,
-      csrfToken: created.session.csrf,
-      farmId: created.session.farmId,
-      role: created.session.role,
-    };
-    return body;
+    const created = await sessions.createLocalOperator(request, reply);
+    return sessionDto(created);
   });
 
   app.post('/api/v1/logout', async (request, reply) => {
-    sessions.revoke(request.cookies[SESSION_COOKIE]);
-    reply.clearCookie(SESSION_COOKIE, { path: '/' });
+    const session = await currentSession(request);
+    if (session?.id) hub.dropSession(session.id);
+    await sessions.revoke(request);
+    clearSessionCookie(reply, config);
     return { ok: true };
   });
 
   app.get('/api/v1/farms', async (request, reply) => {
     const id = requestId();
-    const session = currentSession(request);
-    if (!session) return sendError(reply, 401, 'UNAUTHENTICATED', 'Sign in required.', id);
+    const session = await requireSession(request, reply, id);
+    if (!session) return;
     return {
       farms: [{ id: config.FARM_ID, name: config.FARM_NAME, role: session.role }],
     };
@@ -176,32 +256,25 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
 
   app.get('/api/v1/farms/:farmId/snapshot', async (request, reply) => {
     const id = requestId();
-    const session = currentSession(request);
-    if (!session) return sendError(reply, 401, 'UNAUTHENTICATED', 'Sign in required.', id);
     const { farmId } = request.params as { farmId: string };
-    if (farmId !== config.FARM_ID && farmId !== LOCAL_FARM_ID) {
-      return sendError(reply, 404, 'NOT_FOUND', 'Farm not found.', id);
-    }
-    return controller.snapshot();
+    const session = await requireFarm(request, reply, id, farmId);
+    if (!session) return;
+    return withPermissions(controller.snapshot(), session);
   });
 
   app.post('/api/v1/farms/:farmId/commands', async (request, reply) => {
     const id = requestId();
-    const session = currentSession(request);
-    if (!session) return sendError(reply, 401, 'UNAUTHENTICATED', 'Sign in required.', id);
-    if (!requireOrigin(request, reply, id)) return;
-    const csrf = request.headers['x-csrf-token'];
-    if (csrf !== session.csrf) return sendError(reply, 403, 'CSRF', 'CSRF token mismatch.', id);
-    if (session.role === 'viewer') return sendError(reply, 403, 'FORBIDDEN', 'Viewers cannot send commands.', id);
     const { farmId } = request.params as { farmId: string };
-    if (farmId !== config.FARM_ID) return sendError(reply, 404, 'NOT_FOUND', 'Farm not found.', id);
+    const session = await requireRole(request, reply, id, farmId, 'operator');
+    if (!session) return;
     try {
       const parsed = farmCommandRequestSchema.parse(request.body);
       const idempotencyKey =
         typeof request.headers['idempotency-key'] === 'string'
           ? request.headers['idempotency-key']
           : crypto.randomUUID();
-      const command = await controller.command(parsed, idempotencyKey, `user:${session.username}`);
+      const actor = session.userId ? `user:${session.userId}` : `user:${session.username}`;
+      const command = await controller.command(parsed, idempotencyKey, actor);
       return reply.status(202).send(command);
     } catch (error) {
       if (error instanceof CommandPolicyError) {
@@ -217,34 +290,13 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     }
   });
 
-  function requireOperator(request: FastifyRequest, reply: FastifyReply, id: string) {
-    const session = currentSession(request);
-    if (!session) {
-      void sendError(reply, 401, 'UNAUTHENTICATED', 'Sign in required.', id);
-      return null;
-    }
-    if (!requireOrigin(request, reply, id)) return null;
-    if (request.headers['x-csrf-token'] !== session.csrf) {
-      void sendError(reply, 403, 'CSRF', 'CSRF token mismatch.', id);
-      return null;
-    }
-    if (session.role === 'viewer') {
-      void sendError(reply, 403, 'FORBIDDEN', 'Viewers cannot change automations.', id);
-      return null;
-    }
-    const { farmId } = request.params as { farmId: string };
-    if (farmId !== config.FARM_ID) {
-      void sendError(reply, 404, 'NOT_FOUND', 'Farm not found.', id);
-      return null;
-    }
-    return session;
-  }
-
   app.post('/api/v1/farms/:farmId/automations/start', async (request, reply) => {
     const id = requestId();
-    if (!requireOperator(request, reply, id)) return;
+    const { farmId } = request.params as { farmId: string };
+    if (!(await requireRole(request, reply, id, farmId, 'operator'))) return;
     try {
-      return controller.startAutomations();
+      const session = await currentSession(request);
+      return withPermissions(controller.startAutomations(), session!);
     } catch (error) {
       return sendError(reply, 422, 'AUTOMATION', error instanceof Error ? error.message : 'Cannot start.', id);
     }
@@ -252,26 +304,32 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
 
   app.post('/api/v1/farms/:farmId/automations/pause', async (request, reply) => {
     const id = requestId();
-    if (!requireOperator(request, reply, id)) return;
-    return controller.pauseAutomations();
+    const { farmId } = request.params as { farmId: string };
+    const session = await requireRole(request, reply, id, farmId, 'operator');
+    if (!session) return;
+    return withPermissions(controller.pauseAutomations(), session);
   });
 
   app.post('/api/v1/farms/:farmId/automations/resume-rule', async (request, reply) => {
     const id = requestId();
-    if (!requireOperator(request, reply, id)) return;
+    const { farmId } = request.params as { farmId: string };
+    const session = await requireRole(request, reply, id, farmId, 'operator');
+    if (!session) return;
     const body = request.body as { rule?: string };
     if (!body?.rule || !RULE_IDS.includes(body.rule as RuleId)) {
       return sendError(reply, 400, 'VALIDATION', 'Unknown automation.', id);
     }
     controller.resumeRule(body.rule as RuleId);
-    return controller.snapshot();
+    return withPermissions(controller.snapshot(), session);
   });
 
   app.post('/api/v1/farms/:farmId/automations/reset-watering', async (request, reply) => {
     const id = requestId();
-    if (!requireOperator(request, reply, id)) return;
+    const { farmId } = request.params as { farmId: string };
+    const session = await requireRole(request, reply, id, farmId, 'operator');
+    if (!session) return;
     try {
-      return controller.resetWatering();
+      return withPermissions(controller.resetWatering(), session);
     } catch (error) {
       return sendError(reply, 422, 'AUTOMATION', error instanceof Error ? error.message : 'Cannot reset.', id);
     }
@@ -279,12 +337,14 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
 
   app.put('/api/v1/farms/:farmId/automations/settings', async (request, reply) => {
     const id = requestId();
-    if (!requireOperator(request, reply, id)) return;
+    const { farmId } = request.params as { farmId: string };
+    const session = await requireRole(request, reply, id, farmId, 'operator');
+    if (!session) return;
     try {
       const settings = automationSettingsSchema.parse(request.body);
       const match = request.headers['if-match'];
       const expected = typeof match === 'string' && match !== '' ? Number(match) : undefined;
-      return await controller.configure(settings, expected);
+      return withPermissions(await controller.configure(settings, expected), session);
     } catch (error) {
       if (error instanceof ZodError) {
         return sendError(reply, 400, 'VALIDATION', error.issues[0]?.message ?? 'Invalid settings.', id);
@@ -298,8 +358,64 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
 
   app.post('/api/v1/farms/:farmId/automations/sync-guard', async (request, reply) => {
     const id = requestId();
-    if (!requireOperator(request, reply, id)) return;
-    return controller.syncGuard();
+    const { farmId } = request.params as { farmId: string };
+    const session = await requireRole(request, reply, id, farmId, 'operator');
+    if (!session) return;
+    return withPermissions(controller.syncGuard(), session);
+  });
+
+  app.get('/api/v1/farms/:farmId/members', async (request, reply) => {
+    const id = requestId();
+    const { farmId } = request.params as { farmId: string };
+    const session = await requireFarm(request, reply, id, farmId);
+    if (!session) return;
+    if (session.role !== 'admin') return sendError(reply, 403, 'FORBIDDEN', 'Insufficient role.', id);
+    if (!store) return { members: [] };
+    return { members: await store.listFarmAccess(farmId) };
+  });
+
+  app.put('/api/v1/farms/:farmId/members/:githubId', async (request, reply) => {
+    const id = requestId();
+    const { farmId, githubId } = request.params as { farmId: string; githubId: string };
+    const session = await requireRole(request, reply, id, farmId, 'admin');
+    if (!session || !store) return sendError(reply, 503, 'UNAVAILABLE', 'Membership changes require PostgreSQL.', id);
+    const body = request.body as { role?: FarmRole };
+    if (!body?.role || !['viewer', 'operator', 'admin'].includes(body.role)) {
+      return sendError(reply, 400, 'VALIDATION', 'Role must be viewer, operator, or admin.', id);
+    }
+    try {
+      const user = await store.upsertUser({ githubId, username: githubId });
+      await store.upsertAllowlist({
+        githubId,
+        farmId,
+        role: body.role,
+        createdBy: session.username,
+      });
+      await store.setMembership({ farmId, userId: user.id, role: body.role });
+      if (body.role === 'viewer') await store.revokeUserSessions(user.id);
+      return { members: await store.listFarmAccess(farmId) };
+    } catch (error) {
+      if (error instanceof LastAdminError) return sendError(reply, 409, error.code, error.message, id);
+      throw error;
+    }
+  });
+
+  app.delete('/api/v1/farms/:farmId/members/:githubId', async (request, reply) => {
+    const id = requestId();
+    const { farmId, githubId } = request.params as { farmId: string; githubId: string };
+    const session = await requireRole(request, reply, id, farmId, 'admin');
+    if (!session || !store) return sendError(reply, 503, 'UNAVAILABLE', 'Membership changes require PostgreSQL.', id);
+    const user = await store.getUserByGithubId(githubId);
+    if (!user) return sendError(reply, 404, 'NOT_FOUND', 'Member not found.', id);
+    try {
+      await store.removeMembership(farmId, user.id);
+      await store.revokeAllowlist(githubId);
+      await store.revokeUserSessions(user.id);
+      return { members: await store.listFarmAccess(farmId) };
+    } catch (error) {
+      if (error instanceof LastAdminError) return sendError(reply, 409, error.code, error.message, id);
+      throw error;
+    }
   });
 
   return app;

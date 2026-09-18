@@ -44,7 +44,7 @@ npm run simulator
 
 Then set `SIMULATOR_TRANSPORT=mqtt` for the API. Docker Compose Postgres/Mosquitto remains the preferred integration stack when Docker Desktop is running.
 
-Local login is loopback-only (`POST /api/v1/local/login`). The dashboard does this automatically in local mode.
+Local login is loopback-only (`POST /api/v1/local/login`). The dashboard does this automatically in local mode. GitHub OAuth (`/api/auth/github/start`) needs `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` plus Postgres. Realtime tickets (`POST /api/v1/realtime/tickets`) also require Postgres sessions.
 
 ## Ports
 

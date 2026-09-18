@@ -22,7 +22,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { FarmCommandRequest, FarmSnapshot } from '@smartfarm/contracts';
-import { ensureSession, fetchSnapshot, pauseAutomations, sendCommand, startAutomations } from './api';
+import { ensureSession, fetchSnapshot, logout, pauseAutomations, sendCommand, startAutomations } from './api';
 
 function formatValue(value: number | boolean | null | undefined, unit = '') {
   if (value === null || value === undefined) return 'Unavailable';
@@ -102,12 +102,47 @@ export function Dashboard() {
   const visibleError = error ?? queryError;
   const readings = snapshot?.readings;
   const pending = Boolean(snapshot?.pendingCommands.length);
+  const session = sessionQuery.data;
+
+  if (session && !session.authenticated) {
+    return (
+      <section className="section">
+        <Title1>TT SmartFarm</Title1>
+        <Text as="p">Sign in with the GitHub account that was invited to this farm.</Text>
+        {session.githubLoginEnabled ? (
+          <Button appearance="primary" as="a" href="/api/auth/github/start">
+            Sign in with GitHub
+          </Button>
+        ) : (
+          <MessageBar intent="warning">
+            <MessageBarBody>
+              <MessageBarTitle>GitHub login is not configured</MessageBarTitle>
+              Local simulator login is only available on loopback.
+            </MessageBarBody>
+          </MessageBar>
+        )}
+      </section>
+    );
+  }
 
   return (
     <>
       <header className="section">
         <Title1>TT SmartFarm</Title1>
         <Text as="p">Web controller. The MQTT client never runs in this browser.</Text>
+        {session?.username ? (
+          <div className="status-row">
+            <Text size={200}>{session.username}</Text>
+            <Button
+              size="small"
+              onClick={() => {
+                void logout().then(() => queryClient.invalidateQueries({ queryKey: ['session'] }));
+              }}
+            >
+              Sign out
+            </Button>
+          </div>
+        ) : null}
         {snapshot ? (
           <div className="status-row">
             <Badge appearance="filled" color={statusIntent(snapshot.connection.status)}>

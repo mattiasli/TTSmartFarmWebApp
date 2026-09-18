@@ -102,6 +102,60 @@ export class FarmStore {
     return result.rows[0] ? mapUser(asRow(result.rows[0])) : null;
   }
 
+  async getUserById(userId: string): Promise<UserRecord | null> {
+    const result = await this.pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    return result.rows[0] ? mapUser(asRow(result.rows[0])) : null;
+  }
+
+  async listMembershipsForUser(userId: string): Promise<MembershipRecord[]> {
+    const result = await this.pool.query('SELECT * FROM farm_memberships WHERE user_id = $1', [userId]);
+    return result.rows.map((row) => mapMembership(asRow(row)));
+  }
+
+  async listFarmAccess(farmId: string): Promise<
+    Array<{
+      githubId: string;
+      username: string;
+      displayName: string | null;
+      role: FarmRole;
+      disabledAt: Date | null;
+      allowlisted: boolean;
+    }>
+  > {
+    const result = await this.pool.query(
+      `SELECT u.github_id, u.username, u.display_name, m.role, u.disabled_at,
+              EXISTS (
+                SELECT 1 FROM login_allowlist a
+                WHERE a.github_id = u.github_id AND a.farm_id = m.farm_id AND a.revoked_at IS NULL
+              ) AS allowlisted
+       FROM farm_memberships m
+       JOIN users u ON u.id = m.user_id
+       WHERE m.farm_id = $1
+       ORDER BY u.username`,
+      [farmId],
+    );
+    return result.rows.map((row) => ({
+      githubId: String(row.github_id),
+      username: String(row.username),
+      displayName: row.display_name == null ? null : String(row.display_name),
+      role: row.role as FarmRole,
+      disabledAt: row.disabled_at == null ? null : new Date(String(row.disabled_at)),
+      allowlisted: Boolean(row.allowlisted),
+    }));
+  }
+
+  async revokeAllowlist(githubId: string, now = new Date()) {
+    await this.pool.query(
+      `UPDATE login_allowlist SET revoked_at = $2 WHERE github_id = $1 AND revoked_at IS NULL`,
+      [githubId, now],
+    );
+  }
+
+  async getSessionById(sessionId: string): Promise<SessionRecord | null> {
+    const result = await this.pool.query('SELECT * FROM sessions WHERE id = $1', [sessionId]);
+    return result.rows[0] ? mapSession(asRow(result.rows[0])) : null;
+  }
+
   async upsertAllowlist(input: {
     githubId: string;
     farmId: string;
