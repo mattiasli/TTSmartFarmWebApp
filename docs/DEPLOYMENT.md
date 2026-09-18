@@ -48,11 +48,13 @@ Variables (in addition to the existing `DATABASE_URL` reference):
 | `GITHUB_OAUTH_CLIENT_ID` | from the OAuth app |
 | `GITHUB_OAUTH_CLIENT_SECRET` | from the OAuth app |
 
-Do **not** set `HIVEMQ_*`. Do not set `FARM_MODE=live`.
+Do **not** set `HIVEMQ_*`. Do not set `FARM_MODE=live`. Do **not** copy `VITE_*` suggested variables onto Railway.
 
-`PORT` is assigned by Railway. The process listens on `0.0.0.0`. Health check path is `/health/ready`. Startup runs migrations, then seeds the bootstrap admin.
+`APP_ENV` must be `staging` (not `production`) while `FARM_MODE=simulator`.
 
-After deploy, `GET https://default-service-production.up.railway.app/health/ready` should return JSON with `farmMode: "simulator"`.
+This staging service currently sets `PORT=3001` so it matches the public domain **target port 3001**. If Railway’s `PORT` and the Networking target port differ, `/health/ready` returns “Application failed to respond” even when the deployment is Active. The process listens on `0.0.0.0` and `process.env.PORT`. Health check path is `/health/ready`. Startup runs migrations, then seeds the bootstrap admin.
+
+Observed 2026-09-18: `GET https://default-service-production.up.railway.app/health/ready` returned JSON with `status: ready`, `farmMode: simulator`, `liveCommandsEnabled: false`, `livePumpEnabled: false`, `databaseConfigured: true`, `githubOAuthConfigured: true`.
 
 ## 3. Vercel host project (`smartfarm-host`)
 
@@ -67,9 +69,11 @@ Environment variables (Production):
 | `VITE_AUTOMATIONS_REMOTE_URL` | `https://smartfarm-automations.vercel.app/remoteEntry.js` |
 | `VITE_REALTIME_URL` | `wss://default-service-production.up.railway.app/ws` |
 
-No `DATABASE_URL`, HiveMQ, or OAuth secret on Vercel.
+No `DATABASE_URL`, HiveMQ, or OAuth secret on Vercel. If those were pasted onto the host by mistake, delete them from Vercel; they belong on Railway only.
 
-`apps/dashboard/vercel.json` rewrites `/api/:path*` to `https://default-service-production.up.railway.app/api/:path*` **before** the SPA fallback. Redeploy the host after pulling this commit.
+`VITE_*` variables must be Vercel type **Config**, not **Secret**. A Secret `VITE_` cannot be saved or converted; delete it and recreate as Config. After changing `VITE_*`, Redeploy from Deployments → latest → ⋯ → Redeploy (values are baked at build time).
+
+`apps/dashboard/vercel.json` rewrites `/api/:path*` to `https://default-service-production.up.railway.app/api/:path*` **before** the SPA fallback.
 
 ## 4. Vercel remote project (`smartfarm-automations`)
 
@@ -79,6 +83,8 @@ Root directory: `apps/automations-remote`. No secrets. Confirm `https://smartfar
 
 1. Open `https://smartfarm-host.vercel.app/login`.
 2. Sign in with GitHub as `mattiasli`.
+Observed 2026-09-18: `mattiasli` reached the dashboard at `https://smartfarm-host.vercel.app` with Simulation banner, live socket, paused automations, and host Start/Pause/All off.
+
 3. Confirm a session cookie on the host origin, snapshot JSON through `/api`, and that Pause/All off stay on the host if the editor fails.
 
 Production HiveMQ and live pump remain out of scope until G08/G09.

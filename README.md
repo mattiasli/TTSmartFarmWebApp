@@ -6,7 +6,9 @@ This folder is the application repository (`https://github.com/mattiasli/TTSmart
 
 ## Status
 
-Implementation is in progress. See `IMPLEMENTATION_PLAN.md` and `docs/IMPLEMENTATION_PROGRESS.md`. Live pumping stays disabled until supervised hardware acceptance.
+Local packages **P00–P12** are in `master`. Hosted **simulator staging (G02)** is up: GitHub OAuth through Vercel `/api` to Railway, live WebSocket, dashboard UI. Live commands and pumping stay disabled. Next: remaining P13/G08 smokes, then P14 hardware (pump still off).
+
+See `IMPLEMENTATION_PLAN.md`, `docs/IMPLEMENTATION_PROGRESS.md` (handoff at the top), and `docs/DEPLOYMENT.md`.
 
 ## Layout
 
@@ -29,4 +31,4 @@ npm run dev
 
 `npm run dev` stays running. Open http://127.0.0.1:5173 when it prints that the servers are ready. Press Ctrl+C to stop.
 
-Details: [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md). Runbooks: [docs/RUNBOOKS.md](docs/RUNBOOKS.md). Contracts: [docs/CONTRACTS.md](docs/CONTRACTS.md). CI: [docs/RELEASE.md](docs/RELEASE.md).
+Details: [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md). Staging: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Runbooks: [docs/RUNBOOKS.md](docs/RUNBOOKS.md). Contracts: [docs/CONTRACTS.md](docs/CONTRACTS.md). CI: [docs/RELEASE.md](docs/RELEASE.md).

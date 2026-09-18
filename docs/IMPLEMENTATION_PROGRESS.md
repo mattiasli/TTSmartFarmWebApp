@@ -2,9 +2,81 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Handoff for the next implementer (2026-09-18)
+
+Read this section before changing code. Live pump stays **disabled**. Do not invent secrets. Do not commit `.env` or OAuth client secrets.
+
+**Repo:** `https://github.com/mattiasli/TTSmartFarmWebApp` · default branch `master`  
+**Local folder:** `smartFarmRemoteWebApp/`  
+**Plan:** `IMPLEMENTATION_PLAN.md` packages P00–P15. Completed through **P12** plus **G02 hosted topology proof** on simulator staging. **P13 remaining:** extra staging failure/rollback smokes (G08). **P14/P15** need hardware and production HiveMQ; not started.
+
+### What already works
+
+- Local simulator: `npm run dev` → http://127.0.0.1:5173
+- CI on GitHub Actions (`smartfarm-web-ci.yml`): checks, integration (Postgres service), federation, e2e — last observed all green on `4b9968d`
+- Hosted **simulator** staging (not the physical farm):
+  - Host: https://smartfarm-host.vercel.app
+  - Remote: https://smartfarm-automations.vercel.app
+  - API: https://default-service-production.up.railway.app
+  - Observed `GET /health/ready`: `status: ready`, `controller: owner`, `appEnv: staging`, `farmMode: simulator`, `liveCommandsEnabled: false`, `livePumpEnabled: false`, `databaseConfigured: true`, `githubOAuthConfigured: true`
+  - Observed browser: GitHub login as `mattiasli`, dashboard sensors, **live socket**, Simulation banner, automations paused after backend start, host Start/Pause/All off visible
+
+### Public IDs (not secrets)
+
+- Bootstrap admin GitHub id `43301236` / username `mattiasli`
+- Railway project name `smartfarm-staging` (Railway UI environment is labeled `production`; **app** `APP_ENV` must stay `staging`)
+- Railway service `_default-service`, public host `default-service-production.up.railway.app`
+- Vercel projects `smartfarm-host` (root `apps/dashboard`) and `smartfarm-automations` (root `apps/automations-remote`)
+- GitHub OAuth app name `TT SmartFarm staging`
+  - Homepage `https://smartfarm-host.vercel.app`
+  - Callback **exactly** `https://smartfarm-host.vercel.app/api/auth/github/callback`
+
+### Secrets live only in Railway (never git, never Vercel)
+
+`DATABASE_URL` (shared from Postgres), `GITHUB_OAUTH_CLIENT_ID`, `GITHUB_OAUTH_CLIENT_SECRET`. No `HIVEMQ_*` on staging.
+
+### Code SHAs that matter
+
+| SHA | Why |
+|---|---|
+| `4b9968d` | P12 CI/docs |
+| `1c35e12` | Vercel Node 24.19 engines + monorepo install commands |
+| `b7ddf86` | `Dockerfile`, `railway.toml`, `docs/DEPLOYMENT.md` |
+| `5294fe8` | Host `/api` rewrite → Railway |
+| `440a79e` | API listens on `process.env.PORT` and `0.0.0.0` when not local |
+
+### Staging ops facts that blocked us (do not re-learn)
+
+- Railway **Connect Repo** needs the **Railway GitHub App installed**, not only OAuth-authorized.
+- Public domain **target port** must match the process listen port. Staging used target **3001** and Railway variable `PORT=3001`. Mismatch → Railway “Application failed to respond” even when deploy is Active.
+- `APP_ENV` on Railway must be **`staging`**. `APP_ENV=production` + `FARM_MODE=simulator` throws at startup.
+- Do **not** add Vercel `VITE_*` variables onto Railway. Do **not** put OAuth secret on Vercel.
+- Vercel `VITE_*` vars must be type **Config**, not **Secret**. A Secret `VITE_` cannot be saved and cannot be converted; **Delete** and recreate as Config.
+- After changing `VITE_*`, **Redeploy** the host (build-time bake). Redeploy is Deployments → latest → ⋯ → Redeploy (not a top-right Deploy button).
+- `vercel.json` rewrite `/api/:path*` must stay **before** SPA fallback.
+
+### Next concrete work (do not skip to hardware)
+
+1. Confirm remote `https://smartfarm-automations.vercel.app/remoteEntry.js` is JS from a logged-out browser (G01/G02 remote CORS).
+2. Remaining P13/G08: backend restart stays paused, host emergency controls if remote fails, two-browser settings conflict, no auto-resume after deploy.
+3. Do **not** enable `LIVE_COMMANDS_ENABLED` or `LIVE_PUMP_ENABLED`. Do **not** point staging at HiveMQ.
+4. P14 production read-only only after G08 and a dedicated backend MQTT credential.
+
+### Local commands
+
+See `docs/LOCAL_DEVELOPMENT.md`. `npm run typecheck` / `lint` / `test:unit` / `test:integration` were last fully run at P12 (`110` unit / `25` integration).
+
+## Session 2026-09-18 (P13 G02)
+
+Source SHA: `master` at `440a79e` plus this progress/docs commit.
+
+Completed: hosted simulator topology proof — Railway API + Postgres, Vercel host/remote, GitHub OAuth through `/api` rewrite, ticket/WSS snapshot, dashboard UI. Live flags false.
+
+Unresolved for full P13/G08: remote clean-browser chunk check, deploy overlap/rollback drill, backup restore, latency measurements. Staging GitHub Action deploy workflows still absent (manual dashboard deploys).
+
 ## Session 2026-09-18 (P13 start)
 
-Railway project `smartfarm-staging` has Postgres linked. Public API host is `default-service-production.up.railway.app`. Vercel host `https://smartfarm-host.vercel.app` and remote `https://smartfarm-automations.vercel.app` exist. Host `/api` rewrite now targets that Railway origin. Live commands/pump stay false. G02 still needs a healthy Railway deploy, OAuth on Railway, and host env/redeploy.
+Railway project `smartfarm-staging` has Postgres linked. Public API host is `default-service-production.up.railway.app`. Vercel host `https://smartfarm-host.vercel.app` and remote `https://smartfarm-automations.vercel.app` exist. Host `/api` rewrite now targets that Railway origin. Live commands/pump stay false. **Superseded:** G02 login/WSS/snapshot later succeeded; see Handoff and P13 G02 above.
 
 ## Session 2026-09-18 (P12)
 
