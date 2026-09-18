@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { encodeLcdText, mapFarmCommand, validateMqttCommand } from './commands';
+import { encodeLcdText, mapFarmCommand, requestFromControl, validateMqttCommand } from './commands';
 
 describe('command mapping', () => {
   it('maps typed API actions onto canonical firmware topics', () => {
@@ -19,6 +19,9 @@ describe('command mapping', () => {
       payload: 'close',
     });
     expect(mapFarmCommand({ type: 'farm.allOff' }).payload).toBe('off');
+    expect(requestFromControl('fan', 'on')).toEqual({ type: 'fan.set', on: true });
+    expect(requestFromControl('pump', 'pulse')).toEqual({ type: 'pump.pulse' });
+    expect(requestFromControl('lcd', 'Hello|Farm')).toEqual({ type: 'lcd.setText', line1: 'Hello', line2: 'Farm' });
   });
 
   it('rejects topic injection and unknown controls', () => {

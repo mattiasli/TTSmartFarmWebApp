@@ -88,3 +88,31 @@ export function mapFarmCommand(request: FarmCommandRequest): MqttCommand {
 export function encodeLcdText(line1: string, line2: string): string {
   return validateMqttCommand('lcd', `${line1}|${line2}`).payload;
 }
+
+export function requestFromControl(control: string, payload: string): FarmCommandRequest {
+  validateMqttCommand(control, payload);
+  switch (control) {
+    case 'fan':
+      return { type: 'fan.set', on: payload === 'on' };
+    case 'led':
+      return { type: 'light.set', on: payload === 'on' };
+    case 'pump':
+      return payload === 'pulse' ? { type: 'pump.pulse' } : { type: 'pump.stop' };
+    case 'buzzer':
+      return payload === 'off'
+        ? { type: 'buzzer.stop' }
+        : { type: 'buzzer.beep', frequencyHz: Number(payload) };
+    case 'lcd':
+      if (payload === 'status') return { type: 'lcd.showStatus' };
+      {
+        const [line1 = '', line2 = ''] = payload.split('|');
+        return { type: 'lcd.setText', line1, line2 };
+      }
+    case 'backlight':
+      return { type: 'lcd.setBacklight', on: payload === 'on' };
+    case 'all':
+      return { type: 'farm.allOff' };
+    default:
+      throw new CommandValidationError('Unknown control or command.');
+  }
+}

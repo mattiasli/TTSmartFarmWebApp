@@ -12,4 +12,9 @@ describe('automation settings', () => {
     expect(edited.fanOn).toBe(26);
     expect(edited.fanOff).toBe(24);
   });
+
+  it('T051/T054 rejects a temporarily empty number instead of snapping back', () => {
+    expect(() => editAutomationSetting(DEFAULT_AUTOMATIONS, 'fanOn', '' as never)).toThrow();
+    expect(() => editAutomationSetting(DEFAULT_AUTOMATIONS, 'fanOn', Number.NaN as never)).toThrow();
+  });
 });

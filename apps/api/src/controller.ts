@@ -26,6 +26,7 @@ import {
   mapFarmCommand,
   matchesExpectedState,
   normalizeTelemetry,
+  requestFromControl,
   sameCommandRequest,
   stopSupersedes,
   telemetryAgeMs,
@@ -53,6 +54,7 @@ export class FarmController {
   private receiveSequence = 0;
   private lastReceivedAtMs = Number.NEGATIVE_INFINITY;
   private lastSampleMs = 0;
+  private lastPersistedAttempts = -1;
   private publishChain = Promise.resolve();
   private pumpTimer: ReturnType<typeof setTimeout> | null = null;
   private pumpWatchdog: ReturnType<typeof setTimeout> | null = null;
@@ -72,7 +74,19 @@ export class FarmController {
     readonly link: FarmLink,
     private readonly now = () => Date.now(),
     store: FarmStore | null = null,
-    initial?: { settings?: AutomationSettings; revision?: number; lock?: ControllerLock | null; ownership?: ControllerOwnership },
+    initial?: {
+      settings?: AutomationSettings;
+      revision?: number;
+      lock?: ControllerLock | null;
+      ownership?: ControllerOwnership;
+      runtime?: {
+        attempts?: number;
+        cooldownUntilMs?: number | null;
+        lastPumpStopMs?: number | null;
+        manual?: RuleId[];
+        tankIsLow?: boolean;
+      };
+    },
   ) {
     this.store = store;
     this.lock = initial?.lock ?? null;
@@ -81,13 +95,19 @@ export class FarmController {
     this.engine = new AutomationEngine({
       settings: initial?.settings ?? DEFAULT_AUTOMATIONS,
       clock: this.now,
-      send: async (control, payload) => {
-        await this.assertCanPublish();
-        const mapped = validateMqttCommand(control, payload);
-        await this.link.publish(mapped.topic, mapped.payload);
-        if (control === 'pump' && payload === 'pulse') this.armPumpBackupStop();
+      send: async (control, payload, options) => {
+        if (control === 'pumpguard') {
+          await this.assertCanPublish();
+          const mapped = validateMqttCommand(control, payload);
+          await this.link.publish(mapped.topic, mapped.payload);
+          return;
+        }
+        const request = requestFromControl(control, payload);
+        await this.command(request, crypto.randomUUID(), 'automation:engine');
+        if (options?.cleanup && control === 'pump') this.armPumpBackupStop();
       },
     });
+    if (initial?.runtime) this.engine.restorePersisted(initial.runtime);
     this.engine.pause('Paused after backend start. Resume explicitly.');
     this.driveTimer = setInterval(() => this.drive(), 250);
     this.drive();
@@ -246,6 +266,7 @@ export class FarmController {
       const reserved = await this.store.reserveCommand({
         farmId: this.config.FARM_ID,
         actorScope,
+        source: actorScope.startsWith('automation') ? 'automation' : 'user',
         idempotencyKey,
         request: parsed,
         connectionEpoch: this.link.mqttEpoch,
@@ -293,7 +314,15 @@ export class FarmController {
         throw new CommandPolicyError('ACTUATOR_BUSY', 'Wait for the current command on this output to finish.');
       }
       const mapped = mapFarmCommand(parsed);
-      this.engine.takeManual(mapped.control);
+      if (actorScope !== 'automation:engine') {
+        this.engine.takeManual(mapped.control);
+        if (mapped.control === 'lcd' && this.engine.rememberLcd(mapped.payload)) {
+          tracked.status = 'sent';
+          tracked.reason = 'Saved — the tank warning currently owns the display.';
+          await this.persistCommand(tracked);
+          return tracked;
+        }
+      }
       tracked.status = 'publishing';
       await this.assertCanPublish();
       await this.publishSerialized(tracked, mapped.topic, mapped.payload);
@@ -384,7 +413,9 @@ export class FarmController {
         runtime.cooldownRemainingSeconds > 0
           ? new Date(this.now() + runtime.cooldownRemainingSeconds * 1000)
           : null,
-      guardStatus: runtime.guardConfirmed ? 'confirmed' : 'unknown',
+      lastPumpStopAt: this.engine.lastPumpStopMs() != null ? new Date(this.engine.lastPumpStopMs()!) : null,
+      guardTarget: { tankLow: this.engine.settings.tankLow, tankRecover: this.engine.settings.tankRecover },
+      guardStatus: this.engine.guardStatus(),
     });
   }
 
@@ -404,6 +435,10 @@ export class FarmController {
     }
     const age = latest ? telemetryAgeMs(latest.receivedAtMs, this.now()) : null;
     this.engine.tick(isFresh(age));
+    if (this.store && this.engine.attempts !== this.lastPersistedAttempts) {
+      this.lastPersistedAttempts = this.engine.attempts;
+      void this.persistRuntime();
+    }
     if (this.store && latest && this.now() - this.lastSampleMs >= 10_000) {
       this.lastSampleMs = this.now();
       void this.store.recordTelemetrySample(

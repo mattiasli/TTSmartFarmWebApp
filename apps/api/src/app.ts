@@ -67,12 +67,21 @@ export async function createDeps(config: AppConfig): Promise<AppDeps> {
   const store = new FarmStore(pool);
   await seedLocal(pool, { farmId: config.FARM_ID, farmName: config.FARM_NAME });
   const saved = await store.getConfig(config.FARM_ID);
+  const runtime = await store.getRuntime(config.FARM_ID);
   const lockKey = await store.getFarmLockKey(config.FARM_ID);
   const lock = new DedicatedControllerLock(config.DATABASE_URL, lockKey);
   const controller = new FarmController(config, link, () => Date.now(), store, {
     settings: saved?.settings,
     revision: saved?.revision,
     lock,
+    runtime: runtime
+      ? {
+          attempts: runtime.attempts,
+          cooldownUntilMs: runtime.cooldownUntil?.getTime() ?? null,
+          lastPumpStopMs: runtime.lastPumpStopAt?.getTime() ?? null,
+          manual: runtime.manualOverrides,
+        }
+      : undefined,
   });
   await controller.becomeOwner();
   return {

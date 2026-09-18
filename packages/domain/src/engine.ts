@@ -180,6 +180,38 @@ export class AutomationEngine {
     this.event('Watering attempts reset. A full settling wait starts now.');
   }
 
+  restorePersisted(input: {
+    attempts?: number;
+    cooldownUntilMs?: number | null;
+    lastPumpStopMs?: number | null;
+    manual?: RuleId[];
+    tankIsLow?: boolean;
+  }) {
+    this.enabled = false;
+    this.attempts = input.attempts ?? this.attempts;
+    if (input.lastPumpStopMs != null) this.lastPumpOff = input.lastPumpStopMs;
+    if (input.cooldownUntilMs != null) this.nextWater = Math.max(this.nextWater, input.cooldownUntilMs);
+    if (input.tankIsLow !== undefined) this.tankIsLow = input.tankIsLow;
+    for (const rule of input.manual ?? []) this.manual.add(rule);
+  }
+
+  lastPumpStopMs() {
+    return this.lastPumpOff;
+  }
+
+  guardStatus(): 'unknown' | 'pending' | 'confirmed' | 'failed' {
+    if (this.faults.guard) return 'failed';
+    if (this.guardDirty || this.pending.has('pumpguard')) return 'pending';
+    if (
+      this.data?.guard === 1 &&
+      this.data.tankLow === this.settings.tankLow &&
+      this.data.tankRecover === this.settings.tankRecover
+    ) {
+      return 'confirmed';
+    }
+    return 'unknown';
+  }
+
   sample(data: WireTelemetry) {
     const previousPump = this.data?.pump;
     this.data = data;
@@ -423,11 +455,12 @@ export class AutomationEngine {
       else if (this.pulse) message = this.pulse.stopping ? 'Waiting for the pump to stop.' : 'Watering with one short pulse.';
       else if (d.pump) message = 'Waiting — pump already running.';
       else if (d.soil >= s.soilDry) message = `Soil is moist enough — ${d.soil}%.`;
-      else if (this.attempts >= s.maxPulses)
+      else if (this.attempts >= s.maxPulses) {
         message = `Paused after ${this.attempts} pulses. Check the soil probe and reset watering.`;
-      else if (now < this.nextWater)
+        this.faults.irrigation ??= message;
+      } else if (now < this.nextWater) {
         message = `Waiting ${Math.ceil((this.nextWater - now) / 1000)} seconds before watering again.`;
-      else {
+      } else {
         this.attempts += 1;
         this.pulse = { started: now, seenOn: false, stopping: false };
         this.issue('pump', 'pulse', `Watering started: soil ${d.soil}%, tank ${d.water}%, no rain block.`);

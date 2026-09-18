@@ -2,6 +2,28 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Session 2026-09-18 (P09)
+
+Source SHA / working-tree scope: `master` at `7ba4b8e` plus local P09 changes.
+
+Completed this session: **P09** automation engine persistence, command-service effects, and G05 rule coverage.
+
+Notes:
+
+- Engine effects (except `pumpguard`) go through the same command service as manual actions; automation actor scope does not take manual ownership.
+- Runtime attempts, cooldown, last pump stop, guard target/status, and manual overrides persist and restore. Restart stays paused until explicit resume.
+- Fake-time coverage for T029–T058: irrigation gates, cooldown/max attempts, rain delay, alarm LCD/beep, guard echo, cooling/lighting, motion hold.
+- Loopback MQTT proves an automation command sequence. Live commands/pump remain disabled.
+
+Tests run and actual results:
+
+- `npm run typecheck` — pass
+- `npm run lint` — pass
+- `npm run test:unit` — 86 passed
+- `npm run test:integration` — 25 passed including runtime restore and local MQTT automation sequence
+
+Next concrete task: **P10** dashboard history, live WS UI, and host Pause/All off. Live pumping stays disabled.
+
 ## Session 2026-09-18 (P08)
 
 Source SHA / working-tree scope: `master` at `cbd6b53` plus local P08 changes.
