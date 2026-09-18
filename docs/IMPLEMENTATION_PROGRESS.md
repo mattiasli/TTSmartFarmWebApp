@@ -2,6 +2,30 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Session 2026-09-18 (P12)
+
+Source SHA / working-tree scope: `master` at `879c48f` plus local P12 changes.
+
+Completed this session: **P12** CI gate, frontend import/secret scans, history/backpressure bounds, and operator docs.
+
+Notes:
+
+- `smartfarm-web-ci.yml` now splits lint/types/unit, Postgres service integration, built federation + secret canaries, and Chromium e2e via `run-e2e-test.mjs`. Actions are pinned to commit SHAs. No HiveMQ/OAuth/Railway secrets in CI.
+- History queries reject >30 days or >2000 buckets. Realtime sockets close on 1 MiB backpressure and session/total limits.
+- Docs: `docs/RUNBOOKS.md`, `docs/CONTRACTS.md`, `docs/RELEASE.md`, hardware template. Staging/production deploy workflows are not added; G02 still needs Vercel/Railway/OAuth.
+- Live commands/pump remain disabled.
+
+Tests run and actual results:
+
+- `npm run typecheck` — pass
+- `npm run lint` — pass
+- `npm run test:unit` — 110 passed
+- `npm run test:integration` — 25 passed
+- `npm run check:frontend-imports` — pass
+- `npm run check:contracts` — 62 passed
+
+Next concrete task: **P13** hosted staging (blocked on G02 cloud accounts). Live pumping stays disabled.
+
 ## Session 2026-09-18 (P11)
 
 Source SHA / working-tree scope: `master` at `0d2e409` plus local P11 changes.

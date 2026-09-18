@@ -29,6 +29,7 @@
     "simulator": "npm run start -w @smartfarm/simulator",
     "broker": "npm run broker -w @smartfarm/simulator",
     "check:client-secrets": "node tools/scripts/check-client-secrets.mjs",
+    "check:frontend-imports": "node tools/scripts/check-frontend-imports.mjs",
     "check:contracts": "vitest run packages/domain packages/contracts",
     "preview:host": "npm run preview -w @smartfarm/dashboard",
     "preview:remote": "npm run preview -w @smartfarm/automations-remote"

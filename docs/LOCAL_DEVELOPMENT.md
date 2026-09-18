@@ -15,8 +15,11 @@ Run one-shot checks first, then start the servers in a terminal you leave open:
 
 ```text
 npm ci
+npm run lint
+npm run typecheck
 npm run test:unit
 npm run test:federation
+npm run check:frontend-imports
 npm run dev
 ```
 
@@ -44,7 +47,9 @@ npm run simulator
 
 Then set `SIMULATOR_TRANSPORT=mqtt` for the API. Docker Compose Postgres/Mosquitto remains the preferred integration stack when Docker Desktop is running.
 
-Local login is loopback-only (`POST /api/v1/local/login`). The dashboard does this automatically in local mode. GitHub OAuth (`/api/auth/github/start`) needs `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` plus Postgres. Realtime tickets (`POST /api/v1/realtime/tickets`) also require Postgres sessions.
+Local login is loopback-only (`POST /api/v1/local/login`). The dashboard does this automatically in local mode. GitHub OAuth (`/api/auth/github/start`) needs `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` plus Postgres. Realtime tickets (`POST /api/v1/realtime/tickets`) work with memory sessions locally and Postgres sessions when `DATABASE_URL` is set.
+
+Operator runbooks: `docs/RUNBOOKS.md`. Contract/API surface: `docs/CONTRACTS.md`. CI/release notes: `docs/RELEASE.md`.
 
 ## Ports
 

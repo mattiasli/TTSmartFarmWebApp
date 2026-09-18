@@ -19,6 +19,7 @@ import {
   isPgCheckViolation,
   isPgUniqueViolation,
 } from './errors';
+import { MAX_HISTORY_POINTS, THIRTY_DAYS_MS, assertHistoryQueryWindow } from './history-window';
 import {
   mapAllowlist,
   mapCommand,
@@ -53,9 +54,7 @@ import type {
   WsTicketRecord,
 } from './types';
 
-const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
-const MAX_HISTORY_POINTS = 2000;
 const SAMPLE_INTERVAL_MS = 10_000;
 const EVENT_PAGE_MAX = 100;
 const AUTH_SWEEP_BATCH = 500;
@@ -754,18 +753,11 @@ export class FarmStore {
     path: string;
     bucketSeconds?: number;
   }): Promise<HistorySeriesPoint[]> {
-    if (input.to.getTime() <= input.from.getTime()) {
-      throw new QueryWindowError('History range must have a positive duration.');
-    }
-    if (input.to.getTime() - input.from.getTime() > THIRTY_DAYS_MS) {
-      throw new QueryWindowError();
-    }
-    const bucketSeconds = Math.max(input.bucketSeconds ?? 60, 10);
-    const spanSeconds = Math.ceil((input.to.getTime() - input.from.getTime()) / 1000);
-    const estimated = Math.ceil(spanSeconds / bucketSeconds);
-    if (estimated > MAX_HISTORY_POINTS) {
-      throw new QueryWindowError();
-    }
+    const { bucketSeconds } = assertHistoryQueryWindow(
+      input.from,
+      input.to,
+      input.bucketSeconds ?? 60,
+    );
     if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(input.path)) {
       throw new QueryWindowError('Unsupported history series.');
     }

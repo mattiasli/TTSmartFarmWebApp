@@ -10,15 +10,13 @@ import {
 import type { AppConfig } from '../config';
 import { AuthRecordExpiredError, randomToken, type FarmStore } from '../db';
 import type { MemorySessionStore } from '../sessions';
+import { exceedsBackpressure, exceedsSessionSocketLimit, exceedsTotalSocketLimit } from './backpressure';
 import type { SessionService } from './session';
 
 const AUTH_TIMEOUT_MS = 5_000;
 const AUTH_FRAME_MAX = 2048;
 const HEARTBEAT_MS = 20_000;
 const STALE_MS = 45_000;
-const MAX_SOCKETS_PER_SESSION = 3;
-const MAX_SOCKETS_TOTAL = 100;
-const MAX_BUFFERED = 1_048_576;
 
 type SocketClient = {
   socket: WebSocket;
@@ -88,7 +86,7 @@ export class RealtimeHub {
     for (const client of this.clients) {
       if (!client.authed || client.farmId !== farmId) continue;
       if (client.socket.readyState !== 1) continue;
-      if (client.socket.bufferedAmount > MAX_BUFFERED) {
+      if (exceedsBackpressure(client.socket.bufferedAmount)) {
         this.closeClient(client, 4003, 'backpressure');
         continue;
       }
@@ -130,7 +128,7 @@ export class RealtimeHub {
 
   async attach(socket: WebSocket, request: FastifyRequest) {
     const origin = request.headers.origin;
-    if (!origin || !this.origins.has(origin) || this.clients.size >= MAX_SOCKETS_TOTAL) {
+    if (!origin || !this.origins.has(origin) || exceedsTotalSocketLimit(this.clients.size)) {
       socket.close(4403, 'bad_origin');
       return;
     }
@@ -193,7 +191,7 @@ export class RealtimeHub {
           sessionId = ticket.sessionId;
           farmId = ticket.farmId;
         }
-        if (this.sessionCount(sessionId) >= MAX_SOCKETS_PER_SESSION) {
+        if (exceedsSessionSocketLimit(this.sessionCount(sessionId))) {
           this.closeClient(client, 4401, 'socket_limit');
           return;
         }

@@ -1,3 +1,5 @@
+PostgreSQL repository, auth, MQTT, and controller integration tests.
+
 P05 PostgreSQL repository tests live in `repositories.test.ts`.
 
 ```text
