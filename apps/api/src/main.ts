@@ -11,6 +11,8 @@ if (config.DATABASE_URL) {
 }
 
 const app = await buildApp(config);
-const host = config.APP_ENV === 'local' ? config.HOST : '0.0.0.0';
-await app.listen({ host, port: config.PORT });
-console.log(`API listening on http://${host}:${config.PORT} (${config.SIMULATOR_TRANSPORT} farm link)`);
+const port = Number(process.env.PORT ?? config.PORT);
+const host =
+  config.NODE_ENV === 'production' || config.APP_ENV !== 'local' ? '0.0.0.0' : config.HOST;
+await app.listen({ host, port });
+console.log(`API listening on http://${host}:${port} (${config.SIMULATOR_TRANSPORT} farm link)`);
