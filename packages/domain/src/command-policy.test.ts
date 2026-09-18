@@ -37,4 +37,30 @@ describe('assertCommandPolicy', () => {
       }),
     ).toThrow(/LIVE_PUMP_DISABLED|disabled/i);
   });
+
+  it('blocks a pulse while rain avoidance is active', () => {
+    expect(() =>
+      assertCommandPolicy({
+        ...base,
+        telemetry: { ...HEALTHY_TELEMETRY_FIXTURE, rain: 1 },
+        rainRuleEnabled: true,
+        request: { type: 'pump.pulse' },
+      }),
+    ).toThrow(/RAIN_BLOCKED|rain/i);
+  });
+
+  it('blocks another pulse while a previous pulse is unresolved', () => {
+    expect(() =>
+      assertCommandPolicy({ ...base, unresolvedPump: true, request: { type: 'pump.pulse' } }),
+    ).toThrow(/PUMP_UNCERTAIN|unresolved/i);
+  });
+
+  it('does not buffer starts or stops when the broker is disconnected', () => {
+    expect(() =>
+      assertCommandPolicy({ ...base, brokerReady: false, request: { type: 'fan.set', on: true } }),
+    ).toThrow(/BROKER_UNAVAILABLE|MQTT/i);
+    expect(() =>
+      assertCommandPolicy({ ...base, brokerReady: false, request: { type: 'farm.allOff' } }),
+    ).toThrow(/BROKER_UNAVAILABLE|disconnected/i);
+  });
 });

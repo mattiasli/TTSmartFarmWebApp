@@ -275,6 +275,16 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     return withPermissions(controller.snapshot(), session);
   });
 
+  app.get('/api/v1/farms/:farmId/commands/:commandId', async (request, reply) => {
+    const id = requestId();
+    const { farmId, commandId } = request.params as { farmId: string; commandId: string };
+    const session = await requireFarm(request, reply, id, farmId);
+    if (!session) return;
+    const current = controller.getCommand(commandId) ?? (store ? await store.getCommand(commandId) : null);
+    if (!current) return sendError(reply, 404, 'NOT_FOUND', 'Command not found.', id);
+    return current;
+  });
+
   app.post('/api/v1/farms/:farmId/commands', async (request, reply) => {
     const id = requestId();
     const { farmId } = request.params as { farmId: string };

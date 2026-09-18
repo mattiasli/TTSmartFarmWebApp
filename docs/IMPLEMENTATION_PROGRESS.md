@@ -2,6 +2,29 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Session 2026-09-18 (P08)
+
+Source SHA / working-tree scope: `master` at `cbd6b53` plus local P08 changes.
+
+Completed this session: **P08** durable command confirmation, stop supersession, and pump restrictions.
+
+Notes:
+
+- Commands reserve-before-dispatch, stay idempotent, and never replay after restart. Pending rows become `uncertain`.
+- State match uses only a newer packet in the current MQTT epoch. LCD/beep stay `sent` (`not_reported`).
+- Stops supersede unpublished starts; already-sent work is not unsent. Publishes are serialized; late start callbacks are ignored.
+- Pump pulses require rain/live/guard gates, a 3.5 s backup `off`, and an 8.5 s unresolved watchdog. Another pulse is blocked until resolved.
+- `GET /api/v1/farms/:farmId/commands/:commandId` returns the current record. Live commands/pump remain disabled.
+
+Tests run and actual results:
+
+- `npm run typecheck` — pass
+- `npm run lint` — pass
+- `npm run test:unit` — 75 passed
+- `npm run test:integration` — 23 passed including restart/no-replay and in-process loopback MQTT match
+
+Next concrete task: **P09** persist/MQTT automation sequences on this command service. Live pumping stays disabled.
+
 ## Session 2026-09-18 (P07)
 
 Source SHA / working-tree scope: `master` at `4354afd` plus local P07 changes.

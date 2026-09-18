@@ -643,6 +643,16 @@ export class FarmStore {
     return result.rows[0] ? mapCommand(asRow(result.rows[0])) : null;
   }
 
+  async listPendingCommands(farmId: string): Promise<CommandRecord[]> {
+    const result = await this.pool.query(
+      `SELECT * FROM commands
+       WHERE farm_id = $1 AND status IN ('accepted', 'publishing', 'sent')
+       ORDER BY requested_at ASC`,
+      [farmId],
+    );
+    return result.rows.map((row) => mapCommand(asRow(row)));
+  }
+
   async recordEvent(input: {
     farmId: string;
     category: string;

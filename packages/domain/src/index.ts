@@ -5,5 +5,6 @@ export * from './freshness';
 export * from './normalize';
 export * from './loopback';
 export * from './command-policy';
+export * from './command-confirm';
 export * from './scenarios';
 export * from './engine';

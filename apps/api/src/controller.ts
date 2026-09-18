@@ -9,29 +9,54 @@ import {
   type FarmCommandRequest,
   type FarmSnapshot,
   type RuleId,
+  type WireTelemetry,
 } from '@smartfarm/contracts';
 import {
   AutomationEngine,
   CommandPolicyError,
+  PUBLISH_DEADLINE_MS,
+  PUMP_WATCHDOG_MS,
+  STATE_MATCH_MS,
+  actuatorFor,
   assertCommandPolicy,
+  confirmationModeFor,
   isFresh,
+  isPendingStatus,
+  isStopCommand,
   mapFarmCommand,
+  matchesExpectedState,
   normalizeTelemetry,
+  sameCommandRequest,
+  stopSupersedes,
   telemetryAgeMs,
   validateMqttCommand,
 } from '@smartfarm/domain';
 import type { AppConfig } from './config';
 import { type ControllerLock } from './db/lock';
-import { RevisionConflictError } from './db/errors';
+import { IdempotencyConflictError, RevisionConflictError } from './db/errors';
 import { FarmStore } from './db/store';
 import type { FarmLink } from './farm-link';
 
 const PUMP_BACKUP_STOP_MS = 3500;
 
+type TrackedCommand = CommandDto & {
+  request: FarmCommandRequest;
+  actuator: string;
+  mqttEpoch: string;
+  receiveSequence: number;
+  dispatched: boolean;
+};
+
 export class FarmController {
-  private commands = new Map<string, CommandDto>();
-  private idempotency = new Map<string, CommandDto>();
+  private commands = new Map<string, TrackedCommand>();
+  private idempotency = new Map<string, TrackedCommand>();
+  private receiveSequence = 0;
+  private lastReceivedAtMs = Number.NEGATIVE_INFINITY;
+  private lastSampleMs = 0;
+  private publishChain = Promise.resolve();
   private pumpTimer: ReturnType<typeof setTimeout> | null = null;
+  private pumpWatchdog: ReturnType<typeof setTimeout> | null = null;
+  private matchTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private driveTimer: ReturnType<typeof setInterval> | null = null;
   private settingsRevision = 1;
   readonly engine: AutomationEngine;
@@ -128,6 +153,7 @@ export class FarmController {
     if (!this.lock) {
       this.ownership = 'owner';
       this.engine.pause('Paused after backend start. Resume explicitly.');
+      await this.abandonPendingFromStore('Controller restarted before confirmation.');
       void this.persistRuntime();
       return true;
     }
@@ -135,6 +161,7 @@ export class FarmController {
     this.ownership = acquired ? 'owner' : 'waiting_for_owner';
     if (acquired) {
       this.engine.pause('Paused after backend start. Resume explicitly.');
+      await this.abandonPendingFromStore('Controller restarted before confirmation.');
       void this.persistRuntime();
     }
     return acquired;
@@ -197,10 +224,20 @@ export class FarmController {
     return this.snapshot();
   }
 
+  getCommand(id: string) {
+    return this.commands.get(id) ?? null;
+  }
+
   async command(request: FarmCommandRequest, idempotencyKey: string, actorScope = 'user:local'): Promise<CommandDto> {
+    this.assertOwner();
     const parsed = farmCommandRequestSchema.parse(request);
     const existing = this.idempotency.get(idempotencyKey);
-    if (existing) return existing;
+    if (existing) {
+      if (!sameCommandRequest(existing.request, parsed)) {
+        throw new IdempotencyConflictError();
+      }
+      return existing;
+    }
     const latest = this.link.latest();
     const age = latest ? telemetryAgeMs(latest.receivedAtMs, this.now()) : null;
     const brokerReady = this.link.transport === 'memory' ? true : this.link.ready;
@@ -211,15 +248,35 @@ export class FarmController {
         actorScope,
         idempotencyKey,
         request: parsed,
+        connectionEpoch: this.link.mqttEpoch,
+        receiveSequence: this.receiveSequence,
       });
       if (!reserved.dispatched) {
-        this.commands.set(reserved.command.id, reserved.command);
-        this.idempotency.set(idempotencyKey, reserved.command);
-        return reserved.command;
+        const trackedExisting = this.toTracked(reserved.command.payload, reserved.command, {
+          mqttEpoch: reserved.command.connectionEpoch ?? this.link.mqttEpoch,
+          receiveSequence: reserved.command.receiveSequence ?? this.receiveSequence,
+          dispatched: reserved.command.status !== 'accepted',
+        });
+        this.commands.set(trackedExisting.id, trackedExisting);
+        this.idempotency.set(idempotencyKey, trackedExisting);
+        return trackedExisting;
       }
       reservedId = reserved.command.id;
     }
+    const tracked = this.toTracked(parsed, {
+      id: reservedId ?? crypto.randomUUID(),
+      action: parsed.type,
+      status: 'accepted',
+      confirmationMode: confirmationModeFor(parsed.type),
+      requestedAt: new Date(this.now()).toISOString(),
+      sentAt: null,
+      stateMatchedAt: null,
+      reason: null,
+    });
+    this.commands.set(tracked.id, tracked);
+    this.idempotency.set(idempotencyKey, tracked);
     try {
+      if (isStopCommand(parsed.type)) this.supersedePending(parsed.type, tracked.id);
       assertCommandPolicy({
         request: parsed,
         mode: this.config.FARM_MODE,
@@ -229,43 +286,39 @@ export class FarmController {
         brokerReady,
         telemetryAgeMs: age,
         telemetry: latest?.data ?? null,
+        rainRuleEnabled: this.engine.settings.rain,
+        unresolvedPump: this.hasUnresolvedPump(tracked.id),
       });
+      if (!isStopCommand(parsed.type) && this.hasPendingActuator(tracked.actuator, tracked.id)) {
+        throw new CommandPolicyError('ACTUATOR_BUSY', 'Wait for the current command on this output to finish.');
+      }
       const mapped = mapFarmCommand(parsed);
       this.engine.takeManual(mapped.control);
-      const dto: CommandDto = {
-        id: reservedId ?? crypto.randomUUID(),
-        action: parsed.type,
-        status: 'sent',
-        confirmationMode:
-          parsed.type === 'pump.pulse'
-            ? 'pulse_observation'
-            : parsed.type === 'buzzer.beep' || parsed.type.startsWith('lcd.')
-              ? 'not_reported'
-              : 'state_match',
-        requestedAt: new Date(this.now()).toISOString(),
-        sentAt: new Date(this.now()).toISOString(),
-        stateMatchedAt: null,
-        reason: null,
-      };
-      await this.link.publish(mapped.topic, mapped.payload);
-      if (parsed.type === 'pump.pulse') this.armPumpBackupStop();
-      if (this.store && reservedId) {
-        await this.store.updateCommandStatus({
-          id: reservedId,
-          status: 'sent',
-          sentAt: new Date(this.now()),
-        });
+      tracked.status = 'publishing';
+      await this.assertCanPublish();
+      await this.publishSerialized(tracked, mapped.topic, mapped.payload);
+      if (this.commands.get(tracked.id)?.status === 'superseded') {
+        await this.persistCommand(tracked);
+        return tracked;
       }
-      this.commands.set(dto.id, dto);
-      this.idempotency.set(idempotencyKey, dto);
-      return dto;
+      tracked.status = 'sent';
+      tracked.sentAt = new Date(this.now()).toISOString();
+      tracked.dispatched = true;
+      tracked.mqttEpoch = this.link.mqttEpoch;
+      tracked.receiveSequence = this.receiveSequence;
+      if (parsed.type === 'pump.pulse') this.armPumpBackupStop();
+      await this.persistCommand(tracked);
+      this.scheduleMatch(tracked);
+      return tracked;
     } catch (error) {
-      if (this.store && reservedId) {
-        await this.store.updateCommandStatus({
-          id: reservedId,
-          status: 'rejected',
-          reason: error instanceof Error ? error.message : 'Command failed.',
-        });
+      if (!tracked.dispatched) {
+        tracked.status = 'rejected';
+        tracked.reason = error instanceof Error ? error.message : 'Command failed.';
+        await this.persistCommand(tracked);
+      } else {
+        tracked.status = 'uncertain';
+        tracked.reason = error instanceof Error ? error.message : 'Publish result is uncertain.';
+        await this.persistCommand(tracked);
       }
       throw error;
     }
@@ -276,6 +329,9 @@ export class FarmController {
     this.ownership = 'draining';
     this.engine.pause('Paused after backend restart. Resume explicitly.');
     if (this.pumpTimer) clearTimeout(this.pumpTimer);
+    if (this.pumpWatchdog) clearTimeout(this.pumpWatchdog);
+    this.clearMatchTimers();
+    this.markPendingUncertain('Controller drained before confirmation.');
     if (this.lock?.held) {
       try {
         await this.link.publish('smartfarm/cmd/pump', 'off');
@@ -315,8 +371,6 @@ export class FarmController {
     }
   }
 
-  private lastSampleMs = 0;
-
   private persistRuntime() {
     if (!this.store) return;
     const runtime = this.engine.runtime();
@@ -337,12 +391,18 @@ export class FarmController {
   private drive() {
     if (this.seenMqttEpoch && this.seenMqttEpoch !== this.link.mqttEpoch) {
       this.engine.pause('Paused — MQTT reconnected. Resume explicitly.');
+      this.markPendingUncertain('MQTT epoch changed before confirmation.');
       void this.persistRuntime();
     }
     this.seenMqttEpoch = this.link.mqttEpoch;
     const latest = this.link.latest();
+    if (latest && latest.receivedAtMs > this.lastReceivedAtMs) {
+      this.lastReceivedAtMs = latest.receivedAtMs;
+      this.receiveSequence += 1;
+      this.engine.sample(latest.data);
+      this.observeCommands(latest.data, this.receiveSequence);
+    }
     const age = latest ? telemetryAgeMs(latest.receivedAtMs, this.now()) : null;
-    if (latest) this.engine.sample(latest.data);
     this.engine.tick(isFresh(age));
     if (this.store && latest && this.now() - this.lastSampleMs >= 10_000) {
       this.lastSampleMs = this.now();
@@ -356,9 +416,186 @@ export class FarmController {
 
   private armPumpBackupStop() {
     if (this.pumpTimer) clearTimeout(this.pumpTimer);
+    if (this.pumpWatchdog) clearTimeout(this.pumpWatchdog);
     this.pumpTimer = setTimeout(() => {
-      void this.link.publish('smartfarm/cmd/pump', 'off').catch(() => undefined);
+      void this.enqueuePublish('smartfarm/cmd/pump', 'off').catch(() => undefined);
     }, PUMP_BACKUP_STOP_MS);
+    this.pumpWatchdog = setTimeout(() => {
+      for (const command of this.commands.values()) {
+        if (command.action === 'pump.pulse' && isPendingStatus(command.status)) {
+          command.status = 'uncertain';
+          command.reason = 'Pump pulse was not confirmed in time.';
+          this.engine.pause('Paused — unresolved pump pulse. Inspect the farm before watering again.');
+          void this.persistCommand(command);
+          void this.persistRuntime();
+        }
+      }
+    }, PUMP_WATCHDOG_MS);
+  }
+
+  private supersedePending(stopType: FarmCommandRequest['type'], byId: string) {
+    for (const command of this.commands.values()) {
+      if (command.id === byId) continue;
+      if (command.status !== 'accepted' && command.status !== 'publishing') continue;
+      if (!stopSupersedes(stopType, command.action)) continue;
+      command.status = 'superseded';
+      command.reason = 'Superseded by a stop.';
+      void this.persistCommand(command, byId);
+    }
+  }
+
+  private observeCommands(telemetry: WireTelemetry, sequence: number) {
+    for (const command of this.commands.values()) {
+      if (!isPendingStatus(command.status) || command.status === 'accepted') continue;
+      if (command.mqttEpoch !== this.link.mqttEpoch) {
+        command.status = 'uncertain';
+        command.reason = 'MQTT epoch changed after publish.';
+        void this.persistCommand(command);
+        continue;
+      }
+      if (command.confirmationMode === 'not_reported') continue;
+      if (sequence <= command.receiveSequence) continue;
+      if (command.action === 'pump.pulse') {
+        if (telemetry.pump === 1) command.reason = 'seen_running';
+        if (telemetry.pump === 0 && command.reason === 'seen_running') {
+          command.status = 'state_matched';
+          command.stateMatchedAt = new Date(this.now()).toISOString();
+          command.reason = 'Pulse observed on then off.';
+          void this.persistCommand(command);
+        }
+        continue;
+      }
+      if (matchesExpectedState(command.request, telemetry)) {
+        command.status = 'state_matched';
+        command.stateMatchedAt = new Date(this.now()).toISOString();
+        void this.persistCommand(command);
+      }
+    }
+  }
+
+  private scheduleMatch(command: TrackedCommand) {
+    if (command.confirmationMode === 'not_reported') return;
+    const existing = this.matchTimers.get(command.id);
+    if (existing) clearTimeout(existing);
+    this.matchTimers.set(
+      command.id,
+      setTimeout(() => {
+        this.matchTimers.delete(command.id);
+        if (command.status === 'sent') {
+          command.status = 'uncertain';
+          command.reason = 'No matching telemetry arrived in time.';
+          void this.persistCommand(command);
+        }
+      }, STATE_MATCH_MS),
+    );
+  }
+
+  private markPendingUncertain(reason: string) {
+    for (const command of this.commands.values()) {
+      if (!isPendingStatus(command.status) || command.status === 'accepted') continue;
+      command.status = 'uncertain';
+      command.reason = reason;
+      void this.persistCommand(command);
+    }
+  }
+
+  private persistCommand(command: TrackedCommand, supersededBy?: string) {
+    if (!this.store) return;
+    return this.store.updateCommandStatus({
+      id: command.id,
+      status: command.status,
+      sentAt: command.sentAt ? new Date(command.sentAt) : null,
+      stateMatchedAt: command.stateMatchedAt ? new Date(command.stateMatchedAt) : null,
+      reason: command.reason,
+      supersededBy: supersededBy ?? null,
+    });
+  }
+
+  private toTracked(
+    request: FarmCommandRequest,
+    dto: CommandDto,
+    extra?: Partial<Pick<TrackedCommand, 'mqttEpoch' | 'receiveSequence' | 'dispatched'>>,
+  ): TrackedCommand {
+    return {
+      ...dto,
+      request,
+      actuator: actuatorFor(request.type),
+      mqttEpoch: extra?.mqttEpoch ?? this.link.mqttEpoch,
+      receiveSequence: extra?.receiveSequence ?? this.receiveSequence,
+      dispatched: extra?.dispatched ?? dto.status !== 'accepted',
+    };
+  }
+
+  private hasUnresolvedPump(exceptId: string) {
+    return [...this.commands.values()].some(
+      (command) =>
+        command.id !== exceptId &&
+        command.action === 'pump.pulse' &&
+        (isPendingStatus(command.status) || command.status === 'uncertain'),
+    );
+  }
+
+  private hasPendingActuator(actuator: string, exceptId: string) {
+    return [...this.commands.values()].some(
+      (command) =>
+        command.id !== exceptId &&
+        command.actuator === actuator &&
+        isPendingStatus(command.status) &&
+        !isStopCommand(command.action),
+    );
+  }
+
+  private clearMatchTimers() {
+    for (const timer of this.matchTimers.values()) clearTimeout(timer);
+    this.matchTimers.clear();
+  }
+
+  private enqueuePublish(topic: string, payload: string, command?: TrackedCommand) {
+    const work = this.publishChain.then(async () => {
+      await this.link.awaitHold?.();
+      if (command && (command.status === 'superseded' || this.draining)) return;
+      if (!this.link.ready && this.link.transport !== 'memory') {
+        throw new CommandPolicyError('BROKER_UNAVAILABLE', 'MQTT client is not ready.', 503);
+      }
+      if (command) command.dispatched = true;
+      await this.link.publish(topic, payload);
+    });
+    this.publishChain = work.catch(() => undefined);
+    return work;
+  }
+
+  private async publishSerialized(command: TrackedCommand, topic: string, payload: string) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        this.enqueuePublish(topic, payload, command),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new CommandPolicyError('PUBLISH_TIMEOUT', 'MQTT publish did not complete in time.', 503)),
+            PUBLISH_DEADLINE_MS,
+          );
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  private async abandonPendingFromStore(reason: string) {
+    if (!this.store) return;
+    const pending = await this.store.listPendingCommands(this.config.FARM_ID);
+    for (const row of pending) {
+      const tracked = this.toTracked(row.payload, row, {
+        mqttEpoch: row.connectionEpoch ?? this.link.mqttEpoch,
+        receiveSequence: row.receiveSequence ?? this.receiveSequence,
+        dispatched: true,
+      });
+      tracked.status = 'uncertain';
+      tracked.reason = reason;
+      this.commands.set(tracked.id, tracked);
+      this.idempotency.set(row.idempotencyKey, tracked);
+      await this.persistCommand(tracked);
+    }
   }
 }
 

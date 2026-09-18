@@ -16,6 +16,8 @@ export type FarmLink = {
   latest(): LatestTelemetry | null;
   publish(topic: string, payload: string): Promise<void>;
   close(): Promise<void>;
+  awaitHold?(): Promise<void>;
+  whenReady?(timeoutMs?: number): Promise<void>;
 };
 
 function newEpoch() {
@@ -66,8 +68,10 @@ export class ScriptedFarmLink implements FarmLink {
   ready = true;
   mqttEpoch = newEpoch();
   lcd = { line1: 'Scripted', line2: '', remote: false };
+  deferPublishes = false;
   private current: LatestTelemetry | null = null;
   published: Array<{ topic: string; payload: string; epoch: string }> = [];
+  private waiters: Array<(error?: Error) => void> = [];
 
   latest() {
     return this.current;
@@ -89,6 +93,23 @@ export class ScriptedFarmLink implements FarmLink {
     this.current = null;
   }
 
+  releasePublishes(error?: Error) {
+    this.deferPublishes = false;
+    const waiters = this.waiters.splice(0);
+    for (const waiter of waiters) waiter(error);
+  }
+
+  get waiting() {
+    return this.waiters.length;
+  }
+
+  awaitHold() {
+    if (!this.deferPublishes) return Promise.resolve();
+    return new Promise<void>((resolve, reject) => {
+      this.waiters.push((error) => (error ? reject(error) : resolve()));
+    });
+  }
+
   async publish(topic: string, payload: string) {
     if (!this.ready) throw new Error('MQTT client is not ready.');
     this.published.push({ topic, payload, epoch: this.mqttEpoch });
@@ -96,6 +117,7 @@ export class ScriptedFarmLink implements FarmLink {
 
   async close() {
     this.ready = false;
+    this.releasePublishes(new Error('MQTT client is not ready.'));
   }
 }
 
@@ -119,12 +141,17 @@ export class MqttFarmLink implements FarmLink {
     this.client.on('connect', () => {
       this.mqttEpoch = newEpoch();
       this.current = null;
-      this.ready = true;
-      this.client.subscribe(TELEMETRY_TOPIC, { qos: 0 });
+      this.ready = false;
+      this.client.subscribe(TELEMETRY_TOPIC, { qos: 0 }, (error) => {
+        this.ready = !error;
+      });
     });
     this.client.on('offline', () => {
       this.ready = false;
       this.current = null;
+    });
+    this.client.on('error', () => {
+      this.ready = false;
     });
     this.client.on('message', (topic, payload, packet) => {
       if (topic !== TELEMETRY_TOPIC || packet.retain) return;
@@ -139,6 +166,24 @@ export class MqttFarmLink implements FarmLink {
 
   latest() {
     return this.current;
+  }
+
+  whenReady(timeoutMs = 5000) {
+    if (this.ready) return Promise.resolve();
+    return new Promise<void>((resolve, reject) => {
+      const started = Date.now();
+      const timer = setInterval(() => {
+        if (this.ready) {
+          clearInterval(timer);
+          resolve();
+          return;
+        }
+        if (Date.now() - started >= timeoutMs) {
+          clearInterval(timer);
+          reject(new Error('MQTT client did not become ready.'));
+        }
+      }, 20);
+    });
   }
 
   async publish(topic: string, payload: string) {

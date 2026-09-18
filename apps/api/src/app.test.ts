@@ -39,6 +39,14 @@ describe('api health and local commands', () => {
       payload: { type: 'fan.set', on: true },
     });
     expect(command.statusCode).toBe(202);
+    const commandId = command.json().id as string;
+    const fetched = await app.inject({
+      method: 'GET',
+      url: `/api/v1/farms/${LOCAL_FARM_ID}/commands/${commandId}`,
+      headers: { cookie: `smartfarm_session=${cookie?.value}` },
+    });
+    expect(fetched.statusCode).toBe(200);
+    expect(fetched.json().id).toBe(commandId);
     const snapshot = await app.inject({
       method: 'GET',
       url: `/api/v1/farms/${LOCAL_FARM_ID}/snapshot`,
