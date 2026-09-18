@@ -30,7 +30,7 @@ npm run infra:down
 
 `.github/workflows/smartfarm-web-ci.yml` runs lint/types/unit, Postgres-backed integration, built federation, frontend secret/import scans, and Chromium e2e against `npm run dev`. No production broker credential is present.
 
-Staging and production deploy workflows are **not** enabled: G02 hosted OAuth/proxy/WSS proof still needs Vercel/Railway/OAuth accounts. Do not add deploy tokens to this repository.
+Staging project names/URLs are recorded in [docs/DEPLOYMENT.md](DEPLOYMENT.md). GitHub Actions still does not receive Railway/Vercel/OAuth secrets; first staging deploys are dashboard-triggered. Do not add deploy tokens to this repository.
 
 ## Rollback
 

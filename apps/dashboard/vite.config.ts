@@ -4,7 +4,8 @@ import { defineConfig } from 'vite';
 import { federationShared } from '../../tools/scripts/federation-shared.mjs';
 
 const remoteEntry =
-  process.env.VITE_AUTOMATIONS_REMOTE_URL ?? 'http://127.0.0.1:5174/remoteEntry.js';
+  process.env.VITE_AUTOMATIONS_REMOTE_URL ??
+  (process.env.VERCEL ? 'https://smartfarm-automations.vercel.app/remoteEntry.js' : 'http://127.0.0.1:5174/remoteEntry.js');
 
 export default defineConfig(({ isPreview }) => ({
   server: {
