@@ -9,7 +9,7 @@
     "start": "tsx src/main.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json --pretty false",
     "db:migrate": "tsx src/db/run-migrate.ts",
-    "db:seed:local": "tsx src/db/run-migrate.ts"
+    "db:seed:local": "tsx src/db/run-seed.ts"
   },
   "dependencies": {
     "@fastify/cookie": "11.1.2",

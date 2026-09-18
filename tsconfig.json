@@ -7,6 +7,7 @@
     "apps/*/src/**/*",
     "packages/*/src/**/*",
     "tools/simulator/src/**/*",
+    "tests/**/*.ts",
     "*.ts"
   ],
   "exclude": ["**/dist/**", "**/node_modules/**"]

@@ -1,5 +1,6 @@
 import cookie from '@fastify/cookie';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
+import type pg from 'pg';
 import { ZodError } from 'zod';
 import {
   LOCAL_FARM_ID,
@@ -12,6 +13,7 @@ import {
 import { CommandPolicyError, isLoopbackAddress } from '@smartfarm/domain';
 import { loadConfig, redactedConfig, type AppConfig } from './config';
 import { FarmController } from './controller';
+import { FarmStore, IdempotencyConflictError, RevisionConflictError, createPool, seedLocal } from './db';
 import { createFarmLink } from './farm-link';
 import { MemorySessionStore, SESSION_COOKIE } from './sessions';
 
@@ -32,13 +34,32 @@ function sendError(
 export type AppDeps = {
   controller: FarmController;
   sessions: MemorySessionStore;
+  store: FarmStore | null;
+  pool: pg.Pool | null;
 };
 
 export async function createDeps(config: AppConfig): Promise<AppDeps> {
   const link = createFarmLink(config.SIMULATOR_TRANSPORT, config.SIMULATOR_MQTT_URL);
+  if (!config.DATABASE_URL) {
+    return {
+      controller: new FarmController(config, link),
+      sessions: new MemorySessionStore(),
+      store: null,
+      pool: null,
+    };
+  }
+  const pool = createPool(config.DATABASE_URL);
+  const store = new FarmStore(pool);
+  await seedLocal(pool, { farmId: config.FARM_ID, farmName: config.FARM_NAME });
+  const saved = await store.getConfig(config.FARM_ID);
   return {
-    controller: new FarmController(config, link),
+    controller: new FarmController(config, link, () => Date.now(), store, {
+      settings: saved?.settings,
+      revision: saved?.revision,
+    }),
     sessions: new MemorySessionStore(),
+    store,
+    pool,
   };
 }
 
@@ -55,6 +76,7 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
 
   app.addHook('onClose', async () => {
     await controller.close();
+    await resolved.pool?.end();
   });
 
   const origins = new Set(
@@ -179,11 +201,14 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
         typeof request.headers['idempotency-key'] === 'string'
           ? request.headers['idempotency-key']
           : crypto.randomUUID();
-      const command = await controller.command(parsed, idempotencyKey);
+      const command = await controller.command(parsed, idempotencyKey, `user:${session.username}`);
       return reply.status(202).send(command);
     } catch (error) {
       if (error instanceof CommandPolicyError) {
         return sendError(reply, error.status, error.code, error.message, id);
+      }
+      if (error instanceof IdempotencyConflictError) {
+        return sendError(reply, 409, error.code, error.message, id);
       }
       if (error instanceof ZodError) {
         return sendError(reply, 400, 'VALIDATION', error.issues[0]?.message ?? 'Invalid command.', id);
@@ -259,13 +284,13 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
       const settings = automationSettingsSchema.parse(request.body);
       const match = request.headers['if-match'];
       const expected = typeof match === 'string' && match !== '' ? Number(match) : undefined;
-      return controller.configure(settings, expected);
+      return await controller.configure(settings, expected);
     } catch (error) {
       if (error instanceof ZodError) {
         return sendError(reply, 400, 'VALIDATION', error.issues[0]?.message ?? 'Invalid settings.', id);
       }
-      if (error instanceof Error && (error as Error & { code?: string }).code === 'REVISION') {
-        return sendError(reply, 409, 'REVISION', error.message, id);
+      if (error instanceof RevisionConflictError || (error as Error & { code?: string }).code === 'REVISION') {
+        return sendError(reply, 409, 'REVISION', error instanceof Error ? error.message : 'Revision conflict.', id);
       }
       throw error;
     }

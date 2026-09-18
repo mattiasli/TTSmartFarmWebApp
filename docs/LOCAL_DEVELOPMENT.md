@@ -28,7 +28,14 @@ On Windows PowerShell, use `npm.cmd` if `npm.ps1` is blocked by execution policy
 
 The dashboard proxies `/api` to the local API.
 
-Default `npm run dev` uses an in-memory simulated farm inside the API, so Docker is not required for sensors and controls. Optional MQTT loop:
+Default `npm run dev` uses an in-memory simulated farm inside the API, so Docker is not required for sensors and controls. To persist sessions/commands/history in Postgres:
+
+```text
+npm run infra:up
+npm run db:migrate
+```
+
+Then set `DATABASE_URL=postgres://smartfarm:smartfarm@127.0.0.1:5432/smartfarm` for the API. Leave it unset to keep the in-memory stores. Optional MQTT loop:
 
 ```text
 npm run broker

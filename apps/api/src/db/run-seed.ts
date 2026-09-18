@@ -1,18 +1,16 @@
 import { loadConfig } from '../config';
-import { migrate } from './migrate';
 import { createPool } from './pool';
 import { seedLocal } from './seed';
 
 const config = loadConfig();
 if (!config.DATABASE_URL) {
-  console.log('No DATABASE_URL set. Start Postgres or leave the API on in-memory stores.');
+  console.log('No DATABASE_URL set. Start Postgres before seeding.');
   process.exit(0);
 }
-await migrate(config.DATABASE_URL);
 const pool = createPool(config.DATABASE_URL, 2);
 try {
   await seedLocal(pool);
+  console.log('Local farm seed applied.');
 } finally {
   await pool.end();
 }
-console.log('Migrations and local farm seed applied.');
