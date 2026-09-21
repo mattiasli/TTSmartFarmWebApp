@@ -31,8 +31,15 @@ jobs:
       - run: npm run typecheck
       - run: npm run check:contracts
       - run: npm run check:frontend-imports
-      - run: npm run test:unit
+      - run: npm run test:unit -- --reporter=default --reporter=junit --outputFile=test-results/unit.xml
       - run: npm audit --audit-level=high
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() }}
+        with:
+          name: unit-results-${{ github.sha }}
+          path: test-results/unit.xml
+          retention-days: 7
+          if-no-files-found: warn
 
   integration:
     runs-on: ubuntu-latest
@@ -59,7 +66,14 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-      - run: npm run test:integration
+      - run: npm run test:integration -- --reporter=default --reporter=junit --outputFile=test-results/integration.xml
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() }}
+        with:
+          name: integration-results-${{ github.sha }}
+          path: test-results/integration.xml
+          retention-days: 7
+          if-no-files-found: warn
 
   federation:
     runs-on: ubuntu-latest
@@ -73,6 +87,15 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:federation
       - run: npm run check:client-secrets
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() }}
+        with:
+          name: federation-results-${{ github.sha }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: warn
 
   e2e:
     runs-on: ubuntu-latest
@@ -85,3 +108,33 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: node tools/scripts/run-e2e-test.mjs
+      # Only isolated simulator fixtures are exercised; never upload hosted sessions.
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() }}
+        with:
+          name: e2e-results-${{ github.sha }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: warn
+
+  required:
+    name: smartfarm-required
+    if: ${{ always() }}
+    needs: [checks, integration, federation, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every prerequisite to succeed
+        env:
+          CHECKS: ${{ needs.checks.result }}
+          INTEGRATION: ${{ needs.integration.result }}
+          FEDERATION: ${{ needs.federation.result }}
+          E2E: ${{ needs.e2e.result }}
+        run: |
+          for result in "$CHECKS" "$INTEGRATION" "$FEDERATION" "$E2E"; do
+            if [ "$result" != success ]; then
+              echo "A required CI job failed, was skipped, or was cancelled."
+              exit 1
+            fi
+          done

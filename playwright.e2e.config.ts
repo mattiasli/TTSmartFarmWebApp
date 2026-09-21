@@ -15,6 +15,7 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
+  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }], ['junit', { outputFile: 'test-results/e2e.xml' }]] : [['list']],
 });

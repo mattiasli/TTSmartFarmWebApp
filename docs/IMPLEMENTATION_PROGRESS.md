@@ -2,6 +2,20 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## CI evidence and aggregate gate (2026-09-21)
+
+CI now emits JUnit reports for unit, integration, federation and E2E suites,
+plus browser HTML reports and failure traces/screenshots. Per-suite artifacts
+include the source SHA and expire after seven days. They contain isolated test
+fixtures only; hosted OAuth sessions and provider data are not uploaded here.
+The upload action is pinned to the verified `actions/upload-artifact` v7.0.0 commit.
+
+`smartfarm-required` runs after all four jobs and fails unless every prerequisite
+succeeded, including when one was skipped or cancelled. It is the intended branch
+protection/release prerequisite. Adding this job alone does not configure branch
+protection or make the current provider Git hooks wait for CI; those settings and
+the coordinated deployment workflows remain unfinished.
+
 ## Database lock-session recovery follow-up (2026-09-21)
 
 - Dedicated PostgreSQL lock clients now handle idle error/end events, invalidate
