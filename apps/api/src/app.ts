@@ -275,8 +275,8 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
 
   app.post('/api/v1/logout', async (request, reply) => {
     const session = await currentSession(request);
-    if (session?.id) hub.dropSession(session.id);
     await sessions.revoke(request);
+    if (session?.id) hub.dropSession(session.id);
     clearSessionCookie(reply, config);
     return { ok: true };
   });
@@ -440,21 +440,27 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     const id = requestId();
     const { farmId, githubId } = request.params as { farmId: string; githubId: string };
     const session = await requireRole(request, reply, id, farmId, 'admin');
-    if (!session || !store) return sendError(reply, 503, 'UNAVAILABLE', 'Membership changes require PostgreSQL.', id);
+    if (!session) return;
+    if (!store) return sendError(reply, 503, 'UNAVAILABLE', 'Membership changes require PostgreSQL.', id);
     const body = request.body as { role?: FarmRole };
     if (!body?.role || !['viewer', 'operator', 'admin'].includes(body.role)) {
       return sendError(reply, 400, 'VALIDATION', 'Role must be viewer, operator, or admin.', id);
     }
     try {
-      const user = await store.upsertUser({ githubId, username: githubId });
+      const user = await store.getUserByGithubId(githubId)
+        ?? await store.upsertUser({ githubId, username: githubId });
+      const previous = await store.getMembership(farmId, user.id);
+      await store.setMembership({ farmId, userId: user.id, role: body.role });
+      if (previous?.role !== body.role) {
+        await store.revokeUserSessions(user.id);
+        hub.dropUserSessions(user.id);
+      }
       await store.upsertAllowlist({
         githubId,
         farmId,
         role: body.role,
         createdBy: session.username,
       });
-      await store.setMembership({ farmId, userId: user.id, role: body.role });
-      if (body.role === 'viewer') await store.revokeUserSessions(user.id);
       return { members: await store.listFarmAccess(farmId) };
     } catch (error) {
       if (error instanceof LastAdminError) return sendError(reply, 409, error.code, error.message, id);
@@ -466,13 +472,15 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     const id = requestId();
     const { farmId, githubId } = request.params as { farmId: string; githubId: string };
     const session = await requireRole(request, reply, id, farmId, 'admin');
-    if (!session || !store) return sendError(reply, 503, 'UNAVAILABLE', 'Membership changes require PostgreSQL.', id);
+    if (!session) return;
+    if (!store) return sendError(reply, 503, 'UNAVAILABLE', 'Membership changes require PostgreSQL.', id);
     const user = await store.getUserByGithubId(githubId);
     if (!user) return sendError(reply, 404, 'NOT_FOUND', 'Member not found.', id);
     try {
       await store.removeMembership(farmId, user.id);
       await store.revokeAllowlist(githubId);
       await store.revokeUserSessions(user.id);
+      hub.dropUserSessions(user.id);
       return { members: await store.listFarmAccess(farmId) };
     } catch (error) {
       if (error instanceof LastAdminError) return sendError(reply, 409, error.code, error.message, id);

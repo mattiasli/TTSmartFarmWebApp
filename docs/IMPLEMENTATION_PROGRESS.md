@@ -4,6 +4,24 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Hosted restart exposed missing browser reconnect (2026-09-21)
 
+The deployed rerun on `62259e8449493af48a037e054d89665253d941dc` passed:
+automatic browser WSS recovery, new controller epoch, settings/revision retained,
+paused automations and fan/pump off. Readiness-to-new-owner observation was 14,459 ms
+(includes the operator restart command, not a pure outage measurement).
+See `releases/staging-restart-2026-09-21.json`. The secondary account
+`xueshanmattiasli` completed actual browser OAuth; its isolated SmartFarm viewer
+session is saved locally, with no GitHub cookies retained.
+
+The next access-control audit found no periodic socket session validation and no
+immediate socket closure on membership changes. The fix validates session absolute
+and idle expiry, account disablement and farm membership every 20 seconds, suspends
+publication during database checks, closes on validation failure, and fences pending
+authentication across local revocation. Role changes revoke sessions and close active
+sockets; unchanged roles preserve sessions. Existing GitHub usernames are preserved.
+Regression coverage includes actual PostgreSQL role-change/socket/HTTP revocation,
+idle expiry, disablement, stalled/failed database checks and in-flight authentication.
+Hosted viewer/revocation qualification follows deployment.
+
 The real Railway restart drill on `e48f5db` confirmed persisted settings/revision,
 a new controller epoch, paused automations, and fan/pump off after recovery.
 The browser did not reconnect WSS within 40 seconds after controller recovery;
@@ -16,10 +34,9 @@ waits. A connection/authentication deadline and a silent-stream deadline restore
 polling instead of leaving a dead socket marked live. Old socket listeners/timers
 are removed when the attempt ends. Unit regressions cover fresh tickets, late
 old-socket frames, stalled streams, bounded retries, and cancellation. All 119 unit
-tests, typecheck and lint passed; hosted rerun follows deployment.
+tests, typecheck and lint passed; the successful hosted rerun is recorded above.
 
-The second GitHub account for distinct-user tests is `xueshanmattiasli`; its browser
-sign-in and role/revocation tests still need to be arranged. Provider login is done.
+Provider login and the secondary user's browser sign-in are now complete.
 
 ## Provider access and hosted qualification resumed (2026-09-21)
 

@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { once } from 'node:events';
 import { LOCAL_FARM_ID } from '@smartfarm/contracts';
 import { buildApp } from '../../apps/api/src/app';
 import { loadConfig } from '../../apps/api/src/config';
@@ -150,6 +151,44 @@ describe('P06 postgres auth', () => {
       if (extra) await store.removeMembership(LOCAL_FARM_ID, extra.id);
     }
     await expect(store.removeMembership(LOCAL_FARM_ID, admins[0]!.id)).rejects.toBeInstanceOf(LastAdminError);
+  });
+
+  it('T108 role changes close an active socket and revoke HTTP access without changing the username', async () => {
+    const app = await appWithOauth();
+    await app.ready();
+    const origin = 'http://127.0.0.1:5173';
+    const login = await app.inject({ method: 'POST', url: '/api/v1/local/login' });
+    const adminHeaders = {
+      cookie: `smartfarm_session=${login.cookies.find((entry) => entry.name === 'smartfarm_session')!.value}`,
+      'x-csrf-token': login.json().csrfToken as string,
+      origin,
+    };
+    const user = await store.upsertUser({ githubId: 'role-socket-test', username: 'distinct-operator' });
+    await store.setMembership({ farmId: LOCAL_FARM_ID, userId: user.id, role: 'operator' });
+    await store.upsertAllowlist({ githubId: user.githubId, farmId: LOCAL_FARM_ID, role: 'operator' });
+    await store.createSession({ userId: user.id, tokenHash: sha256('role-test-token'), csrfSecret: 'role-csrf' });
+    const headers = { cookie: 'smartfarm_session=role-test-token', 'x-csrf-token': 'role-csrf', origin };
+    const minted = await app.inject({ method: 'POST', url: '/api/v1/realtime/tickets', headers,
+      payload: { farmId: LOCAL_FARM_ID } });
+    expect(minted.statusCode).toBe(200);
+    const socket = await app.injectWS('/ws', { headers: { origin } });
+    try {
+      const first = once(socket, 'message');
+      socket.send(JSON.stringify({ type: 'authenticate', ticket: minted.json().ticket }));
+      await first;
+      const closed = once(socket, 'close');
+      const changed = await app.inject({ method: 'PUT',
+        url: `/api/v1/farms/${LOCAL_FARM_ID}/members/${user.githubId}`,
+        headers: adminHeaders, payload: { role: 'viewer' } });
+      expect(changed.statusCode).toBe(200);
+      expect((await closed)[0]).toBe(4002);
+      expect((await store.getUserByGithubId(user.githubId))?.username).toBe('distinct-operator');
+      const denied = await app.inject({ method: 'GET', url: `/api/v1/farms/${LOCAL_FARM_ID}/snapshot`, headers });
+      expect(denied.statusCode).toBe(401);
+    } finally {
+      socket.terminate();
+      await app.close();
+    }
   });
 
   it('T109 expires idle sessions', async () => {

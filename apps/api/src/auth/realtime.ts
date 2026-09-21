@@ -21,15 +21,18 @@ const STALE_MS = 45_000;
 type SocketClient = {
   socket: WebSocket;
   sessionId: string | null;
+  userId: string | null;
   farmId: string | null;
   origin: string;
   authed: boolean;
+  authenticating: boolean;
   lastSeen: number;
 };
 
 export class RealtimeHub {
   private readonly clients = new Set<SocketClient>();
   private sequence = 0;
+  private accessGeneration = 0;
   readonly serverEpoch = crypto.randomUUID();
   private heartbeat: ReturnType<typeof setInterval> | null = null;
   private snapshotTimer: ReturnType<typeof setInterval> | null = null;
@@ -67,8 +70,40 @@ export class RealtimeHub {
   }
 
   dropSession(sessionId: string) {
+    this.accessGeneration += 1;
     for (const client of [...this.clients]) {
       if (client.sessionId === sessionId) this.closeClient(client, 4002, 'session_revoked');
+    }
+  }
+
+  dropUserSessions(userId: string) {
+    this.accessGeneration += 1;
+    for (const client of [...this.clients]) {
+      if (client.userId === userId) this.closeClient(client, 4002, 'session_revoked');
+    }
+  }
+
+  private async validSession(sessionId: string, farmId: string) {
+    if (!this.store) return this.memorySessions?.getById(sessionId)?.farmId === farmId;
+    const session = await this.store.getSessionById(sessionId);
+    if (!session || session.revokedAt || session.expiresAt.getTime() <= Date.now()
+      || session.idleExpiresAt.getTime() <= Date.now()) return false;
+    const user = await this.store.getUserById(session.userId);
+    if (!user || user.disabledAt) return false;
+    return Boolean(await this.store.getMembership(farmId, user.id));
+  }
+
+  private async revalidate(client: SocketClient) {
+    // Suspend publication while checking, including when the database stalls.
+    client.authed = false;
+    try {
+      const valid = client.sessionId && client.farmId
+        && await this.validSession(client.sessionId, client.farmId);
+      if (!this.clients.has(client)) return;
+      if (!valid) this.closeClient(client, 4002, 'session_revoked');
+      else client.authed = true;
+    } catch {
+      this.closeClient(client, 4002, 'session_unavailable');
     }
   }
 
@@ -102,6 +137,7 @@ export class RealtimeHub {
         continue;
       }
       if (client.authed && client.socket.readyState === 1) {
+        void this.revalidate(client);
         try {
           client.socket.ping();
         } catch {
@@ -135,9 +171,11 @@ export class RealtimeHub {
     const client: SocketClient = {
       socket,
       sessionId: null,
+      userId: null,
       farmId: null,
       origin,
       authed: false,
+      authenticating: false,
       lastSeen: Date.now(),
     };
     this.clients.add(client);
@@ -158,14 +196,19 @@ export class RealtimeHub {
   }
 
   private async onMessage(client: SocketClient, raw: WebSocket.RawData, timer: ReturnType<typeof setTimeout>) {
+    if (!this.clients.has(client)) return;
     client.lastSeen = Date.now();
     const text = typeof raw === 'string' ? raw : raw.toString();
     if (!client.authed) {
+      // An authenticated socket awaiting its periodic check cannot authenticate again.
+      if (client.sessionId || client.authenticating) return;
+      client.authenticating = true;
       if (text.length > AUTH_FRAME_MAX) {
         this.closeClient(client, 4401, 'auth_frame');
         return;
       }
       try {
+        const generation = this.accessGeneration;
         const parsed = JSON.parse(text) as { type?: string; ticket?: string };
         if (parsed.type !== 'authenticate' || typeof parsed.ticket !== 'string') {
           this.closeClient(client, 4401, 'auth_frame');
@@ -182,6 +225,7 @@ export class RealtimeHub {
           }
           sessionId = session.id;
           farmId = ticket.farmId;
+          client.userId = session.userId;
         } else {
           const ticket = this.memorySessions?.consumeTicket(parsed.ticket, client.origin);
           if (!ticket) {
@@ -190,6 +234,11 @@ export class RealtimeHub {
           }
           sessionId = ticket.sessionId;
           farmId = ticket.farmId;
+        }
+        if (!await this.validSession(sessionId, farmId)
+          || generation !== this.accessGeneration || !this.clients.has(client)) {
+          this.closeClient(client, 4401, 'session_invalid');
+          return;
         }
         if (exceedsSessionSocketLimit(this.sessionCount(sessionId))) {
           this.closeClient(client, 4401, 'socket_limit');
