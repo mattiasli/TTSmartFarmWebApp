@@ -19,7 +19,7 @@ explicitly. Do not infer successful actuation from HTTP acceptance.
 
 | ID | Procedure and required result | Evidence/status |
 |---|---|---|
-| S01 | From a logged-out browser, load the pinned remote entry and all imported JS/CSS. Verify content types, CORS, no login interstitial, and a genuine 404 for a missing chunk. Render the editor with no unexpected script errors. | Pending hosted execution |
+| S01 | From a logged-out browser, load the pinned remote entry and all imported JS/CSS. Verify content types, CORS, no login interstitial, and a genuine 404 for a missing chunk. Render the editor with no unexpected script errors. | Public alias import/nine assets passed September 21; exact deployment URL returns 302, immutable pin blocked |
 | S02 | Sign in through the host `/api` rewrite; inspect secure HttpOnly host cookie, private/no-store responses, snapshot and authenticated WSS. Repeat in Chromium and WebKit. | Basic Chromium topology reported September 18; complete rerun pending |
 | S03 | Exercise simulator manual commands and all five automations. Check reported vs pending states, guard synchronization, permissions, and continued server automation after browser closure. | Pending hosted execution |
 | S04 | Block remote requests in the browser. Verify fallback, continuing sensor updates, successful host Pause, and All off stopping a simulated running output. | Local browser regression in `tests/e2e/recovery.spec.ts`; hosted pending |
@@ -32,7 +32,7 @@ explicitly. Do not infer successful actuation from HTTP acceptance.
 | S11 | Roll back API to a schema-compatible version and host/remote as a recorded immutable pair. Verify login, assets, snapshots, paused automations, and no replay. | Pending immutable release mapping and hosted execution |
 | S12 | Restore an actual staging backup into a new isolated database. Verify migrations, roles, settings revisions, events/history; revoke restored sessions; start simulator paused with live flags false. Record duration and backup age. | Pending provider backup/restore access |
 | S13 | Measure normal telemetry-to-browser latency (<2 s), stale indication (~4 s plus scheduling), command acceptance (<1 s), and memory over 30 minutes. Record sample counts, percentiles, process/browser memory, row/index size and retention behavior. | Pending measurements; targets are not claimed results |
-| S14 | Verify CI for the exact release SHA; coordinated deploy authority, immutable remote URL, compatible previous pair, backup policy, one replica, sleep disabled, and deployed flags. | Manual staging deploys remain; release automation pending |
+| S14 | Verify CI for the exact release SHA; coordinated deploy authority, immutable remote URL, compatible previous pair, backup policy, one replica, sleep disabled, and deployed flags. | CI and Git-linked deployments passed for 1c41af6; CI-gated ordered release, immutable pin and remaining provider settings pending |
 
 ## How to run the local browser regressions
 
@@ -87,3 +87,17 @@ per second, reloads settings/runtime under the acquired lock, remains paused,
 and prevents waiting instances from writing runtime/history. This is a plausible
 explanation of the hosted symptom, not a diagnosis from Railway logs. Deploy and
 repeat S06/S10 to verify the hosted fix.
+
+## Deployed follow-up on 2026-09-21
+
+Commit `1c41af6cf605de8e7578292993e1b1c48b66372a` was pushed and all GitHub CI
+jobs passed in [run 35575055409](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35575055409).
+GitHub deployment records show successful Railway API and both Vercel deployments.
+At `2026-09-21T07:56:27.187Z`, the read-only smoke reported **controller owner**
+and all four public checks passed. Both live flags remained false.
+
+The immutable Vercel deployment URLs recorded in the release mapping each return
+302 without authentication. The remote candidate therefore cannot yet replace
+the public alias in the host. Provider access is needed to configure approved
+public immutable assets and to perform restart/rollback/backup recovery drills.
+G08 is still pending; the immediate waiting-controller incident is resolved.

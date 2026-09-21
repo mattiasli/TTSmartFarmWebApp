@@ -8,9 +8,10 @@ This folder is the application repository (`https://github.com/mattiasli/TTSmart
 
 Local packages **P00–P12** are in `master`. Hosted **simulator staging (G02)** was demonstrated on September 18: GitHub OAuth through Vercel `/api` to Railway, live WebSocket, dashboard UI. Live commands and pumping stay disabled. Next: remaining P13/G08 qualification, then P14 hardware (pump still off).
 
-P13 now includes recovery browser tests and a controller handover fix. September 21
-public checks found staging stuck at `waiting_for_owner`; deployment and hosted
-verification remain pending. See [staging acceptance](docs/STAGING_ACCEPTANCE.md).
+P13 recovery tests and controller handover fixes were committed and deployed as
+`1c41af6`. CI passed, and September 21 public checks confirmed staging is now
+controller `owner`. Full recovery qualification and public immutable remote access
+remain pending. See [staging acceptance](docs/STAGING_ACCEPTANCE.md).
 
 See `IMPLEMENTATION_PLAN.md`, `docs/IMPLEMENTATION_PROGRESS.md` (handoff at the top), and `docs/DEPLOYMENT.md`.
 

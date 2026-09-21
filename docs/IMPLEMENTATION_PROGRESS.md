@@ -2,7 +2,42 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21, P13 recovery qualification)
+## Current handoff (2026-09-21, committed and deployed)
+
+The user explicitly authorized implementing the plan, committing, and deploying.
+The tested P13 changes were committed and pushed as
+`1c41af6cf605de8e7578292993e1b1c48b66372a` (`Fix staging controller handover and editor recovery`).
+GitHub CI completed successfully: https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35575055409
+All four jobs passed: checks, integration, federation, e2e.
+
+Git-linked Railway and both Vercel projects deployed successfully. Deployment IDs
+and immutable URL candidates are recorded in `docs/releases/staging.json` for this
+observed release; later documentation commits may trigger additional deployments.
+
+Public smoke at `2026-09-21T07:56:27.187Z` passed all four current checks:
+the API is now **controller `owner`**, staging/memory simulator, both live flags false;
+anonymous proxy responses are no-store; nine remote assets load cross-origin;
+missing remote assets return 404. The immediate stuck-controller blocker is resolved.
+
+Newly verified blocker: the exact Vercel deployment URLs for both host and remote
+return HTTP 302 to unauthenticated requests, while the public aliases work. Do not
+pin the remote's protected deployment URL until clean-browser access is enabled.
+The remote still reports an empty release SHA. G08 remains pending.
+
+Next actions:
+
+1. Connect Railway and Vercel integrations for project settings/logs, restart,
+   rollback, and isolated backup restore access. These integrations were discovered
+   but are not yet confirmed connected. Existing Git credential access already
+   handles GitHub push, CI, and deployment metadata; no new GitHub token is needed.
+2. Enable public access for approved immutable remote assets, pin the verified
+   remote URL in the host build, and provide release SHA metadata.
+3. Complete authenticated staging browser checks and the S06–S14 recovery/metrics
+   evidence. Successful deploy status and public HTTP health do not pass all G08.
+
+Live hardware is still out of scope until the plan's production/hardware gates.
+
+## Implementation session (2026-09-21, P13 recovery qualification)
 
 Source: `master` at `ad76ef2` plus uncommitted P13 changes. Nothing from this
 session has been pushed or deployed. Live commands and pumping remain disabled.

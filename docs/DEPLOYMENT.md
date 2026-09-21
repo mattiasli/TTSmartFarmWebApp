@@ -1,9 +1,11 @@
 # Staging deployment (G02)
 
 Current qualification work: [P13 acceptance report](STAGING_ACCEPTANCE.md).
-On September 21 the public API answered but reported `waiting_for_owner`.
-The local handover fix must be deployed and verified before treating staging as
-operational. The September 18 observations below are historical.
+On September 21 the public API initially reported `waiting_for_owner`. Commit
+`1c41af6` was deployed through the Git-linked projects, and public smoke subsequently
+confirmed controller `owner`. Exact remote deployment URLs still return 302 without
+authentication; public immutable remote access and full G08 drills remain pending.
+The September 18 observations below are historical.
 
 Do not put HiveMQ passwords, OAuth secrets, or `DATABASE_URL` in git. Live commands and pump stay **false**.
 
