@@ -1,7 +1,8 @@
-import mqtt, { type MqttClient } from 'mqtt';
+import mqtt, { type IClientOptions, type MqttClient } from 'mqtt';
 import { TELEMETRY_TOPIC, type WireTelemetry } from '@smartfarm/contracts';
 import { assertLoopbackMqttUrl, parseTelemetry, scenarioTelemetry, type ScenarioName } from '@smartfarm/domain';
 import { SimulatedFarm } from '@smartfarm/simulator';
+import type { AppConfig } from './config';
 
 export type LatestTelemetry = {
   data: WireTelemetry;
@@ -139,7 +140,7 @@ export class ScriptedFarmLink implements FarmLink {
   }
 }
 
-export class MqttFarmLink implements FarmLink {
+class BrokerFarmLink implements FarmLink {
   readonly transport = 'mqtt' as const;
   ready = false;
   mqttEpoch = newEpoch();
@@ -147,12 +148,14 @@ export class MqttFarmLink implements FarmLink {
   private current: LatestTelemetry | null = null;
   private client: MqttClient;
 
-  constructor(url: string) {
-    const parsed = assertLoopbackMqttUrl(url);
-    this.client = mqtt.connect(parsed.toString(), {
+  constructor(url: string, options: IClientOptions = {}, private readonly commandsEnabled = true) {
+    this.client = mqtt.connect(url, {
+      ...options,
       clientId: `smartfarm-web-${this.mqttEpoch.slice(0, 8)}`,
       clean: true,
       queueQoSZero: false,
+      // Subscribe explicitly on each connection so readiness follows its SUBACK.
+      resubscribe: false,
       protocolVersion: 4,
       reconnectPeriod: 2000,
     });
@@ -160,11 +163,16 @@ export class MqttFarmLink implements FarmLink {
       this.mqttEpoch = newEpoch();
       this.current = null;
       this.ready = false;
-      this.client.subscribe(TELEMETRY_TOPIC, { qos: 0 }, (error) => {
-        this.ready = !error;
+      this.client.subscribe(TELEMETRY_TOPIC, { qos: 0 }, (error, grants) => {
+        this.ready = !error && Boolean(grants?.some((grant) =>
+          grant.topic === TELEMETRY_TOPIC && grant.qos !== 128));
       });
     });
     this.client.on('offline', () => {
+      this.ready = false;
+      this.current = null;
+    });
+    this.client.on('close', () => {
       this.ready = false;
       this.current = null;
     });
@@ -205,6 +213,7 @@ export class MqttFarmLink implements FarmLink {
   }
 
   async publish(topic: string, payload: string) {
+    if (!this.commandsEnabled) throw new Error('Live MQTT publishing is disabled.');
     if (!this.ready) throw new Error('MQTT client is not ready.');
     await new Promise<void>((resolve, reject) => {
       this.client.publish(topic, payload, { qos: 0, retain: false }, (error) => {
@@ -218,6 +227,40 @@ export class MqttFarmLink implements FarmLink {
     this.ready = false;
     await new Promise<void>((resolve) => this.client.end(true, {}, () => resolve()));
   }
+}
+
+export class MqttFarmLink extends BrokerFarmLink {
+  constructor(url: string) {
+    super(assertLoopbackMqttUrl(url).toString());
+  }
+}
+
+export class LiveMqttFarmLink extends BrokerFarmLink {
+  constructor(config: AppConfig) {
+    if (config.FARM_MODE !== 'live' || config.APP_ENV === 'staging') {
+      throw new Error('Live MQTT requires live mode outside simulator staging.');
+    }
+    const host = config.HIVEMQ_HOST;
+    // A bare DNS hostname prevents URL credentials, paths or protocol overrides.
+    if (!host || host.length > 253 || !host.split('.').every((label) =>
+      /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(label)) ||
+      !config.HIVEMQ_USERNAME?.trim() || !config.HIVEMQ_PASSWORD) {
+      throw new Error('Live MQTT requires a bare HIVEMQ_HOST and backend credentials.');
+    }
+    super(`mqtts://${host}:${config.HIVEMQ_MQTT_TLS_PORT}`, {
+      username: config.HIVEMQ_USERNAME,
+      password: config.HIVEMQ_PASSWORD,
+      rejectUnauthorized: true,
+      servername: host,
+      connectTimeout: 10_000,
+    }, config.LIVE_COMMANDS_ENABLED);
+  }
+}
+
+export function createConfiguredFarmLink(config: AppConfig): FarmLink {
+  return config.FARM_MODE === 'live'
+    ? new LiveMqttFarmLink(config)
+    : createFarmLink(config.SIMULATOR_TRANSPORT, config.SIMULATOR_MQTT_URL);
 }
 
 export function createFarmLink(transport: 'memory' | 'mqtt', mqttUrl: string): FarmLink {

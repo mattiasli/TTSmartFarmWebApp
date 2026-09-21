@@ -16,6 +16,13 @@ current implementation scope (including P13 step 5 / G08 S12). Record the
 exception explicitly; do not mark backup/restore as passed or reopen it without
 a new user instruction.
 
+**User credential exception, 21 September 2026:** Reuse the existing device MQTT
+credential for the initial read-only connection without changing or resetting it.
+Both live flags remain false. This overrides the dedicated-principal prerequisite
+for that initial connection only; it does not establish broker-enforced read-only
+permissions or qualify physical actuation. Current runtime evidence and remaining
+work are recorded in `docs/IMPLEMENTATION_PROGRESS.md`.
+
 Build a conventional, responsive web application with **React, TypeScript, Vite, and Fluent UI v9**. It must show every available farm reading, control the existing physical farm through HiveMQ, and manage the five existing automation categories. **Do not include the 3D model, Three.js, Electron, or an Android wrapper.**
 
 The architecture is fixed as follows:

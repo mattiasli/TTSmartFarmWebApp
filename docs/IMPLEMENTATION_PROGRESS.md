@@ -2,14 +2,50 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21 16:37 UTC)
+## Current handoff (2026-09-21 16:49 UTC)
 
 **Verified coordinated release: 79f128b8b0af73a0b7f6e39f3bed5457ba9578d9.**
 CI 35625693558 and release workflow 35626061921 both succeeded. All six release
 stages passed: preflight/previous mapping, API, immutable remote, host build,
 candidate browser, promotion/stable browser. Evidence: `releases/staging-79f128b.json`.
-S14 coordinated deployment is now demonstrated; S02 WebKit SameSite evidence is
-the remaining G08 item. S12 backup/restore remains explicitly deferred.
+S14 coordinated deployment is demonstrated. Fresh WebKit OAuth at 16:49 UTC
+captured the original 302 cookie attributes (Secure, HttpOnly, SameSite=Lax,
+host-only, Path=/), editor, snapshot/no-store and three WSS snapshots. No cookies
+were imported or saved. Evidence: `releases/staging-webkit-observed-oauth-2026-09-21.json`.
+The local HTTPS observer preserved the original response and verified upstream
+TLS; the disposable browser trusted its test certificate, while provider HTTPS
+was tunneled opaquely. The Windows driver's SameSite=None report is not the
+server response. No additional user sign-in is needed for S02.
+
+G08 is qualified for the agreed scope after review of S01–S14. S12 backup/restore
+remains explicitly deferred, never passed. Next: P14 dedicated broker access and
+read-only telemetry, then supervised non-pump acceptance. G09/G10 remain open.
+
+Subsequent release 35627854052 for documentation/tooling revision 3e431b6 failed
+at the API stage (Railway deployment 7a94d608-9f9c-42f3-b708-ec6dd185397f).
+The image built and migration logs reported success, but the deployment failed
+before a new API became active; provider diagnosis was null. Do not infer the
+cause from that alone. The verified 79f128b API remains healthy and owner; the
+workflow did not proceed to remote/host promotion. Inspect this failed deployment
+before retrying. This is separate from the successful fresh OAuth observation.
+
+P14 implementation now selects a dedicated live TLS MQTT adapter, with verified
+certificate/hostname, credential validation, successful-SUBACK requirement,
+disconnect freshness reset and read-only publish rejection. The prior factory
+always selected simulator transport; live-mode policy flags alone were not a
+physical connection. Five focused tests and all 143 unit tests pass, with lint
+and typecheck. No live connection has been attempted. The saved credential matches
+the device's existing credential; a dedicated read-only backend credential has
+been requested. See `PRODUCTION_DEPLOYMENT.md` for remaining provisioning/physical
+steps. The user subsequently requested reuse of the existing credential for the
+initial read-only connection; this is an explicit dedicated-principal exception,
+not proof of a broker publish denial. A verified TLS connection/subscription has
+now succeeded with that credential, using the local read-only observer. Physical
+sensor stimuli, firmware identity and hosted live deployment remain unverified.
+All three actual local MQTT integration tests pass after disabling automatic
+resubscription so readiness always waits for the explicit subscription's SUBACK.
+A local container migration exited normally; the Railway failure's cause
+is still unproven, so no speculative migration change was made.
 
 All five environment secrets are configured and provider access is verified.
 `STAGING_RELEASE_ENABLED=true`; Railway has no Git deployment trigger, both

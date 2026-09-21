@@ -2,6 +2,12 @@
 
 This file is a template. Fill it during a supervised window. Do not write credentials.
 
+Preparation: the live TLS adapter is implemented. The user authorized reuse of
+the existing MQTT credential for the initial read-only observation; it has not
+been reset. This is not evidence of broker-enforced read-only permissions.
+Production provisioning and physical acceptance remain outstanding. See
+[production connection](PRODUCTION_DEPLOYMENT.md).
+
 - Date:
 - Operator:
 - Firmware identifier:
@@ -14,7 +20,13 @@ This file is a template. Fill it during a supervised window. Do not write creden
 
 - [ ] Desktop/Android controllers paused
 - [ ] Fresh telemetry observed (all 22 fields)
+- [ ] Firmware identity confirmed on the physical device
+- [ ] Several minutes of telemetry correlated with supervised sensor stimuli
 - [ ] No test commands sent while live commands are false
+
+Record observed fields: `t`, `h`, `dht`, `soil`, `water`, `light`, `steam`, `rain`,
+`dist`, `pir`, `btn`, `rssi`, `fan`, `led`, `feed`, `pump`, `buzz`, `bl`, `guard`,
+`tankLow`, `tankRecover`, `pumpBlocked`. Record missing/invalid fields explicitly.
 
 ## Non-pump controls
 

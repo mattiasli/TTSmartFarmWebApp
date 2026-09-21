@@ -1,6 +1,9 @@
 # P13 staging acceptance (G08)
 
-G08 is **pending**. Local tests support the gate but do not qualify the hosted release.
+G08 is **qualified for the agreed scope on September 21, 2026**. S01–S11,
+S13 and S14 have hosted/local evidence as specified below. S12 backup/restore is
+explicitly deferred by the user, not passed. This qualifies simulator staging;
+physical acceptance (G09) remains outstanding.
 Use simulator staging only: `APP_ENV=staging`, `FARM_MODE=simulator`,
 `SIMULATOR_TRANSPORT=memory`, both live flags false, and no HiveMQ credentials.
 
@@ -20,7 +23,7 @@ explicitly. Do not infer successful actuation from HTTP acceptance.
 | ID | Procedure and required result | Evidence/status |
 |---|---|---|
 | S01 | From a logged-out browser, load the pinned remote entry and all imported JS/CSS. Verify content types, CORS, no login interstitial, and a genuine 404 for a missing chunk. Render the editor with no unexpected script errors. | Passed September 21 on recorded 9abcf36 pair: anonymous immutable asset smoke and authenticated Chromium/WebKit render |
-| S02 | Sign in through the host `/api` rewrite; inspect secure HttpOnly host cookie, private/no-store responses, snapshot and authenticated WSS. Repeat in Chromium and WebKit. | Chromium OAuth/cookie passed; both browsers pass authenticated snapshot/WSS. Fresh WebKit 26.6 OAuth on 94b8e5a passed editor rendering, authenticated snapshot/no-store and WSS without imported cookies; Secure/HttpOnly observed. Windows WebKit omits redirect Set-Cookie and incorrectly reports Lax as None (independently reproduced), so SameSite remains unproven. Evidence: releases/staging-webkit-oauth-2026-09-21.json |
+| S02 | Sign in through the host `/api` rewrite; inspect secure HttpOnly host cookie, private/no-store responses, snapshot and authenticated WSS. Repeat in Chromium and WebKit. | Passed. Chromium OAuth/cookie evidence retained. Fresh WebKit 26.6 GitHub OAuth on 79f128b observed the original 302 response: Secure, HttpOnly, SameSite=Lax, host-only, Path=/. Editor, authenticated snapshot/no-store and three WSS snapshots passed without imported cookies. A local HTTPS observer preserved the original response and verified upstream TLS; provider HTTPS was tunneled opaquely. This resolves the Windows driver's incorrect SameSite=None report. Evidence: releases/staging-webkit-observed-oauth-2026-09-21.json; earlier instrumentation result retained |
 | S03 | Exercise simulator manual commands and all five automations. Check reported vs pending states, guard synchronization, permissions, and continued server automation after browser closure. | Passed on f7d36d9: fan/light/feeder/LCD/backlight/beep/pump observations, all five automation sequences, guard confirmation and pump on/off recorded after page closure with 10 seconds without polling. Original settings restored, normal scenario, paused/off cleanup. Viewer restrictions in S07. Evidence: releases/staging-automations-2026-09-21.json |
 | S04 | Block remote requests in the browser. Verify fallback, continuing sensor updates, successful host Pause, and All off stopping a simulated running output. | Hosted Chromium/WebKit fallback, fresh telemetry, Start/Pause, fan and All off checks passed September 21; see staging-controls evidence |
 | S05 | Open two isolated sessions. An untouched editor follows another session's save. A dirty editor keeps its draft and shows conflict. Reload accepts saved settings; a save overtaken in transit returns 409 without overwrite. | Passed on ad1706e in Chromium with mattiasli and xueshanmattiasli: all listed conflict cases plus successful operator save. Original settings restored, temporary access removed. Evidence: releases/staging-concurrency-2026-09-21.json |
@@ -69,17 +72,16 @@ Two browser contexts have separate local sessions. This proves browser concurren
 not real GitHub identity/role provisioning or PostgreSQL durability. Those require
 the hosted checks and PostgreSQL integration tests above.
 
-## Remaining release work
+## Gate review and next phase
 
-1. Fill the exact current and previous compatible deployment mapping.
-2. Complete authenticated hosted browser checks and provider recovery drills.
-3. Implement section 16's CI-gated staging deployment flow and immutable remote pinning
-   with the actual authorized project IDs and deployment access.
-4. Attach sanitized results and measurements, then review every S01–S14 row.
+Reviewed S01–S14 on September 21 after the fresh WebKit observation. The recorded
+79f128b release passed the coordinated workflow, with earlier feature/recovery
+observations linked per row. Backup/restore remains the explicit S12 scope exception.
+Historical failures below are retained and superseded by their successful reruns.
 
-Only mark G08 passed when all required hosted observations exist. P14 starts with
-production read-only and a dedicated backend MQTT credential; hardware pumping
-remains subject to G09.
+P14 starts with production read-only and a dedicated backend MQTT credential.
+Both live flags stay false until the supervised hardware procedure permits
+non-pump controls; pumping remains subject to its separate G09 checks.
 
 ## Observations on 2026-09-21
 

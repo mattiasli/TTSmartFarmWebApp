@@ -31,7 +31,7 @@ import {
   seedLocal,
   type FarmRole,
 } from './db';
-import { createFarmLink, MemoryFarmLink } from './farm-link';
+import { createConfiguredFarmLink, MemoryFarmLink } from './farm-link';
 import { MemorySessionStore } from './sessions';
 import { DatabaseMaintenance } from './db/maintenance';
 
@@ -58,7 +58,7 @@ export type AppDeps = {
 };
 
 export async function createDeps(config: AppConfig): Promise<AppDeps> {
-  const link = createFarmLink(config.SIMULATOR_TRANSPORT, config.SIMULATOR_MQTT_URL);
+  const link = createConfiguredFarmLink(config);
   if (!config.DATABASE_URL) {
     return {
       controller: new FarmController(config, link),

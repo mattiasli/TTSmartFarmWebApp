@@ -1,0 +1,25 @@
+{
+  "observedAt": "2026-09-21T16:49:20.661Z",
+  "apiSha": "79f128b8b0af73a0b7f6e39f3bed5457ba9578d9",
+  "browser": "webkit",
+  "version": "26.6",
+  "actualGithubOAuth": true,
+  "originalCallbackStatus": 302,
+  "callbackCookie": {
+    "secure": true,
+    "httpOnly": true,
+    "sameSiteLax": true,
+    "hostOnly": true,
+    "pathRoot": true
+  },
+  "sameSiteQualified": true,
+  "sameSiteReported": "None",
+  "secureHttpOnlyCookie": true,
+  "editorRendered": true,
+  "wssSnapshots": 3,
+  "authenticatedSnapshot": true,
+  "noStore": true,
+  "importedCookies": false,
+  "githubCookiesSaved": false,
+  "observation": "Loopback HTTPS observer forwards original app response; upstream TLS verified, provider HTTPS tunneled opaquely; disposable browser trusts observer certificate."
+}

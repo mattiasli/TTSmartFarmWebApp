@@ -4,11 +4,11 @@ Current qualification work: [P13 acceptance report](STAGING_ACCEPTANCE.md).
 The current release mapping is in [releases/staging.json](releases/staging.json).
 API infrastructure is defined in [the Railway IaC file](../.railway/railway.ts);
 see its [operating notes](../.railway/README.md) for scope and provider readback limits.
-Release `966a6d1` passed required CI and deployed to all three services. Hosted S08
-Postgres outage recovered with the API process alive and automations paused.
-Manual commands and all five automations previously passed. The host uses the anonymously
-accessible immutable `9abcf36` remote; its protection and asset checks are recorded
-in the acceptance report. G08 remains pending the outstanding hosted drills.
+Recorded release `79f128b` passed CI and the coordinated API/remote/host workflow.
+G08 is qualified for the agreed scope; evidence and historical failures are in
+the acceptance report. The manifest is a recorded snapshot, not a live pointer.
+A subsequent `3e431b6` API deployment failed before replacing that release.
+For P14 preparation see [production connection](PRODUCTION_DEPLOYMENT.md).
 Backup/restore (S12), including logical dump/local restore, is explicitly deferred
 by the user; no paid backup feature or upgrade should be enabled for this work.
 The September 18 observations below are historical.
