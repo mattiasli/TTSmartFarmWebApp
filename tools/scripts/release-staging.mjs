@@ -31,7 +31,11 @@ const stage = async (name, action) => {
   await save();
   console.log(`Staging release: ${name}`);
   try { const result = await action(); entry.status = 'passed'; return result; }
-  catch { entry.status = 'failed'; throw new Error(`Staging release failed at ${name}; inspect provider state before retrying.`); }
+  catch (error) {
+    entry.status = 'failed';
+    if (error.releaseDiagnostic) entry.diagnostic = error.releaseDiagnostic;
+    throw new Error(`Staging release failed at ${name}; inspect provider state before retrying.`);
+  }
   finally { entry.finishedAt = new Date().toISOString(); await save(); }
 };
 function cli(command, args, token) {
@@ -40,10 +44,24 @@ function cli(command, args, token) {
     const child = spawn(command, token ? [...args, '--token', token] : args,
       { env: process.env, stdio: ['ignore', 'pipe', 'pipe'], timeout: 20 * 60_000 });
     let stdout = '';
+    let stderr = '';
     child.stdout.on('data', (data) => { stdout += String(data); });
-    child.stderr.on('data', () => { /* Provider details stay out of CI secret-bearing error text. */ });
+    child.stderr.on('data', (data) => { stderr = (stderr + String(data)).slice(-16000); });
     child.on('error', () => reject(new Error(`${command} could not run`)));
-    child.on('close', (code) => code === 0 ? resolve(stdout) : reject(new Error(`${command} exited unsuccessfully`)));
+    child.on('close', (code) => {
+      if (code === 0) { resolve(stdout); return; }
+      const error = new Error(`${command} exited unsuccessfully`);
+      // eslint-disable-next-line no-control-regex -- Strip CLI ANSI color escapes before selecting error lines.
+      let diagnostic = stderr.replace(/\u001b\[[0-9;]*m/g, '').split(/\r?\n/)
+        .filter((line) => /^(?:Error:|error:)/.test(line.trim())).join('\n');
+      for (const name of ['RAILWAY_TOKEN', 'VERCEL_HOST_TOKEN', 'VERCEL_REMOTE_TOKEN', 'STAGING_SESSION_COOKIE', 'VERCEL_HOST_AUTOMATION_BYPASS']) {
+        if (process.env[name]) diagnostic = diagnostic.replaceAll(process.env[name], '[redacted]');
+      }
+      // URLs may carry credentials or provider request parameters.
+      error.releaseDiagnostic = `${command} exit ${code}: ${diagnostic.replace(/https?:\/\/\S+/g, '[provider URL]').slice(0, 1500)}`;
+      console.log(error.releaseDiagnostic);
+      reject(error);
+    });
   });
 }
 async function railway(query) {
