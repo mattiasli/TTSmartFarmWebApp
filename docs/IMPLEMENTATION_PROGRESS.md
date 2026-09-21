@@ -4,6 +4,23 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-21 14:37 UTC)
 
+### Coordinated release implementation (2026-09-21 15:17 UTC)
+
+Added the disabled smartfarm-web-staging workflow, exact-source/CI policy checks,
+ordered API/remote/host runner and pre-promotion browser checks. Three release
+policy tests, lint and typecheck pass. Hosted candidate verification passed against
+the existing 893a491 host with the immutable 9abcf36 remote: nine public remote
+assets, contract v1, missing chunk 404, editor, two WSS snapshots, history,
+no-store and paused/off simulator state. This is evidence for the candidate
+verifier, not an end-to-end coordinated release. Simulator automations were paused.
+
+Encrypted host automation-bypass and staging app-session secrets are now in the
+GitHub smartfarm-staging environment. Railway project-token creation was denied;
+Vercel deployment-token creation failed without a confirmed provider cause.
+Deployment credentials and native-hook cutover remain outstanding. Workflow
+activation is disabled and native hooks are still connected. See RELEASE.md for
+the concrete credential and activation steps. No backup/restore was performed.
+
 ### Follow-up: IaC applied and fresh WebKit OAuth verified (14:50 UTC)
 
 Release `94b8e5af4ed1e6a3a5a5821f183ab9994f868c84` passed all CI and provider
