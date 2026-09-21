@@ -64,6 +64,25 @@ The active process must be polled to completion before recording results or
 deploying a new API during this observation. Provider memory metrics are accessible
 and will be collected for the matching window separately.
 
+That observation completed at `2026-09-21T12:43:42.439Z`: 1,800,271 ms,
+2,280 snapshots, one controller epoch, zero page errors, unchanged API SHA.
+Snapshot interval p95 was 808 ms. Approximate telemetry age p95 was 377 ms, but
+the uncalibrated clock caveat still applies. Railway process memory for the same
+window averaged 101.925 MB and peaked at 110.461 MB; these are observed values,
+not proof of leak freedom. Raw browser JS heap samples and provider summary:
+`releases/staging-browser-measurement-2026-09-21.json` and
+`releases/staging-provider-memory-2026-09-21.json`.
+
+The user completed a real WebKit GitHub sign-in as mattiasli. The verifier passed
+its authenticated-user and GitHub-authorization assertions, then failed because
+the callback Set-Cookie header was not exposed. A fresh local fixture reproduced
+Windows WebKit omitting Set-Cookie on HTTP 302 responses and reporting a server-set
+Lax cookie as None. This is an instrumentation limitation, not a demonstrated OAuth
+failure. Cookie SameSite verification remains explicitly unqualified. The verifier
+now records that limitation instead of treating it as failed authentication; its
+subsequent editor/WSS steps were not reached in that particular real-login run.
+The separately recorded imported-session WebKit editor/WSS checks passed.
+
 ## Hosted restart exposed missing browser reconnect (2026-09-21)
 
 The deployed rerun on `62259e8449493af48a037e054d89665253d941dc` passed:

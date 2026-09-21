@@ -41,7 +41,9 @@ try {
   assert.equal(session?.authenticated, true, 'WebKit sign-in was not completed');
   assert.equal(session.username, 'mattiasli');
   assert.equal(githubAuthorizationSeen, true);
-  assert.deepEqual(callbackCookie, { secure: true, httpOnly: true, sameSiteLax: true, hostOnly: true });
+  const appCookie = (await context.cookies(host)).find((cookie) => cookie.name === 'smartfarm_session');
+  assert.ok(appCookie?.secure && appCookie.httpOnly);
+  if (callbackCookie) assert.deepEqual(callbackCookie, { secure: true, httpOnly: true, sameSiteLax: true, hostOnly: true });
   await page.goto('/automations');
   await expect(page.getByTestId('automation-editor')).toBeVisible({ timeout: 20_000 });
   await expect.poll(() => frames).toBeGreaterThan(1);
@@ -51,6 +53,9 @@ try {
   const health = await (await context.request.get('https://default-service-production.up.railway.app/health/ready')).json();
   const evidence = { observedAt: new Date().toISOString(), apiSha: health.releaseSha,
     browser: 'webkit', version: browser.version(), actualGithubOAuth: true, callbackCookie,
+    secureHttpOnlyCookie: true, sameSiteReported: appCookie.sameSite,
+    sameSiteQualified: callbackCookie?.sameSiteLax === true,
+    instrumentationLimit: callbackCookie ? null : 'Windows WebKit omits Set-Cookie on redirect responses and reports even server-set Lax cookies as None; independently reproduced with a local fixture.',
     editorRendered: true, wssSnapshots: frames, authenticatedSnapshot: true, noStore: true,
     importedCookies: false, githubCookiesSaved: false };
   await writeFile(new URL('../../.infra/staging-webkit-oauth-evidence.json', import.meta.url), JSON.stringify(evidence, null, 2));

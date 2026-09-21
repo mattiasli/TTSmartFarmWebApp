@@ -1,0 +1,191 @@
+{
+  "startedAt": "2026-09-21T12:13:42.167Z",
+  "finishedAt": "2026-09-21T12:43:42.439Z",
+  "durationMs": 1800271,
+  "apiSha": "ad1706e332bd2a2679294e57c56ae4af2f7c35db",
+  "finalApiSha": "ad1706e332bd2a2679294e57c56ae4af2f7c35db",
+  "browser": "153.0.8010.12",
+  "clockQualification": "Browser/server clock offset is not independently measured. Age and delivery values assume synchronized clocks; they do not alone prove the latency target.",
+  "approximateTelemetryToBrowserMs": {
+    "count": 2280,
+    "min": 132,
+    "p50": 264,
+    "p95": 377,
+    "p99": 393,
+    "max": 551
+  },
+  "approximateServerToBrowserMs": {
+    "count": 2280,
+    "min": 122,
+    "p50": 138,
+    "p95": 151,
+    "p99": 161,
+    "max": 524
+  },
+  "snapshotIntervalMs": {
+    "count": 2279,
+    "min": 13,
+    "p50": 800,
+    "p95": 808,
+    "p99": 817,
+    "max": 1180
+  },
+  "browserJsHeap": [
+    {
+      "elapsedMs": 2,
+      "usedBytes": 11264992,
+      "totalBytes": 15089664
+    },
+    {
+      "elapsedMs": 60011,
+      "usedBytes": 9011016,
+      "totalBytes": 10371072
+    },
+    {
+      "elapsedMs": 120011,
+      "usedBytes": 9269896,
+      "totalBytes": 11157504
+    },
+    {
+      "elapsedMs": 180020,
+      "usedBytes": 9458164,
+      "totalBytes": 11419648
+    },
+    {
+      "elapsedMs": 240032,
+      "usedBytes": 9613716,
+      "totalBytes": 11419648
+    },
+    {
+      "elapsedMs": 300047,
+      "usedBytes": 9360456,
+      "totalBytes": 11419648
+    },
+    {
+      "elapsedMs": 360056,
+      "usedBytes": 9749824,
+      "totalBytes": 11157504
+    },
+    {
+      "elapsedMs": 420072,
+      "usedBytes": 10007128,
+      "totalBytes": 11157504
+    },
+    {
+      "elapsedMs": 480091,
+      "usedBytes": 9552024,
+      "totalBytes": 11157504
+    },
+    {
+      "elapsedMs": 540101,
+      "usedBytes": 9077052,
+      "totalBytes": 10895360
+    },
+    {
+      "elapsedMs": 600104,
+      "usedBytes": 9393544,
+      "totalBytes": 11157504
+    },
+    {
+      "elapsedMs": 660120,
+      "usedBytes": 9697528,
+      "totalBytes": 11419648
+    },
+    {
+      "elapsedMs": 720122,
+      "usedBytes": 9060520,
+      "totalBytes": 10895360
+    },
+    {
+      "elapsedMs": 780139,
+      "usedBytes": 9111344,
+      "totalBytes": 10895360
+    },
+    {
+      "elapsedMs": 840166,
+      "usedBytes": 9110584,
+      "totalBytes": 10895360
+    },
+    {
+      "elapsedMs": 900170,
+      "usedBytes": 9184076,
+      "totalBytes": 10895360
+    },
+    {
+      "elapsedMs": 960181,
+      "usedBytes": 9082836,
+      "totalBytes": 10895360
+    },
+    {
+      "elapsedMs": 1020200,
+      "usedBytes": 9222260,
+      "totalBytes": 10895360
+    },
+    {
+      "elapsedMs": 1080215,
+      "usedBytes": 9266164,
+      "totalBytes": 10895360
+    },
+    {
+      "elapsedMs": 1140221,
+      "usedBytes": 9303084,
+      "totalBytes": 11157504
+    },
+    {
+      "elapsedMs": 1200227,
+      "usedBytes": 9794276,
+      "totalBytes": 11681792
+    },
+    {
+      "elapsedMs": 1260235,
+      "usedBytes": 9838192,
+      "totalBytes": 11943936
+    },
+    {
+      "elapsedMs": 1320240,
+      "usedBytes": 9615772,
+      "totalBytes": 11681792
+    },
+    {
+      "elapsedMs": 1380249,
+      "usedBytes": 9726856,
+      "totalBytes": 11681792
+    },
+    {
+      "elapsedMs": 1440264,
+      "usedBytes": 9300636,
+      "totalBytes": 12992512
+    },
+    {
+      "elapsedMs": 1500276,
+      "usedBytes": 9371092,
+      "totalBytes": 12992512
+    },
+    {
+      "elapsedMs": 1560286,
+      "usedBytes": 9881464,
+      "totalBytes": 13254656
+    },
+    {
+      "elapsedMs": 1620308,
+      "usedBytes": 9896632,
+      "totalBytes": 13254656
+    },
+    {
+      "elapsedMs": 1680313,
+      "usedBytes": 9792396,
+      "totalBytes": 12468224
+    },
+    {
+      "elapsedMs": 1740312,
+      "usedBytes": 9585316,
+      "totalBytes": 11681792
+    }
+  ],
+  "controllerEpochs": [
+    "269caeff-aadd-424a-9e7f-2c19b2e8dcfc"
+  ],
+  "sockets": 1,
+  "pageErrors": 0,
+  "memoryScope": "Chromium page JavaScript heap only; provider process memory and database size/retention require separate evidence."
+}
