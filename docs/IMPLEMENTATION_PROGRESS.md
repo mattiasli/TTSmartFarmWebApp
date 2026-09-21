@@ -4,6 +4,24 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Database maintenance implementation (2026-09-21)
 
+**Verified staging release:** `b3ae50288e9f68a49c9ba7612a514a3f4e6083a3`.
+CI run 35611197988 and all provider deployments passed. Hosted admin metrics
+confirm migration 003, 25,590 telemetry rows, 192 events and 176 commands with
+table/index sizes in `releases/staging-database-size-2026-09-21.json`. Scheduled
+auth cleanup removed 9 OAuth flows, 109 tickets and revoked one expired session.
+Retention completed without errors; all hosted history is younger than its
+retention cutoff, so zero history deletions is expected. Populated deletion
+behavior is covered by the real PostgreSQL integration fixture below.
+
+S08 preparation reproduced three uncaught idle-pool disconnect exceptions during
+an actual TCP outage affecting all database connections. Pool errors are now
+handled without logging credential-bearing error objects; interrupted background
+controller writes pause control and trigger ownership recovery. The new real
+PostgreSQL outage test verifies HTTP readiness, unavailable commands, no publishes,
+settings/revision retention and paused recovery, including an in-flight write.
+It and both controller lock tests pass; all 135 unit tests, typecheck and lint
+pass. This outage fix still needs deployment and the hosted S08 drill.
+
 Backup/restore remains explicitly deferred, including logical dump/local restore.
 The evidence-only release `6e6df4113d01c85ef9421eb5c883bd6e64364167` passed
 CI run 35609030418 and all three provider deployments.
@@ -20,7 +38,7 @@ Validation: 135 unit tests passed; PostgreSQL maintenance tests passed with 1,00
 expired rows per retained table, newer linked records, scheduled cleanup and
 anonymous/viewer/admin permissions. Full integration run had only a stale
 migration-list assertion failure; after updating it, all 14 repository tests
-passed. Typecheck and lint passed. Hosted migration/metrics verification is pending.
+passed. Typecheck and lint passed. Hosted migration/metrics verification passed.
 Use `node tools/scripts/inspect-staging-database.mjs` after deployment.
 
 ## Previous verified handoff (2026-09-21 13:56 UTC)

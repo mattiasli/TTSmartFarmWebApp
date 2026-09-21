@@ -1,0 +1,63 @@
+{
+  "observedAt": "2026-09-21T14:23:24.750Z",
+  "apiSha": "b3ae50288e9f68a49c9ba7612a514a3f4e6083a3",
+  "readOnly": true,
+  "tables": [
+    {
+      "table": "telemetry_samples",
+      "retentionDays": 30,
+      "rows": 25590,
+      "oldest": "2026-09-18T15:10:50.000Z",
+      "expired_rows": 0,
+      "table_bytes": 14016512,
+      "index_bytes": 3514368
+    },
+    {
+      "table": "events",
+      "retentionDays": 90,
+      "rows": 192,
+      "oldest": "2026-09-18T15:10:54.157Z",
+      "expired_rows": 0,
+      "table_bytes": 73728,
+      "index_bytes": 65536
+    },
+    {
+      "table": "commands",
+      "retentionDays": 30,
+      "rows": 176,
+      "oldest": "2026-09-18T16:04:14.683Z",
+      "expired_rows": 0,
+      "table_bytes": 114688,
+      "index_bytes": 139264
+    }
+  ],
+  "migrations": [
+    "001_init.sql",
+    "002_p05_complete.sql",
+    "003_retention_indexes.sql"
+  ],
+  "sizeScope": "Physical table/index bytes include the database relation; row counts are restricted to this farm.",
+  "maintenance": {
+    "authIntervalMs": 60000,
+    "retentionIntervalMs": 86400000,
+    "authRunning": false,
+    "retentionRunning": false,
+    "lastAuth": {
+      "completedAt": "2026-09-21T14:22:55.745Z",
+      "rows": {
+        "oauth": 9,
+        "tickets": 109,
+        "sessions": 1
+      }
+    },
+    "lastRetention": {
+      "completedAt": "2026-09-21T14:22:55.750Z",
+      "rows": {
+        "samples": 0,
+        "events": 0,
+        "commands": 0
+      }
+    },
+    "lastError": null
+  }
+}

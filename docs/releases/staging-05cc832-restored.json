@@ -2,16 +2,16 @@
     "schemaVersion":  1,
     "environment":  "staging",
     "qualification":  "pending",
-    "sourceSha":  "b3ae50288e9f68a49c9ba7612a514a3f4e6083a3",
-    "ciRunUrl":  "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35611197988",
-    "observedAt":  "2026-09-21T14:23:24.750Z",
+    "sourceSha":  "05cc832d62deac0e0ea88ac3faaec10bb973d422",
+    "ciRunUrl":  "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35607375925",
+    "observedAt":  "2026-09-21T13:56:34.9060645Z",
     "host":  {
                  "project":  "smartfarm-host",
                  "publicOrigin":  "https://smartfarm-host.vercel.app",
-                 "deploymentId":  "6u22ravHQ2PQ3KLrpf2c6cRf3WCy",
-                 "githubDeploymentId":  6570540573,
-                 "deploymentUrl":  "https://smartfarm-host-hnaduqtpb-mattias-li-s-projects.vercel.app",
-                 "sourceSha":  "b3ae50288e9f68a49c9ba7612a514a3f4e6083a3"
+                 "deploymentId":  "4sNdetXxZCp9sreExDc8viMi4MTa",
+                 "githubDeploymentId":  6569833287,
+                 "deploymentUrl":  "https://smartfarm-host-k5au35gks-mattias-li-s-projects.vercel.app",
+                 "sourceSha":  "05cc832d62deac0e0ea88ac3faaec10bb973d422"
              },
     "remote":  {
                    "project":  "smartfarm-automations",
@@ -32,15 +32,15 @@
                 "projectId":  "285fc6b3-caef-4e86-9a03-0966a2262b2b",
                 "serviceId":  "acac3d1f-1dc4-4f32-ba83-81a704167f31",
                 "environmentId":  "9229a204-ddea-466e-a906-438c5ed1e757",
-                "deploymentId":  "b9ccd24c-78b1-4b85-bf31-609af44aae01",
-                "githubDeploymentId":  6570476052,
+                "deploymentId":  "49895789-ccfb-4354-8367-3bff89845efc",
+                "githubDeploymentId":  null,
                 "imageDigest":  null,
-                "sourceSha":  "b3ae50288e9f68a49c9ba7612a514a3f4e6083a3",
-                "runtimeReportedSha":  "b3ae50288e9f68a49c9ba7612a514a3f4e6083a3",
-                "sourceEvidence":  "Exact baked SHA verified through hosted admin metrics after successful CI and provider deployments."
+                "sourceSha":  "05cc832d62deac0e0ea88ac3faaec10bb973d422",
+                "runtimeReportedSha":  "05cc832d62deac0e0ea88ac3faaec10bb973d422",
+                "sourceEvidence":  "Exact baked SHA verified after restoring original deployment 06ac316c-79ee-400a-9665-28dd1e620759 through image rollback."
             },
     "database":  {
-                     "schemaVersion":  "003_retention_indexes.sql",
+                     "schemaVersion":  null,
                      "backupObservedAt":  null,
                      "restoreEvidence":  null,
                      "backupRestoreDisposition":  "Explicitly deferred by user on 2026-09-21, including logical dump/local restore"
@@ -53,11 +53,12 @@
                             "LIVE_PUMP_ENABLED":  false
                         },
     "previousCompatibleRelease":  {
-                                      "manifest":  "staging-05cc832-restored.json",
-                                      "sourceSha":  "05cc832d62deac0e0ea88ac3faaec10bb973d422",
+                                      "manifest":  "staging-a94f688.json",
+                                      "sourceSha":  "a94f6883e5ac8e5c3cc200cab1ed1a3605967728",
+                                      "rollbackEvidence":  "staging-rollback-a94f688-2026-09-21.json",
                                       "schemaCompatible":  true,
                                       "remotePinRetained":  true,
-                                      "note":  "Historical verified compatible pair; provider rollback availability must be checked independently."
+                                      "restorationVerified":  true
                                   },
     "acceptanceReport":  "../STAGING_ACCEPTANCE.md"
 }

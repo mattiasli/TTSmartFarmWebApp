@@ -194,7 +194,7 @@ export class FarmController {
       this.ownership = 'owner';
       this.engine.pause('Paused after backend start. Resume explicitly.');
       await this.abandonPendingFromStore('Controller restarted before confirmation.');
-      void this.persistRuntime();
+      this.persistInBackground(this.persistRuntime());
       return true;
     }
     const acquired = await this.lock.tryAcquire();
@@ -242,14 +242,14 @@ export class FarmController {
     this.assertOwner();
     this.drive();
     this.engine.start();
-    void this.persistRuntime();
+    this.persistInBackground(this.persistRuntime());
     return this.snapshot();
   }
 
   pauseAutomations(reason = 'Paused by you') {
     this.assertOwner();
     this.engine.pause(reason);
-    void this.persistRuntime();
+    this.persistInBackground(this.persistRuntime());
     return this.snapshot();
   }
 
@@ -485,6 +485,14 @@ export class FarmController {
     void this.becomeOwner().catch(() => undefined);
   }
 
+  private persistInBackground(work: Promise<unknown> | undefined) {
+    void work?.catch(() => {
+      // A lost background write must pause control, never crash the process.
+      // Reacquisition reloads persisted state before making control available.
+      if (this.ownership === 'owner') this.loseOwnership();
+    });
+  }
+
   private persistRuntime() {
     if (!this.store) return;
     const runtime = this.engine.runtime();
@@ -511,7 +519,7 @@ export class FarmController {
     if (this.seenMqttEpoch && this.seenMqttEpoch !== this.link.mqttEpoch) {
       this.engine.pause('Paused — MQTT reconnected. Resume explicitly.');
       this.markPendingUncertain('MQTT epoch changed before confirmation.');
-      void this.persistRuntime();
+      this.persistInBackground(this.persistRuntime());
     }
     this.seenMqttEpoch = this.link.mqttEpoch;
     const latest = this.link.latest();
@@ -525,15 +533,15 @@ export class FarmController {
     this.engine.tick(isFresh(age));
     if (this.store && this.engine.attempts !== this.lastPersistedAttempts) {
       this.lastPersistedAttempts = this.engine.attempts;
-      void this.persistRuntime();
+      this.persistInBackground(this.persistRuntime());
     }
     if (this.store && latest && this.now() - this.lastSampleMs >= 10_000) {
       this.lastSampleMs = this.now();
-      void this.store.recordTelemetrySample(
+      this.persistInBackground(this.store.recordTelemetrySample(
         this.config.FARM_ID,
         latest.data as unknown as Record<string, unknown>,
         new Date(this.now()),
-      );
+      ));
     }
   }
 
@@ -549,8 +557,8 @@ export class FarmController {
           command.status = 'uncertain';
           command.reason = 'Pump pulse was not confirmed in time.';
           this.engine.pause('Paused — unresolved pump pulse. Inspect the farm before watering again.');
-          void this.persistCommand(command);
-          void this.persistRuntime();
+          this.persistInBackground(this.persistCommand(command));
+          this.persistInBackground(this.persistRuntime());
         }
       }
     }, PUMP_WATCHDOG_MS);
@@ -563,7 +571,7 @@ export class FarmController {
       if (!stopSupersedes(stopType, command.action)) continue;
       command.status = 'superseded';
       command.reason = 'Superseded by a stop.';
-      void this.persistCommand(command, byId);
+      this.persistInBackground(this.persistCommand(command, byId));
     }
   }
 
@@ -573,7 +581,7 @@ export class FarmController {
       if (command.mqttEpoch !== this.link.mqttEpoch) {
         command.status = 'uncertain';
         command.reason = 'MQTT epoch changed after publish.';
-        void this.persistCommand(command);
+        this.persistInBackground(this.persistCommand(command));
         continue;
       }
       if (command.confirmationMode === 'not_reported') continue;
@@ -584,14 +592,14 @@ export class FarmController {
           command.status = 'state_matched';
           command.stateMatchedAt = new Date(this.now()).toISOString();
           command.reason = 'Pulse observed on then off.';
-          void this.persistCommand(command);
+          this.persistInBackground(this.persistCommand(command));
         }
         continue;
       }
       if (matchesExpectedState(command.request, telemetry)) {
         command.status = 'state_matched';
         command.stateMatchedAt = new Date(this.now()).toISOString();
-        void this.persistCommand(command);
+        this.persistInBackground(this.persistCommand(command));
       }
     }
   }
@@ -607,7 +615,7 @@ export class FarmController {
         if (command.status === 'sent') {
           command.status = 'uncertain';
           command.reason = 'No matching telemetry arrived in time.';
-          void this.persistCommand(command);
+          this.persistInBackground(this.persistCommand(command));
         }
       }, STATE_MATCH_MS),
     );
@@ -618,7 +626,7 @@ export class FarmController {
       if (!isPendingCommand(command) || command.status === 'accepted') continue;
       command.status = 'uncertain';
       command.reason = reason;
-      void this.persistCommand(command);
+      this.persistInBackground(this.persistCommand(command));
     }
   }
 
