@@ -120,4 +120,42 @@ describe('P07 controller lifecycle', () => {
     expect(lock.tryAcquire).toHaveBeenCalledTimes(1);
     expect(link.published).toEqual([]);
   });
+
+  it('T079 read-only live shutdown never publishes cleanup commands', async () => {
+    const lock: ControllerLock = {
+      key: 1, held: true, tryAcquire: async () => true,
+      release: async () => { lock.held = false; },
+      isHealthy: async () => true, close: async () => undefined,
+    };
+    const link = new ScriptedFarmLink();
+    const controller = new FarmController(
+      loadConfig({ NODE_ENV: 'test', FARM_MODE: 'live', LIVE_COMMANDS_ENABLED: 'false' }),
+      link, Date.now, null, { lock, ownership: 'owner' },
+    );
+    controllers.push(controller);
+    await controller.close();
+    expect(link.published).toEqual([]);
+    expect(lock.held).toBe(false);
+  });
+
+  it('T079 bounds drain and ignores a late ownership health result', async () => {
+    vi.useFakeTimers();
+    let healthy!: (value: boolean) => void;
+    const lock: ControllerLock = {
+      key: 1, held: true, tryAcquire: async () => true,
+      release: async () => { lock.held = false; },
+      isHealthy: () => new Promise<boolean>((resolve) => { healthy = resolve; }),
+      close: async () => undefined,
+    };
+    const link = new ScriptedFarmLink();
+    const controller = new FarmController(loadConfig({ NODE_ENV: 'test' }), link, Date.now, null, { lock, ownership: 'owner' });
+    controllers.push(controller);
+    const drain = controller.drain();
+    expect(controller.drain()).toBe(drain);
+    await vi.advanceTimersByTimeAsync(2_500);
+    await drain;
+    healthy(true);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(link.published).toEqual([]);
+  });
 });

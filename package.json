@@ -23,6 +23,7 @@
     "test:federation": "node tools/scripts/run-federation-test.mjs",
     "test:e2e": "playwright test --config playwright.e2e.config.ts",
     "check:staging-public": "node tools/scripts/check-staging-public.mjs",
+    "test:container-shutdown": "node tools/scripts/check-container-shutdown.mjs",
     "infra:up": "docker compose up -d",
     "infra:down": "docker compose down",
     "db:migrate": "npm run db:migrate -w @smartfarm/api",

@@ -2,7 +2,43 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21, committed and deployed)
+## Shutdown and release metadata follow-up (2026-09-21)
+
+Source: `11d629d` plus this follow-up. Provider integrations remain unconfirmed;
+GitHub CI and automatic Railway/Vercel deployment access work through Git.
+
+Implemented:
+
+- API handles SIGTERM/SIGINT, drains once before Fastify closes, then closes
+  sockets/controller/database. Shutdown has a 12-second deadline inside the
+  configured 15-second Railway window. The container starts Node directly as PID 1.
+- Cleanup stop attempts are bounded to 2.5 seconds, require healthy ownership,
+  suppress late health-check continuations, and never publish in live read-only mode.
+- API health/diagnostics report `RELEASE_SHA` or Railway's Git SHA. Host/remote
+  builds use `VITE_RELEASE_SHA` or Vercel's Git SHA; dashboard diagnostics show it.
+  Public smoke now requires actual 40-character API/remote SHAs and can check
+  `EXPECTED_API_SHA` / `EXPECTED_REMOTE_SHA` against a release candidate.
+- Docker base is pinned to the observed/tested image digest.
+
+Evidence before deployment:
+
+- Typecheck and lint passed; 114 unit tests passed; frontend import and built
+  secret-canary checks passed; production federation build/browser proof passed.
+- Windows PostgreSQL/MQTT suite: 25 passed, one Unix-signal test explicitly skipped.
+- New `tests/integration/process-shutdown.test.ts` passed in the Linux Docker image:
+  two real API processes, old owner running automations, successor HTTP-ready while
+  waiting, SIGTERM exit 0, automatic takeover, and paused successor. Linux CI runs it.
+- `docker build -t smartfarm-g08-shutdown:local .` passed. `test:container-shutdown`
+  tested the actual image entrypoint with network disabled: SIGTERM, exit 0,
+  shutdown complete in 424 ms. It removes only its temporary test container.
+- The image install reported 2 moderate and 1 high npm audit findings. Dependency
+  audit/triage remains required; do not run `npm audit fix --force` blindly.
+
+G08 remains pending: immutable remote access/pinning, authenticated browser and
+provider recovery drills, backup restore, coordinated release gating, and measurements.
+Deployment results for this follow-up must be verified after push.
+
+## Previous deployed handoff (2026-09-21)
 
 The user explicitly authorized implementing the plan, committing, and deploying.
 The tested P13 changes were committed and pushed as

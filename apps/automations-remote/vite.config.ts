@@ -7,6 +7,11 @@ const publicOrigin = process.env.VITE_REMOTE_PUBLIC_ORIGIN ?? 'http://127.0.0.1:
 
 export default defineConfig({
   base: './',
+  define: {
+    'import.meta.env.VITE_RELEASE_SHA': JSON.stringify(
+      process.env.VITE_RELEASE_SHA || process.env.VERCEL_GIT_COMMIT_SHA || 'dev',
+    ),
+  },
   server: {
     host: '127.0.0.1',
     port: 5174,

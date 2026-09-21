@@ -28,7 +28,7 @@ explicitly. Do not infer successful actuation from HTTP acceptance.
 | S07 | Revoke a signed-in user's access with a second admin. Verify socket closure and rejected reads/writes, including after refresh. Preserve the last admin. | Pending hosted execution |
 | S08 | Interrupt staging database access in a controlled window. Verify rejected mutations, no publishing after ownership loss, and paused recovery. Restore original connectivity. | Pending provider access and hosted execution |
 | S09 | Exercise actual broker loss/reconnect with the isolated local MQTT suite; verify stale state, no queued replay, and explicit resume. Hosted memory transport has no broker; also exercise hosted backend/socket interruption. | Run and record local MQTT integration results; hosted network recovery pending |
-| S10 | Deploy a compatible new API while the old owner drains. Record both deployment IDs, readiness while waiting for ownership, one owner, bounded drain, and paused handover. | Pending provider access and hosted execution |
+| S10 | Deploy a compatible new API while the old owner drains. Record both deployment IDs, readiness while waiting for ownership, one owner, bounded drain, and paused handover. | Linux two-process SIGTERM/paused takeover and Docker PID-1 shutdown passed locally; complete Railway drill pending |
 | S11 | Roll back API to a schema-compatible version and host/remote as a recorded immutable pair. Verify login, assets, snapshots, paused automations, and no replay. | Pending immutable release mapping and hosted execution |
 | S12 | Restore an actual staging backup into a new isolated database. Verify migrations, roles, settings revisions, events/history; revoke restored sessions; start simulator paused with live flags false. Record duration and backup age. | Pending provider backup/restore access |
 | S13 | Measure normal telemetry-to-browser latency (<2 s), stale indication (~4 s plus scheduling), command acceptance (<1 s), and memory over 30 minutes. Record sample counts, percentiles, process/browser memory, row/index size and retention behavior. | Pending measurements; targets are not claimed results |
@@ -101,3 +101,23 @@ The immutable Vercel deployment URLs recorded in the release mapping each return
 the public alias in the host. Provider access is needed to configure approved
 public immutable assets and to perform restart/rollback/backup recovery drills.
 G08 is still pending; the immediate waiting-controller incident is resolved.
+
+## Reproduce container shutdown
+
+```text
+docker build -t smartfarm-g08-shutdown:local .
+npm run test:container-shutdown
+```
+
+This starts one network-isolated simulator container with both live flags false,
+checks readiness, delivers Docker's SIGTERM, requires exit 0 and the completion log
+within 15 seconds, then removes only the container it created. The September 21
+run completed in 424 ms. The PostgreSQL two-process signal test also runs in Linux
+CI; Windows deliberately skips it because Windows termination does not implement
+Unix SIGTERM handlers.
+
+API release identity comes from `RELEASE_SHA` or `RAILWAY_GIT_COMMIT_SHA`. Frontend
+build identity comes from `VITE_RELEASE_SHA` or `VERCEL_GIT_COMMIT_SHA`. Missing or
+non-SHA hosted identity now fails `check:staging-public`. Set `EXPECTED_API_SHA` and
+`EXPECTED_REMOTE_SHA` to additionally require exact release candidates; they may
+differ when a host deliberately pins a previous compatible remote.

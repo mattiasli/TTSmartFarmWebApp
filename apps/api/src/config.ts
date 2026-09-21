@@ -6,6 +6,7 @@ const schema = z.object({
   APP_ENV: z.enum(['local', 'staging', 'production']).default('local'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
   HOST: z.string().default('127.0.0.1'),
+  RELEASE_SHA: z.string().default('dev'),
   PUBLIC_APP_ORIGIN: z.string().default('http://127.0.0.1:5173'),
   ALLOWED_BROWSER_ORIGINS: z.string().default('http://127.0.0.1:5173,http://localhost:5173'),
   FARM_MODE: z.enum(['simulator', 'live']).default('simulator'),
@@ -41,6 +42,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     APP_ENV: env.APP_ENV ?? 'local',
     PORT: env.PORT ?? '3001',
     HOST: env.HOST ?? '127.0.0.1',
+    RELEASE_SHA: env.RELEASE_SHA || env.RAILWAY_GIT_COMMIT_SHA || 'dev',
     PUBLIC_APP_ORIGIN: env.PUBLIC_APP_ORIGIN ?? 'http://127.0.0.1:5173',
     ALLOWED_BROWSER_ORIGINS: env.ALLOWED_BROWSER_ORIGINS,
     FARM_MODE: env.FARM_MODE ?? 'simulator',
@@ -60,6 +62,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
 export function redactedConfig(config: AppConfig) {
   return {
     appEnv: config.APP_ENV,
+    releaseSha: config.RELEASE_SHA,
     farmMode: config.FARM_MODE,
     liveCommandsEnabled: config.LIVE_COMMANDS_ENABLED,
     livePumpEnabled: config.LIVE_PUMP_ENABLED,

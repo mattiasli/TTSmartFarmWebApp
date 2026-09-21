@@ -69,6 +69,7 @@ export class FarmController {
   ownership: ControllerOwnership;
   readonly controllerEpoch = crypto.randomUUID();
   private draining = false;
+  private drainPromise: Promise<void> | null = null;
   private seenMqttEpoch: string | null = null;
 
   constructor(
@@ -159,6 +160,7 @@ export class FarmController {
     const snap = this.snapshot();
     return {
       ownership: this.ownership,
+      releaseSha: this.config.RELEASE_SHA,
       controllerEpoch: this.controllerEpoch,
       mqttEpoch: this.link.mqttEpoch,
       brokerReady: snap.connection.brokerReady,
@@ -402,7 +404,12 @@ export class FarmController {
     }
   }
 
-  async drain() {
+  drain(): Promise<void> {
+    this.drainPromise ??= this.performDrain();
+    return this.drainPromise;
+  }
+
+  private async performDrain() {
     const wasOwner = this.ownership === 'owner';
     this.draining = true;
     if (this.ownershipRetryTimer) clearTimeout(this.ownershipRetryTimer);
@@ -412,11 +419,26 @@ export class FarmController {
     if (this.pumpWatchdog) clearTimeout(this.pumpWatchdog);
     this.clearMatchTimers();
     this.markPendingUncertain('Controller drained before confirmation.');
-    if (this.lock?.held) {
+    if (wasOwner && this.lock?.held && this.link.ready &&
+        (this.config.FARM_MODE === 'simulator' || this.config.LIVE_COMMANDS_ENABLED)) {
+      let deadline: ReturnType<typeof setTimeout> | undefined;
+      let stopWindowOpen = true;
       try {
-        await this.link.publish('smartfarm/cmd/pump', 'off');
+        await Promise.race([
+          (async () => {
+            if (await this.lock?.isHealthy() && stopWindowOpen && this.lock?.held) {
+              await this.link.publish('smartfarm/cmd/pump', 'off');
+            }
+          })(),
+          new Promise<void>((_, reject) => {
+            deadline = setTimeout(() => reject(new Error('Drain stop deadline.')), PUBLISH_DEADLINE_MS);
+          }),
+        ]);
       } catch {
         // Bounded cleanup; firmware still has its own cap.
+      } finally {
+        stopWindowOpen = false;
+        if (deadline) clearTimeout(deadline);
       }
     }
     if (wasOwner) await this.persistRuntime();

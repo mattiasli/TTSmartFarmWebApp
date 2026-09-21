@@ -37,6 +37,7 @@ export function Settings() {
       </section>
       <section className="section">
         <Title3>Diagnostics</Title3>
+        <Text as="p">Dashboard release: {import.meta.env.VITE_RELEASE_SHA}</Text>
         <pre className="diagnostics">{JSON.stringify(diagnostics.data ?? live.snapshot?.connection ?? {}, null, 2)}</pre>
       </section>
       {live.session?.role === 'admin' ? (

@@ -8,6 +8,11 @@ const remoteEntry =
   (process.env.VERCEL ? 'https://smartfarm-automations.vercel.app/remoteEntry.js' : 'http://127.0.0.1:5174/remoteEntry.js');
 
 export default defineConfig(({ isPreview }) => ({
+  define: {
+    'import.meta.env.VITE_RELEASE_SHA': JSON.stringify(
+      process.env.VITE_RELEASE_SHA || process.env.VERCEL_GIT_COMMIT_SHA || 'dev',
+    ),
+  },
   server: {
     host: '127.0.0.1',
     port: 5173,

@@ -31,7 +31,9 @@ try {
       databaseConfigured: true, githubOAuthConfigured: true,
     })) assert.equal(body[key], value, `Unexpected health field ${key}`);
     assert.equal(body.controller, 'owner', `Controller is ${body.controller}; HTTP readiness alone does not qualify staging.`);
-    return { controller: body.controller, mode: body.farmMode, liveFlags: false };
+    assert.match(body.releaseSha ?? '', /^[a-f0-9]{40}$/i, 'API release SHA is missing or invalid.');
+    if (process.env.EXPECTED_API_SHA) assert.equal(body.releaseSha, process.env.EXPECTED_API_SHA);
+    return { controller: body.controller, mode: body.farmMode, liveFlags: false, releaseSha: body.releaseSha };
   });
   await check('anonymous session through host proxy', async () => {
     const response = await context.request.get(`${hostOrigin}/api/v1/session`);
@@ -66,6 +68,8 @@ try {
     }, remoteEntry);
     assert.equal(meta.contractVersion, 1);
     assert.equal(meta.componentType, 'function');
+    assert.match(meta.releaseSha ?? '', /^[a-f0-9]{40}$/i, 'Remote release SHA is missing or invalid.');
+    if (process.env.EXPECTED_REMOTE_SHA) assert.equal(meta.releaseSha, process.env.EXPECTED_REMOTE_SHA);
     assert.deepEqual(failed, []);
     assert.ok(assets.length > 1, 'Expected the entry and imported child assets.');
     for (const asset of assets) {

@@ -128,6 +128,10 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   );
   hub.start();
 
+  app.addHook('preClose', async () => {
+    await controller.drain();
+  });
+
   app.addHook('onClose', async () => {
     await hub.close();
     await controller.close();
