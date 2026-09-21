@@ -17,7 +17,7 @@ export function isStopCommand(type: FarmCommandRequest['type']) {
 
 export function confirmationModeFor(type: FarmCommandRequest['type']): ConfirmationMode {
   if (type === 'pump.pulse') return 'pulse_observation';
-  if (type === 'buzzer.beep' || type.startsWith('lcd.')) return 'not_reported';
+  if (type === 'buzzer.beep' || type === 'lcd.setText' || type === 'lcd.showStatus') return 'not_reported';
   return 'state_match';
 }
 
@@ -73,6 +73,11 @@ export function matchesExpectedState(request: FarmCommandRequest, telemetry: Wir
 
 export function isPendingStatus(status: CommandStatus) {
   return status === 'accepted' || status === 'publishing' || status === 'sent';
+}
+
+export function isPendingCommand(command: { status: CommandStatus; confirmationMode: ConfirmationMode }) {
+  return isPendingStatus(command.status)
+    && !(command.status === 'sent' && command.confirmationMode === 'not_reported');
 }
 
 export function stopSupersedes(stop: FarmCommandRequest['type'], pending: FarmCommandRequest['type']) {

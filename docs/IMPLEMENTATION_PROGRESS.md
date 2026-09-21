@@ -2,6 +2,26 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Hosted manual-command failure and fix (2026-09-21)
+
+Release `5e2ab4e69ae5d457c594353cc27400a6e88f2b3a` deployed successfully to all
+three services and passed all CI jobs (including the additional review job):
+https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35601603610
+
+The expanded hosted automation harness stopped during manual backlight changes:
+HTTP 422 `ACTUATOR_BUSY`. Backlight was incorrectly classified as sent-only even
+though `bl` telemetry reports it; sent-only LCD/beep commands also remained pending
+forever and blocked subsequent commands. Failed evidence is preserved in
+`releases/staging-automations-before-command-fix-2026-09-21.json`. Harness cleanup
+restored normal sensor conditions, original settings, synchronized guard and All off.
+
+The fix uses state matching for backlight and treats sent/not_reported commands as
+finished for actuator locking and pending UI, while preserving their honest `sent`
+status. Disconnect/restart no longer turns already-sent unreported commands into
+uncertain work; accepted-but-not-sent commands still become uncertain without replay.
+All 133 unit tests and the PostgreSQL restart regression passed. Full hosted S03
+and calibrated latency/stale checks must be rerun after deploying this fix.
+
 ## Backup facility limitation and measurements (2026-09-21)
 
 Hosted S05 passed on `ad1706e` with distinct GitHub identities `mattiasli` and

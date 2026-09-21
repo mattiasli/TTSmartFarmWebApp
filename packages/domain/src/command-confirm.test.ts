@@ -12,6 +12,7 @@ describe('command confirmation', () => {
     expect(confirmationModeFor('lcd.setText')).toBe('not_reported');
     expect(confirmationModeFor('buzzer.beep')).toBe('not_reported');
     expect(confirmationModeFor('fan.set')).toBe('state_match');
+    expect(confirmationModeFor('lcd.setBacklight')).toBe('state_match');
   });
 
   it('only matches newer expected actuator state', () => {

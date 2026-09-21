@@ -75,6 +75,23 @@ describe('P08 command confirmation', () => {
     expect(beep.confirmationMode).toBe('not_reported');
     expect(lcd.status).toBe('sent');
     expect(lcd.confirmationMode).toBe('not_reported');
+    expect(controller.snapshot().pendingCommands.some((command) => [beep.id, lcd.id].includes(command.id))).toBe(false);
+    const again = await controller.command({ type: 'buzzer.beep', frequencyHz: 440 }, crypto.randomUUID());
+    const nextText = await controller.command({ type: 'lcd.setText', line1: 'Next', line2: 'Text' }, crypto.randomUUID());
+    expect(again.status).toBe('sent');
+    expect(nextText.status).toBe('sent');
+  });
+
+  it('matches backlight telemetry before accepting the next backlight change', async () => {
+    const now = Date.now();
+    const { controller, link } = make(now);
+    const first = await controller.command({ type: 'lcd.setBacklight', on: true }, crypto.randomUUID());
+    expect(first.confirmationMode).toBe('state_match');
+    await expect(controller.command({ type: 'lcd.setBacklight', on: false }, crypto.randomUUID())).rejects.toMatchObject({ code: 'ACTUATOR_BUSY' });
+    link.inject({ ...HEALTHY_TELEMETRY_FIXTURE, bl: 1 }, now + 1);
+    controller.snapshot();
+    expect(controller.getCommand(first.id)?.status).toBe('state_matched');
+    await expect(controller.command({ type: 'lcd.setBacklight', on: false }, crypto.randomUUID())).resolves.toMatchObject({ status: 'sent' });
   });
 
   it('T025/T027 stop supersedes a pending start and ignores the late callback', async () => {

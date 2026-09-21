@@ -26,7 +26,10 @@ try {
     const response = await context.request.post(`${farm}/${path}`, {
       headers: { ...headers, 'Idempotency-Key': crypto.randomUUID() }, data });
     const elapsed = performance.now() - start;
-    assert.ok(response.ok(), `${path} failed: ${response.status()}`);
+    if (!response.ok()) {
+      const body = await response.json();
+      throw new Error(`${path} ${data.type ?? ''} failed: ${response.status()} ${body.error?.code ?? 'UNKNOWN'}`);
+    }
     if (path === 'commands') durations.push(elapsed);
     return response.json();
   };
@@ -63,14 +66,19 @@ try {
     }
     await command({ type: 'lcd.setText', line1: 'G08 SIMULATOR', line2: 'HOSTED CHECK' });
     await expect.poll(async () => (await snapshot()).lcd.line1).toBe('G08 SIMULATOR');
-    await command({ type: 'buzzer.beep', frequencyHz: 880 });
+    let beepObserved = false;
+    for (let attempt = 0; attempt < 4 && !beepObserved; attempt++) {
+      await command({ type: 'buzzer.beep', frequencyHz: 880 });
+      beepObserved = (await snapshot()).readings.buzzer === true;
+    }
+    assert.equal(beepObserved, true, 'Short simulated beep was never observed in telemetry');
     await command({ type: 'buzzer.stop' });
     await reading('buzzer', false);
     await command({ type: 'pump.pulse' });
     await reading('pump', true);
     await reading('pump', false);
     evidence.results.manual = { fan: true, light: true, feeder: true, lcdText: true, backlight: true,
-      simulatedPumpOnAndOff: true, buzzerStop: true, beepAcceptedOnly: true, guardConfirmed: true };
+      simulatedPumpOnAndOff: true, buzzerStop: true, beepObserved: true, guardConfirmed: true };
     await command({ type: 'farm.allOff' });
     await configure({ ...base, cooling: true, lighting: true, alarm: true });
     for (const rule of ['cooling', 'lighting', 'alarm']) await post('automations/resume-rule', { rule });

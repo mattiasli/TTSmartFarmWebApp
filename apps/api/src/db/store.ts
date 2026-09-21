@@ -646,6 +646,7 @@ export class FarmStore {
     const result = await this.pool.query(
       `SELECT * FROM commands
        WHERE farm_id = $1 AND status IN ('accepted', 'publishing', 'sent')
+         AND NOT (status = 'sent' AND confirmation_mode = 'not_reported')
        ORDER BY requested_at ASC`,
       [farmId],
     );

@@ -1,0 +1,10 @@
+{
+  "apiSha": "5e2ab4e69ae5d457c594353cc27400a6e88f2b3a",
+  "date": "2026-09-21",
+  "result": "failed",
+  "scenario": "Manual simulator commands before full automation qualification",
+  "failure": { "action": "lcd.setBacklight", "httpStatus": 422, "code": "ACTUATOR_BUSY" },
+  "cause": "Backlight was classified as not_reported and remained sent indefinitely; sent-only commands also counted as pending actuator work.",
+  "cleanup": "Harness completed All off, normal scenario, original settings restoration and guard synchronization before exiting with the original failure.",
+  "fullAutomationQualification": false
+}

@@ -34,6 +34,11 @@ describe('P08 restart does not replay commands', () => {
     });
     expect(reserved.dispatched).toBe(true);
     expect(reserved.command.status).toBe('accepted');
+    const sentOnly = await store.reserveCommand({ farmId: LOCAL_FARM_ID, actorScope: 'user:local',
+      idempotencyKey: crypto.randomUUID(), request: { type: 'buzzer.beep', frequencyHz: 880 } });
+    await store.updateCommandStatus({ id: sentOnly.command.id, status: 'sent', sentAt: new Date() });
+    const notYetSent = await store.reserveCommand({ farmId: LOCAL_FARM_ID, actorScope: 'user:local',
+      idempotencyKey: crypto.randomUUID(), request: { type: 'lcd.setText', line1: 'Queued', line2: 'Text' } });
 
     const link = new ScriptedFarmLink();
     link.inject(HEALTHY_TELEMETRY_FIXTURE);
@@ -53,6 +58,8 @@ describe('P08 restart does not replay commands', () => {
       expect(link.published).toHaveLength(0);
       const persisted = await store.getCommand(reserved.command.id);
       expect(persisted?.status).toBe('uncertain');
+      expect((await store.getCommand(sentOnly.command.id))?.status).toBe('sent');
+      expect((await store.getCommand(notYetSent.command.id))?.status).toBe('uncertain');
     } finally {
       await controller.close();
     }

@@ -22,6 +22,7 @@ import {
   confirmationModeFor,
   isFresh,
   isPendingStatus,
+  isPendingCommand,
   isStopCommand,
   mapFarmCommand,
   matchesExpectedState,
@@ -145,9 +146,7 @@ export class FarmController {
       readings: latest ? normalizeTelemetry(latest.data) : null,
       wire: latest?.data ?? null,
       lcd: this.link.lcd,
-      pendingCommands: [...this.commands.values()].filter((command) =>
-        ['accepted', 'publishing', 'sent'].includes(command.status),
-      ),
+      pendingCommands: [...this.commands.values()].filter(isPendingCommand),
       permissions: { canControl: true, canView: true },
       automations: {
         revision: this.settingsRevision,
@@ -616,7 +615,7 @@ export class FarmController {
 
   private markPendingUncertain(reason: string) {
     for (const command of this.commands.values()) {
-      if (!isPendingStatus(command.status) || command.status === 'accepted') continue;
+      if (!isPendingCommand(command) || command.status === 'accepted') continue;
       command.status = 'uncertain';
       command.reason = reason;
       void this.persistCommand(command);
@@ -664,7 +663,7 @@ export class FarmController {
       (command) =>
         command.id !== exceptId &&
         command.actuator === actuator &&
-        isPendingStatus(command.status) &&
+        isPendingCommand(command) &&
         !isStopCommand(command.action),
     );
   }
