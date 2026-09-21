@@ -1,0 +1,15 @@
+{
+  "oldDeploymentId": "8435236e-ab40-4c5d-a326-9747d8b616e7",
+  "newDeploymentId": "06ac316c-79ee-400a-9665-28dd1e620759",
+  "newSha": "05cc832d62deac0e0ea88ac3faaec10bb973d422",
+  "events": [
+    { "timestamp": "2026-09-21T13:48:26.188087264Z", "deployment": "new", "event": "readiness_ownership", "httpReady": true, "controller": "waiting_for_owner" },
+    { "timestamp": "2026-09-21T13:48:30.273161629Z", "deployment": "old", "event": "API draining after SIGTERM." },
+    { "timestamp": "2026-09-21T13:48:30.635811704Z", "deployment": "old", "event": "API shutdown complete." },
+    { "timestamp": "2026-09-21T13:48:32.747396037Z", "deployment": "new", "event": "readiness_ownership", "httpReady": true, "controller": "owner" }
+  ],
+  "observedDrainLogIntervalMs": 362.650075,
+  "browserEvidence": "staging-handover-2026-09-21.json",
+  "singleOwnerEvidence": "New process reported waiting while old process remained active; new owner observed after old shutdown. PostgreSQL dedicated advisory-lock exclusion is exercised by the integration suite.",
+  "limitation": "Provider log timestamps measure observed logging intervals, not exact actuator timing."
+}

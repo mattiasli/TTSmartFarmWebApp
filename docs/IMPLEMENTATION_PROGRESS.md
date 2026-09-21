@@ -2,7 +2,37 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21 13:40 UTC)
+## Current handoff (2026-09-21 13:56 UTC)
+
+Latest verified runtime is `05cc832d62deac0e0ea88ac3faaec10bb973d422`.
+All CI jobs passed in run 35607375925. **S10 hosted handover passed:** new API
+reported HTTP-ready/waiting_for_owner while the old deployment remained active;
+old SIGTERM-to-shutdown log interval was 363 ms; new owner followed shutdown.
+Browser observer confirmed a new epoch, settings/revision retention, paused/off
+state and automatic WSS recovery. Evidence: `releases/staging-overlap-logs-2026-09-21.json`
+and `releases/staging-handover-2026-09-21.json`.
+
+**S11 supported rollback and restoration passed:** API and host returned to the
+immediately previous a94f688 pair with the same immutable 9abcf36 remote. Exact
+baked SHA survived rollback. Public assets and authenticated Chromium/WebKit
+rendering/snapshots/WSS passed. The latest 05cc832 pair was then restored and all
+these checks passed again. Every transition retained settings, paused automations
+and off outputs. Current Railway restored deployment:
+`49895789-ccfb-4354-8367-3bff89845efc`; host `4sNdetXxZCp9sreExDc8viMi4MTa`.
+See `releases/staging-05cc832.json` and the rollback/restore evidence files.
+Browser checks reused app sessions; fresh OAuth/SameSite qualification remains S02.
+
+CI gates now have before/after provider evidence in
+`releases/staging-ci-hold-2026-09-21.json`: host build READY without its stable
+alias while the required check ran, then successful exact GitHub job references
+and stable aliases; Railway WAITING then build/deploy after CI. Independent gates
+still do not order remote/API/host deployment, so S14 remains incomplete.
+
+Remaining G08 work: S02 WebKit OAuth/SameSite qualification, S08 hosted DB outage,
+S13 DB size/retention, S14 ordered release and IaC. S12 backup/restore is explicitly
+deferred. Later gates still require production access and supervised hardware evidence.
+
+### Previous baseline and preparation
 
 Verified `a94f6883e5ac8e5c3cc200cab1ed1a3605967728`: all CI passed, all three
 deployments succeeded, API owner reports its exact baked source revision, public

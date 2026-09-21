@@ -1,0 +1,83 @@
+{
+  "sourceSha": "05cc832d62deac0e0ea88ac3faaec10bb973d422",
+  "ciRun": 35607375925,
+  "hostBeforeCi": {
+    "observedAt": "2026-09-21T13:43:46.8868104Z",
+    "deploymentId": "dpl_4sNdetXxZCp9sreExDc8viMi4MTa",
+    "readyState": "READY",
+    "aliasAssigned": false,
+    "stableAliasPresent": false,
+    "checkId": "ckr_7ad78385-5f61-43f3-a246-d3832f7acfed",
+    "checkStatus": "running",
+    "checkConclusion": null
+  },
+  "remoteBeforeCi": {
+    "observedAt": "2026-09-21T13:43:55.1025659Z",
+    "deploymentId": "dpl_GqGfbjveDjPKPC6E6rCeUWAsCzJJ",
+    "readyState": "BUILDING",
+    "aliasAssigned": false,
+    "stableAliasPresent": false,
+    "checkId": "ckr_296c53e1-ece4-4e1a-823e-14b5b3d76b29",
+    "checkStatus": "running",
+    "checkConclusion": null
+  },
+  "railwayBeforeCi": {
+    "deploymentId": "06ac316c-79ee-400a-9665-28dd1e620759",
+    "status": "WAITING",
+    "previousDeploymentId": "8435236e-ab40-4c5d-a326-9747d8b616e7",
+    "previousStatus": "SUCCESS"
+  },
+  "afterCi": {
+    "ciConclusion": "success",
+    "requiredJobId": 106358713674,
+    "requiredJobCompletedAt": "2026-09-21T13:45:48Z",
+    "vercel": [
+      {
+        "observedAt": "2026-09-21T13:47:21.1814882Z",
+        "id": "dpl_4sNdetXxZCp9sreExDc8viMi4MTa",
+        "readyState": "READY",
+        "aliasAssigned": true,
+        "alias": [
+          "smartfarm-host.vercel.app",
+          "smartfarm-host-mattias-li-s-projects.vercel.app",
+          "smartfarm-host-git-master-mattias-li-s-projects.vercel.app"
+        ],
+        "checks": [
+          {
+            "id": "ckr_7ad78385-5f61-43f3-a246-d3832f7acfed",
+            "status": "completed",
+            "conclusion": "succeeded",
+            "externalId": "106358713674",
+            "externalUrl": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35607375925/job/106358713674",
+            "completedAt": 1789998352790
+          }
+        ]
+      },
+      {
+        "observedAt": "2026-09-21T13:47:27.8498959Z",
+        "id": "dpl_GqGfbjveDjPKPC6E6rCeUWAsCzJJ",
+        "readyState": "READY",
+        "aliasAssigned": true,
+        "alias": [
+          "smartfarm-automations.vercel.app",
+          "smartfarm-automations-mattias-li-s-projects.vercel.app",
+          "smartfarm-automations-git-master-mattias-li-s-projects.vercel.app"
+        ],
+        "checks": [
+          {
+            "id": "ckr_296c53e1-ece4-4e1a-823e-14b5b3d76b29",
+            "status": "completed",
+            "conclusion": "succeeded",
+            "externalId": "106358713674",
+            "externalUrl": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35607375925/job/106358713674",
+            "completedAt": 1789998352795
+          }
+        ]
+      }
+    ],
+    "railwayObservedState": "SUCCESS",
+    "oldApiStillSuccessful": true,
+    "railwayHandoverEvidence": "staging-handover-2026-09-21.json"
+  },
+  "limitation": "Host was READY without its stable alias while CI ran; both frontends later had successful exact CI checks and assigned stable aliases. Railway moved WAITING to BUILDING then SUCCESS after CI. Independent provider gates do not order the complete remote/API/host release."
+}

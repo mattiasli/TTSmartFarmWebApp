@@ -1,0 +1,14 @@
+{
+  "observedAt": "2026-09-21T13:48:32.841Z",
+  "fromSha": "a94f6883e5ac8e5c3cc200cab1ed1a3605967728",
+  "targetSha": "05cc832d62deac0e0ea88ac3faaec10bb973d422",
+  "oldEpoch": "2494249d-db52-4fb1-9470-22231820b64e",
+  "newEpoch": "bcac6873-67ab-43f0-ae2a-0cb03493a07a",
+  "observationMs": 109621,
+  "settingsAndRevisionRetained": true,
+  "automationsPaused": true,
+  "outputsOff": true,
+  "automaticWssRecovery": true,
+  "browser": "153.0.8010.12",
+  "limitation": "Observer readiness to recovery includes operator/provider command time."
+}
