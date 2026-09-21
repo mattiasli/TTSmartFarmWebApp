@@ -11,8 +11,8 @@ if (!config.DATABASE_URL) {
 await migrate(config.DATABASE_URL);
 const pool = createPool(config.DATABASE_URL, 2);
 try {
-  await seedLocal(pool);
+  await seedLocal(pool, { farmId: config.FARM_ID, farmName: config.FARM_NAME, environment: config.APP_ENV });
 } finally {
   await pool.end();
 }
-console.log('Migrations and local farm seed applied.');
+console.log('Migrations and configured farm seed applied.');

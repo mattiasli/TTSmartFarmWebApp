@@ -9,8 +9,8 @@ if (!config.DATABASE_URL) {
 }
 const pool = createPool(config.DATABASE_URL, 2);
 try {
-  await seedLocal(pool);
-  console.log('Local farm seed applied.');
+  await seedLocal(pool, { farmId: config.FARM_ID, farmName: config.FARM_NAME, environment: config.APP_ENV });
+  console.log('Configured farm seed applied.');
 } finally {
   await pool.end();
 }

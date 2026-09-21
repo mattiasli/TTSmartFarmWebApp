@@ -4,6 +4,16 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-21 17:31 UTC)
 
+Update 18:07 UTC: 03e0edf passed CI 35634180123 and staging release 35634568197.
+Production deployment tokens passed preflight in first live release 35635193382.
+Its API deployment 07ecd466-11ad-49a8-8c1b-473cde2a15e6 failed during startup:
+pre-deploy `run-migrate.ts` seeded the default local farm, then the configured
+live farm collided on controller_lock_key=1. No host/remote deployed or commands
+sent. Migration/seed entry points now use the configured farm ID/name/environment,
+matching API startup; an actual PostgreSQL migration-to-startup regression passes.
+Retry requires the new revision's CI/staging qualification and removal of only
+the unused default seed left in the new production database. All live flags stay false.
+
 **Verified coordinated release: 28c8cde67e89f1ef944fa296dec78d4500a3762b.**
 CI 35630085572 and release workflow 35630437207 both succeeded. All six release
 stages passed: preflight/previous mapping, API, immutable remote, host build,

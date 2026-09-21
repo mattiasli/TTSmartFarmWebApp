@@ -69,7 +69,7 @@ export async function createDeps(config: AppConfig): Promise<AppDeps> {
   }
   const pool = createPool(config.DATABASE_URL);
   const store = new FarmStore(pool);
-  await seedLocal(pool, { farmId: config.FARM_ID, farmName: config.FARM_NAME });
+  await seedLocal(pool, { farmId: config.FARM_ID, farmName: config.FARM_NAME, environment: config.APP_ENV });
   const saved = await store.getConfig(config.FARM_ID);
   const runtime = await store.getRuntime(config.FARM_ID);
   const lockKey = await store.getFarmLockKey(config.FARM_ID);
