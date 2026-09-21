@@ -25,18 +25,43 @@ export class DedicatedControllerLock implements ControllerLock {
   async tryAcquire(): Promise<boolean> {
     if (this.held && this.client) return true;
     if (!this.client) {
-      this.client = new pg.Client({ connectionString: this.databaseUrl });
-      await this.client.connect();
+      const client = new pg.Client({
+        connectionString: this.databaseUrl,
+        connectionTimeoutMillis: 2_000,
+        query_timeout: 2_000,
+      });
+      this.client = client;
+      // An idle PostgreSQL disconnect emits an error outside any query promise.
+      // Fence this session immediately and let the controller retry a fresh one.
+      const lost = () => {
+        if (this.client !== client) return;
+        this.client = null;
+        this.held = false;
+        void client.end().catch(() => undefined);
+      };
+      client.on('error', lost);
+      client.on('end', lost);
+      try {
+        await client.connect();
+      } catch (error) {
+        lost();
+        throw error;
+      }
     }
-    const result = await this.client.query<{ acquired: boolean }>(
-      'SELECT pg_try_advisory_lock($1) AS acquired',
-      [this.key],
-    );
-    this.held = result.rows[0]?.acquired === true;
-    if (!this.held) {
+    const client = this.client;
+    if (!client) return false;
+    try {
+      const result = await client.query<{ acquired: boolean }>(
+        'SELECT pg_try_advisory_lock($1) AS acquired',
+        [this.key],
+      );
+      this.held = this.client === client && result.rows[0]?.acquired === true;
+      if (!this.held) await this.close();
+      return this.held;
+    } catch (error) {
       await this.close();
+      throw error;
     }
-    return this.held;
   }
 
   async release(): Promise<void> {
@@ -54,11 +79,12 @@ export class DedicatedControllerLock implements ControllerLock {
 
   async isHealthy(): Promise<boolean> {
     if (!this.held || !this.client) return false;
+    const client = this.client;
     try {
-      await this.client.query('SELECT 1');
-      return true;
+      await client.query('SELECT 1');
+      return this.held && this.client === client;
     } catch {
-      this.held = false;
+      if (this.client === client) await this.close();
       return false;
     }
   }

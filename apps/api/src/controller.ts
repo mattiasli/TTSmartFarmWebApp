@@ -56,6 +56,7 @@ export class FarmController {
   private lastSampleMs = 0;
   private lastPersistedAttempts = -1;
   private publishChain = Promise.resolve();
+  private ownershipGeneration = 0;
   private pumpTimer: ReturnType<typeof setTimeout> | null = null;
   private pumpWatchdog: ReturnType<typeof setTimeout> | null = null;
   private matchTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -456,6 +457,7 @@ export class FarmController {
   }
 
   private assertOwner() {
+    if (this.lock && !this.lock.held && this.ownership === 'owner') this.loseOwnership();
     if (this.draining || this.ownership !== 'owner') {
       throw new CommandPolicyError(
         'CONTROLLER_UNAVAILABLE',
@@ -470,10 +472,18 @@ export class FarmController {
   private async assertCanPublish() {
     this.assertOwner();
     if (this.lock && !(await this.lock.isHealthy())) {
-      this.ownership = 'waiting_for_owner';
-      this.engine.pause('Paused — controller lock lost. Resume when ownership returns.');
+      this.loseOwnership();
       throw new CommandPolicyError('CONTROLLER_UNAVAILABLE', 'Controller lock is no longer valid.', 503);
     }
+    this.assertOwner();
+  }
+
+  private loseOwnership() {
+    if (this.draining) return;
+    this.ownershipGeneration += 1;
+    this.ownership = 'waiting_for_owner';
+    this.engine.pause('Paused — controller lock lost. Resume when ownership returns.');
+    void this.becomeOwner().catch(() => undefined);
   }
 
   private persistRuntime() {
@@ -496,6 +506,7 @@ export class FarmController {
   }
 
   private drive() {
+    if (this.lock && !this.lock.held && this.ownership === 'owner') this.loseOwnership();
     // A waiting process must not overwrite the owner's runtime/history.
     if (this.ownership !== 'owner' || this.draining) return;
     if (this.seenMqttEpoch && this.seenMqttEpoch !== this.link.mqttEpoch) {
@@ -664,9 +675,14 @@ export class FarmController {
   }
 
   private enqueuePublish(topic: string, payload: string, command?: TrackedCommand) {
+    const generation = this.ownershipGeneration;
     const work = this.publishChain.then(async () => {
       await this.link.awaitHold?.();
       if (command && (command.status === 'superseded' || this.draining)) return;
+      await this.assertCanPublish();
+      if (generation !== this.ownershipGeneration) {
+        throw new CommandPolicyError('CONTROLLER_UNAVAILABLE', 'Command belongs to a lost controller session.', 503);
+      }
       if (!this.link.ready && this.link.transport !== 'memory') {
         throw new CommandPolicyError('BROKER_UNAVAILABLE', 'MQTT client is not ready.', 503);
       }

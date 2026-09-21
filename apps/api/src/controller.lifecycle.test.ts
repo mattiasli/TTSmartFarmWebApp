@@ -121,6 +121,31 @@ describe('P07 controller lifecycle', () => {
     expect(link.published).toEqual([]);
   });
 
+  it('never replays a held publish after lock loss and successful reacquisition', async () => {
+    const lock: ControllerLock = {
+      key: 1, held: true,
+      tryAcquire: async () => { lock.held = true; return true; },
+      release: async () => { lock.held = false; },
+      isHealthy: async () => lock.held,
+      close: async () => { lock.held = false; },
+    };
+    const link = new ScriptedFarmLink();
+    link.inject(HEALTHY_TELEMETRY_FIXTURE);
+    const controller = new FarmController(loadConfig({ NODE_ENV: 'test' }), link, Date.now, null, { lock, ownership: 'owner' });
+    controllers.push(controller);
+    link.deferPublishes = true;
+    const command = controller.command({ type: 'fan.set', on: true }, crypto.randomUUID());
+    const rejected = expect(command).rejects.toMatchObject({ code: 'CONTROLLER_UNAVAILABLE' });
+    await expect.poll(() => link.waiting).toBeGreaterThan(0);
+    lock.held = false;
+    controller.snapshot();
+    expect(await controller.becomeOwner()).toBe(true);
+    link.releasePublishes();
+    await rejected;
+    expect(link.published).toEqual([]);
+    expect(controller.snapshot().automations.runtime.masterEnabled).toBe(false);
+  });
+
   it('T079 read-only live shutdown never publishes cleanup commands', async () => {
     const lock: ControllerLock = {
       key: 1, held: true, tryAcquire: async () => true,

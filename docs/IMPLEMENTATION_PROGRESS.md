@@ -2,6 +2,20 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Database lock-session recovery follow-up (2026-09-21)
+
+- Dedicated PostgreSQL lock clients now handle idle error/end events, invalidate
+  ownership, discard failed connections, and bound connect/query waits to two seconds.
+- Controller ticks and mutations detect a lost session, pause, and retry acquisition.
+  Recovery remains paused. Queued publishes recheck ownership at dispatch and reject
+  work from an earlier ownership generation, including after successful reacquisition.
+- An isolated PostgreSQL regression terminates the actual advisory-lock backend,
+  holds its lock with a competing session, verifies rejected mutations/no publishes,
+  releases the competitor, and observes automatic paused recovery.
+- A unit regression holds a command across loss/reacquisition and verifies no replay.
+  This covers explicit session termination; it does not qualify a hosted network
+  partition, full database outage, or provider recovery. S08 remains pending.
+
 ## Shutdown and release metadata follow-up (2026-09-21)
 
 Deployed source: `a355e207aa3aaeeee64a0bac71b2acf2c2079473`. Provider integrations remain unconfirmed;

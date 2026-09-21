@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_AUTOMATIONS, LOCAL_FARM_ID } from '@smartfarm/contracts';
 import { buildApp, createDeps } from '../../apps/api/src/app';
 import { loadConfig } from '../../apps/api/src/config';
@@ -18,6 +18,41 @@ describe('P07 two-process controller lock', () => {
 
   afterAll(async () => {
     await db?.close();
+  });
+
+  it('pauses after the actual lock session is terminated and reacquires without replay', async () => {
+    const config = loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: 'simulator', DATABASE_URL: db.url });
+    const deps = await createDeps(config);
+    const app = await buildApp(config, deps);
+    const blocker = await db.pool.connect();
+    const key = await deps.store!.getFarmLockKey(LOCAL_FARM_ID);
+    const publish = vi.spyOn(deps.controller.link, 'publish');
+    try {
+      deps.controller.startAutomations();
+      const result = await blocker.query<{ pid: number }>(
+        `SELECT pid FROM pg_locks WHERE locktype = 'advisory' AND granted
+         AND database = (SELECT oid FROM pg_database WHERE datname = current_database())
+         AND objid = $1`, [key],
+      );
+      expect(result.rows).toHaveLength(1);
+      await blocker.query('SELECT pg_terminate_backend($1)', [result.rows[0]!.pid]);
+      // Reserve the released lock before the controller retries, as another owner would.
+      await blocker.query('SELECT pg_advisory_lock($1)', [key]);
+      await expect.poll(() => deps.controller.snapshot().connection.ownership).toBe('waiting_for_owner');
+      expect(deps.controller.snapshot().automations.runtime.masterEnabled).toBe(false);
+      publish.mockClear();
+      expect(() => deps.controller.startAutomations()).toThrow();
+      await expect(deps.controller.command({ type: 'fan.set', on: true }, crypto.randomUUID(), 'test')).rejects.toThrow();
+      expect(publish).not.toHaveBeenCalled();
+      await blocker.query('SELECT pg_advisory_unlock($1)', [key]);
+      await expect.poll(() => deps.controller.ownership, { timeout: 5_000 }).toBe('owner');
+      expect(deps.controller.snapshot().automations.runtime.masterEnabled).toBe(false);
+    } finally {
+      publish.mockRestore();
+      await blocker.query('SELECT pg_advisory_unlock($1)', [key]);
+      blocker.release();
+      await app.close();
+    }
   });
 
   it('T075/T078 one owner, the other stays ready without the lock', async () => {
