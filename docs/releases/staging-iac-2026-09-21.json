@@ -1,0 +1,63 @@
+{
+    "observedAt":  "2026-09-21T14:50:38.0344629Z",
+    "cliVersion":  "5.58.0",
+    "sdkVersion":  "3.11.0",
+    "partial":  "smartfarm-api",
+    "applyResult":  {
+                        "id":  "iac-change-set/9229a204-ddea-466e-a906-438c5ed1e757/dc83464d978eecca2cc426e3562ba6b9",
+                        "status":  "applied",
+                        "changes":  [
+                                        {
+                                            "kind":  "resource.update",
+                                            "path":  "service.acac3d1f-1dc4-4f32-ba83-81a704167f31",
+                                            "summary":  null,
+                                            "status":  "applied",
+                                            "outputs":  null
+                                        }
+                                    ],
+                        "diagnostics":  [
+
+                                        ],
+                        "deploymentId":  "iac-change-set/9229a204-ddea-466e-a906-438c5ed1e757/dc83464d978eecca2cc426e3562ba6b9",
+                        "stagedPatchId":  "iac-change-set/9229a204-ddea-466e-a906-438c5ed1e757/dc83464d978eecca2cc426e3562ba6b9"
+                    },
+    "serviceReadback":  {
+                            "activeDeployments":  [
+                                                      {
+                                                          "id":  "320d58e1-6a26-4b55-9066-3a4b3919a2fd",
+                                                          "status":  "SUCCESS"
+                                                      }
+                                                  ],
+                            "builder":  "RAILPACK",
+                            "dockerfilePath":  "Dockerfile",
+                            "drainingSeconds":  15,
+                            "healthcheckPath":  "/health/ready",
+                            "healthcheckTimeout":  30,
+                            "numReplicas":  1,
+                            "preDeployCommand":  [
+                                                     "npm run db:migrate"
+                                                 ],
+                            "restartPolicyType":  "ON_FAILURE",
+                            "serviceName":  "default-service",
+                            "sleepApplication":  false
+                        },
+    "repeatedDefaultDifferences":  [
+                                       {
+                                           "summary":  "Update default-service deploy.restartPolicyType, deploy.sleepApplication",
+                                           "severity":  "safe",
+                                           "kind":  "resource.update",
+                                           "details":  [
+                                                           "deploy.restartPolicyType (null ? \"ON_FAILURE\")",
+                                                           "deploy.sleepApplication (null ? false)"
+                                                       ]
+                                       }
+                                   ],
+    "effectiveDockerBuild":  "Deployment 320d58e1-6a26-4b55-9066-3a4b3919a2fd build logs explicitly load build definition from Dockerfile",
+    "limitations":  [
+                        "CLI plan omits default restart/sleep fields; direct readback confirms ON_FAILURE and false.",
+                        "ServiceInstance builder reports RAILPACK while config graph specifies DOCKERFILE; deployment logs confirm Dockerfile build.",
+                        "Independent provider CI gates still do not coordinate API, remote, host sequence."
+                    ],
+    "databaseAndVolumeChanges":  false,
+    "backupRestore":  "Explicitly deferred"
+}

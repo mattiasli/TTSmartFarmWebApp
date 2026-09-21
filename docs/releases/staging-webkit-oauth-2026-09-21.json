@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-09-21T14:49:45.865Z",
+  "apiSha": "94b8e5af4ed1e6a3a5a5821f183ab9994f868c84",
+  "browser": "webkit",
+  "version": "26.6",
+  "actualGithubOAuth": true,
+  "callbackCookie": null,
+  "secureHttpOnlyCookie": true,
+  "sameSiteReported": "None",
+  "sameSiteQualified": false,
+  "instrumentationLimit": "Windows WebKit omits Set-Cookie on redirect responses and reports even server-set Lax cookies as None; independently reproduced with a local fixture.",
+  "editorRendered": true,
+  "wssSnapshots": 2,
+  "authenticatedSnapshot": true,
+  "noStore": true,
+  "importedCookies": false,
+  "githubCookiesSaved": false
+}

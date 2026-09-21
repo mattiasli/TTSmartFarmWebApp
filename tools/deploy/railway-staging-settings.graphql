@@ -1,0 +1,7 @@
+query {
+  serviceInstance(environmentId: "9229a204-ddea-466e-a906-438c5ed1e757", serviceId: "acac3d1f-1dc4-4f32-ba83-81a704167f31") {
+    serviceName builder dockerfilePath numReplicas sleepApplication
+    drainingSeconds healthcheckPath healthcheckTimeout preDeployCommand restartPolicyType
+    activeDeployments { id status }
+  }
+}

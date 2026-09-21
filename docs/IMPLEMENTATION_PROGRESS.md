@@ -4,6 +4,30 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-21 14:37 UTC)
 
+### Follow-up: IaC applied and fresh WebKit OAuth verified (14:50 UTC)
+
+Release `94b8e5af4ed1e6a3a5a5821f183ab9994f868c84` passed all CI and provider
+deployments (run 35613578059). Fresh WebKit 26.6 GitHub OAuth as mattiasli then
+passed editor rendering, authenticated snapshot/no-store and WSS; no cookies were
+imported. Evidence: `releases/staging-webkit-oauth-2026-09-21.json`. Secure and
+HttpOnly were observed, but redirect Set-Cookie was omitted and SameSite reported
+None by Windows WebKit. S02 cookie qualification remains explicitly unresolved;
+the user completed the requested login and need not repeat it without a concrete
+new verification method.
+
+Railway API IaC is now authored at `.railway/railway.ts`, using SDK 3.11.0 and CLI
+5.58.0, and was applied successfully. Its partial owns only default-service.
+Database and volume are excluded; secrets remain preserve() references. Direct
+readback confirms one replica, sleep false, ON_FAILURE, readiness and drain;
+deployment 320d58e1-6a26-4b55-9066-3a4b3919a2fd succeeded and its build log confirms
+Dockerfile use. The graph reads DOCKERFILE but ServiceInstance reports RAILPACK;
+the plan also repeatedly omits default restart/sleep values. These provider
+reporting discrepancies are recorded, not treated as proof of drift or a reason
+for repeated applies. Evidence: `releases/staging-iac-2026-09-21.json`.
+The legacy TOML has been replaced. Typecheck includes IaC. Remaining S14 work is
+the actual coordinated GitHub Actions staging release workflow and credentials.
+Do not equate independent successful provider checks with ordered deployment.
+
 Verified release `966a6d18b09a22047da13d71a7fe6f7b40b83527` passed CI run
 35612537569 (135 unit, 32 PostgreSQL integration, federation and browser checks)
 and all three provider deployments. Mapping: `releases/staging-966a6d1.json`.

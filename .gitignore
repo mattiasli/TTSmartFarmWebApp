@@ -28,7 +28,9 @@ blob-report/
 
 # Hosting / container local state
 .vercel/
-.railway/
+.railway/*
+!.railway/railway.ts
+!.railway/README.md
 docker-data/
 .infra/
 

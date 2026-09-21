@@ -2,6 +2,8 @@
 
 Current qualification work: [P13 acceptance report](STAGING_ACCEPTANCE.md).
 The current release mapping is in [releases/staging.json](releases/staging.json).
+API infrastructure is defined in [the Railway IaC file](../.railway/railway.ts);
+see its [operating notes](../.railway/README.md) for scope and provider readback limits.
 Release `966a6d1` passed required CI and deployed to all three services. Hosted S08
 Postgres outage recovered with the API process alive and automations paused.
 Manual commands and all five automations previously passed. The host uses the anonymously
