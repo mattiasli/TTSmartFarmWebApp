@@ -69,12 +69,14 @@ async function railway(query) {
   assert.equal(result.errors, undefined, 'Railway query failed');
   return result.data;
 }
-async function vercel(path, token) {
+async function vercel(path, token, method = 'GET', body) {
   const response = await fetch(`https://api.vercel.com${path}${path.includes('?') ? '&' : '?'}teamId=${team}`, {
-    headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(20000),
+    method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(20000),
   });
-  assert.equal(response.status, 200, `Vercel read failed: ${response.status}`);
-  return response.json();
+  assert.ok(response.ok, `Vercel ${method} failed: ${response.status}`);
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 const deployment = (url, token) => vercel(`/v13/deployments/${new URL(url).hostname}`, token);
 const serviceQuery = `query { serviceInstance(environmentId: "${environment}", serviceId: "${service}") {
@@ -189,9 +191,18 @@ try {
       cookie: process.env.STAGING_SESSION_COOKIE, protectionBypass: process.env.VERCEL_HOST_AUTOMATION_BYPASS });
   });
   await stage('host promotion and stable-origin qualification', async () => {
-    await cli('vercel', ['promote', candidate, '--yes'], process.env.VERCEL_HOST_TOKEN, hostProject);
-    const promoted = await deployment(host, process.env.VERCEL_HOST_TOKEN);
-    assert.equal(promoted.id, evidence.host.deploymentId);
+    // The CLI promotion wrapper requires a user profile even with an explicit
+    // project. Invoke its project-scoped endpoint directly and observe aliasing.
+    await vercel(`/v10/projects/${hostProject}/promote/${evidence.host.deploymentId}`,
+      process.env.VERCEL_HOST_TOKEN, 'POST', {});
+    const promotionDeadline = Date.now() + 3 * 60_000;
+    let promoted;
+    while (Date.now() < promotionDeadline) {
+      promoted = await deployment(host, process.env.VERCEL_HOST_TOKEN);
+      if (promoted.id === evidence.host.deploymentId) break;
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+    assert.equal(promoted?.id, evidence.host.deploymentId, 'Stable host did not point to the qualified candidate');
     evidence.stableSmoke = await checkReleaseCandidate({ candidate: host, remote: remoteEntry, sha,
       cookie: process.env.STAGING_SESSION_COOKIE });
     assertStagingHealth(await health(), sha);
