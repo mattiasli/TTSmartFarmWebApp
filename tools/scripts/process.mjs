@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
@@ -65,9 +65,12 @@ export function killTree(child) {
   child.stdout?.destroy();
   child.stderr?.destroy();
   if (process.platform === 'win32') {
-    spawn('taskkill', ['/pid', String(child.pid), '/t', '/f'], {
+    // Complete cleanup before a harness exits; an unawaited taskkill can leave
+    // Vite/tsx grandchildren listening after their parent has disappeared.
+    spawnSync('taskkill', ['/pid', String(child.pid), '/t', '/f'], {
       stdio: 'ignore',
       windowsHide: true,
+      timeout: 10_000,
     });
     return;
   }

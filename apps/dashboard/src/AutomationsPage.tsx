@@ -1,6 +1,6 @@
 import { Text, Title3 } from '@fluentui/react-components';
 import { useQueryClient } from '@tanstack/react-query';
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import type { AutomationPanelPropsV1, FarmSnapshot } from '@smartfarm/contracts';
 import { resetWatering, resumeAutomationRule, saveAutomationSettings, syncGuard } from './api';
 import { useFarmLiveContext } from './FarmLiveContext';
@@ -32,7 +32,6 @@ function mapReadings(snapshot: FarmSnapshot): AutomationPanelPropsV1['readings']
 export function AutomationsPage({ hostMessage }: { hostMessage: string }) {
   const live = useFarmLiveContext();
   const queryClient = useQueryClient();
-  const [remoteKey, setRemoteKey] = useState(0);
   const snapshot = live.snapshot;
   const editorProps: Partial<AutomationPanelPropsV1> & { onNotify?: (message: string) => void } = snapshot
     ? {
@@ -97,9 +96,11 @@ export function AutomationsPage({ hostMessage }: { hostMessage: string }) {
           ? 'Running on the server. Closing this tab does not pause them.'
           : snapshot?.automations.runtime.pausedReason || 'Paused — start explicitly.'}
       </Text>
-      <RemoteBoundary onRetry={() => setRemoteKey((value) => value + 1)}>
+      {/* Failed module imports are cached for this document. Reload to retry the
+          trusted remote without changing server automation state. */}
+      <RemoteBoundary onRetry={() => window.location.reload()}>
         <Suspense fallback={<Text>Loading automation editor…</Text>}>
-          <AutomationPanel key={remoteKey} {...editorProps} />
+          <AutomationPanel {...editorProps} />
         </Suspense>
       </RemoteBoundary>
     </section>

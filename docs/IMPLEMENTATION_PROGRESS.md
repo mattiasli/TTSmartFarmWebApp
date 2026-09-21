@@ -2,7 +2,72 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Handoff for the next implementer (2026-09-18)
+## Current handoff (2026-09-21, P13 recovery qualification)
+
+Source: `master` at `ad76ef2` plus uncommitted P13 changes. Nothing from this
+session has been pushed or deployed. Live commands and pumping remain disabled.
+
+Completed locally:
+
+- Added `docs/STAGING_ACCEPTANCE.md` with S01–S14 evidence requirements and
+  `docs/releases/staging.json` with public project mapping. Unknown deployment IDs
+  remain null; this is not yet an immutable release manifest.
+- Added real-browser regression cases for failed remote loading with functional
+  sensors/Pause/All off, retry recovery, clean-editor updates, dirty/empty draft
+  preservation, conflict reload/Cancel, and a real API 409 on an overtaken save.
+- Fixed editor dirty tracking to use its accepted baseline, rather than incoming
+  live settings. Accept the editor's own save response even if its new revision
+  already arrived by WebSocket. Disable field edits while saving.
+- Fixed remote retry: a document reload clears cached failed imports. Remounting
+  the same React lazy component did not recover; the browser test reproduced it.
+- Reproduced and fixed a deployment handover defect: a waiting controller tried
+  the advisory lock only once. It now retries every second, serializes attempts,
+  reloads current settings/runtime after acquisition, stays paused, and cancels
+  acquisition on shutdown. Waiting instances do not write runtime/history.
+- Extended the real PostgreSQL overlap test to require automatic takeover after
+  the old owner closes and to verify settings changed while waiting survive.
+- The E2E harness forces isolated memory-simulator configuration. Windows cleanup
+  waits for taskkill to finish; previously the harness left test servers behind.
+
+Public hosted observations at `2026-09-21T07:39:06.307Z`:
+
+- `npm run check:staging-public` is a new read-only smoke using a fresh headless
+  Chromium context. It intentionally exits nonzero for the current deployment.
+- Host proxy session response: unauthenticated, local login disabled, no-store.
+- Actual cross-origin federation container/editor import: nine remote assets,
+  valid JS/CSS and CORS, contract major 1; missing remote module returns 404.
+- **Hosted API returns 200 but controller is `waiting_for_owner`.** Both live flags
+  are false, staging memory simulator, database/OAuth configured. This blocks G08.
+- Remote uses mutable alias and reports empty release SHA. Immutable artifact
+  pairing and provenance remain unresolved. Logged-in OAuth/WSS was not rerun.
+
+The reproduced local handover defect plausibly explains the hosted waiting state;
+Railway logs and a deployed rerun are still needed to establish the hosted cause.
+
+Validation after the fixes:
+
+- `npm.cmd run typecheck` — pass.
+- `npm.cmd run lint` — pass.
+- `npm.cmd run test:unit` — 112 passed.
+- `npm.cmd run test:integration` — 25 passed against local PostgreSQL and loopback MQTT.
+- `npm.cmd run check:frontend-imports` — pass.
+- `npm.cmd run test:federation` — pass (production host/remote builds and browser proof).
+- `node tools/scripts/run-e2e-test.mjs` — 6 passed.
+- `npm.cmd run check:client-secrets` — pass on built frontend artifacts.
+- `git diff --check` — pass.
+
+Builds still report large Fluent shared chunks; the dev servers log Keyborg disposal
+warnings. Neither failed the browser assertions. Performance qualification remains
+an explicit G08 task; these warnings have not been treated as measured failures.
+
+Next: deploy the reviewed fixes to simulator staging, verify owner acquisition and
+paused restart on Railway, then complete S01–S14. Provider deployment/log access
+and authenticated browser sessions are needed for those hosted operations.
+CI-gated staging deployment, immutable host/remote mapping, rollback, backup restore,
+DB-failure/session-revocation drills, WebKit and 30-minute measurements remain open.
+**P13/G08 is not complete. Do not advance to physical commands or P14 yet.**
+
+## Previous handoff (2026-09-18; superseded by current handoff above)
 
 Read this section before changing code. Live pump stays **disabled**. Do not invent secrets. Do not commit `.env` or OAuth client secrets.
 

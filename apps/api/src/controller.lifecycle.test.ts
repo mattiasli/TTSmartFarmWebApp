@@ -1,14 +1,16 @@
 import { HEALTHY_TELEMETRY_FIXTURE } from '@smartfarm/contracts';
 import { CommandPolicyError } from '@smartfarm/domain';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadConfig } from './config';
 import { FarmController } from './controller';
 import { ScriptedFarmLink } from './farm-link';
+import type { ControllerLock } from './db/lock';
 
 describe('P07 controller lifecycle', () => {
   const controllers: FarmController[] = [];
   afterEach(async () => {
     while (controllers.length) await controllers.pop()?.close();
+    vi.useRealTimers();
   });
 
   function make(link = new ScriptedFarmLink(), ownership: 'owner' | 'waiting_for_owner' = 'owner') {
@@ -69,5 +71,53 @@ describe('P07 controller lifecycle', () => {
     await expect(controller.command({ type: 'fan.set', on: true }, crypto.randomUUID())).rejects.toMatchObject({
       code: 'CONTROLLER_UNAVAILABLE',
     });
+  });
+
+  it('T078 retries ownership after the prior owner releases it, staying paused', async () => {
+    vi.useFakeTimers();
+    let available = false;
+    const lock: ControllerLock = {
+      key: 1, held: false,
+      tryAcquire: vi.fn(async () => { lock.held = available; return available; }),
+      release: async () => { lock.held = false; },
+      isHealthy: async () => lock.held,
+      close: async () => { lock.held = false; },
+    };
+    const controller = new FarmController(loadConfig({ NODE_ENV: 'test' }), new ScriptedFarmLink(), Date.now, null, { lock });
+    controllers.push(controller);
+    expect(await controller.becomeOwner()).toBe(false);
+    available = true;
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(controller.ownership).toBe('owner');
+    expect(controller.snapshot().automations.runtime.masterEnabled).toBe(false);
+    expect(lock.tryAcquire).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(3_000);
+    expect(lock.tryAcquire).toHaveBeenCalledTimes(2);
+  });
+
+  it('T079 serializes ownership attempts and releases a lock acquired during shutdown', async () => {
+    vi.useFakeTimers();
+    let acquire!: (value: boolean) => void;
+    const lock: ControllerLock = {
+      key: 1, held: false,
+      tryAcquire: vi.fn(() => new Promise<boolean>((resolve) => { acquire = resolve; })),
+      release: vi.fn(async () => { lock.held = false; }),
+      isHealthy: async () => lock.held,
+      close: async () => { lock.held = false; },
+    };
+    const link = new ScriptedFarmLink();
+    const controller = new FarmController(loadConfig({ NODE_ENV: 'test' }), link, Date.now, null, { lock });
+    controllers.push(controller);
+    const first = controller.becomeOwner();
+    expect(controller.becomeOwner()).toBe(first);
+    const closing = controller.close();
+    lock.held = true;
+    acquire(true);
+    expect(await first).toBe(false);
+    await closing;
+    await vi.advanceTimersByTimeAsync(3_000);
+    expect(lock.held).toBe(false);
+    expect(lock.tryAcquire).toHaveBeenCalledTimes(1);
+    expect(link.published).toEqual([]);
   });
 });

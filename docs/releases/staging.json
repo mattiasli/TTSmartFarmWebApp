@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "environment": "staging",
+  "qualification": "pending",
+  "sourceSha": null,
+  "ciRunUrl": null,
+  "observedAt": null,
+  "host": {
+    "project": "smartfarm-host",
+    "publicOrigin": "https://smartfarm-host.vercel.app",
+    "deploymentId": null,
+    "deploymentUrl": null
+  },
+  "remote": {
+    "project": "smartfarm-automations",
+    "publicOrigin": "https://smartfarm-automations.vercel.app",
+    "deploymentId": null,
+    "immutableEntryUrl": null,
+    "contractMajor": 1
+  },
+  "api": {
+    "project": "smartfarm-staging",
+    "service": "_default-service",
+    "publicOrigin": "https://default-service-production.up.railway.app",
+    "deploymentId": null,
+    "imageDigest": null
+  },
+  "database": {
+    "schemaVersion": null,
+    "backupObservedAt": null,
+    "restoreEvidence": null
+  },
+  "requiredRuntime": {
+    "APP_ENV": "staging",
+    "FARM_MODE": "simulator",
+    "SIMULATOR_TRANSPORT": "memory",
+    "LIVE_COMMANDS_ENABLED": false,
+    "LIVE_PUMP_ENABLED": false
+  },
+  "previousCompatibleRelease": null,
+  "acceptanceReport": "../STAGING_ACCEPTANCE.md"
+}

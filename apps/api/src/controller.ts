@@ -60,6 +60,8 @@ export class FarmController {
   private pumpWatchdog: ReturnType<typeof setTimeout> | null = null;
   private matchTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private driveTimer: ReturnType<typeof setInterval> | null = null;
+  private ownershipRetryTimer: ReturnType<typeof setTimeout> | null = null;
+  private ownershipAttempt: Promise<boolean> | null = null;
   private settingsRevision = 1;
   readonly engine: AutomationEngine;
   private readonly store: FarmStore | null;
@@ -169,7 +171,23 @@ export class FarmController {
     };
   }
 
-  async becomeOwner() {
+  becomeOwner(): Promise<boolean> {
+    if (this.draining) return Promise.resolve(false);
+    if (this.ownershipAttempt) return this.ownershipAttempt;
+    if (this.lock?.held && this.ownership === 'owner') return Promise.resolve(true);
+    if (this.ownershipRetryTimer) clearTimeout(this.ownershipRetryTimer);
+    this.ownershipAttempt = this.acquireOwnership().finally(() => {
+      this.ownershipAttempt = null;
+      if (this.lock && !this.draining && this.ownership !== 'owner') {
+        this.ownershipRetryTimer = setTimeout(() => {
+          void this.becomeOwner().catch(() => undefined);
+        }, 1_000);
+      }
+    });
+    return this.ownershipAttempt;
+  }
+
+  private async acquireOwnership() {
     if (!this.lock) {
       this.ownership = 'owner';
       this.engine.pause('Paused after backend start. Resume explicitly.');
@@ -178,13 +196,44 @@ export class FarmController {
       return true;
     }
     const acquired = await this.lock.tryAcquire();
-    this.ownership = acquired ? 'owner' : 'waiting_for_owner';
-    if (acquired) {
+    if (!acquired) return false;
+    try {
+      if (this.draining) {
+        await this.lock.release();
+        return false;
+      }
+      // The previous owner may have saved settings/runtime while we waited.
+      // Read them under ownership before exposing a controller that can mutate.
+      if (this.store) {
+        const saved = await this.store.getConfig(this.config.FARM_ID);
+        const runtime = await this.store.getRuntime(this.config.FARM_ID);
+        if (saved) {
+          this.engine.configure(saved.settings);
+          this.settingsRevision = saved.revision;
+        }
+        if (runtime) {
+          this.engine.restorePersisted({
+            attempts: runtime.attempts,
+            cooldownUntilMs: runtime.cooldownUntil?.getTime() ?? null,
+            lastPumpStopMs: runtime.lastPumpStopAt?.getTime() ?? null,
+            manual: runtime.manualOverrides,
+          });
+        }
+      }
       this.engine.pause('Paused after backend start. Resume explicitly.');
       await this.abandonPendingFromStore('Controller restarted before confirmation.');
-      void this.persistRuntime();
+      await this.persistRuntime();
+      if (this.draining) {
+        await this.lock.release();
+        return false;
+      }
+      this.ownership = 'owner';
+      return true;
+    } catch (error) {
+      this.ownership = 'waiting_for_owner';
+      await this.lock.release();
+      throw error;
     }
-    return acquired;
   }
 
   startAutomations() {
@@ -354,7 +403,9 @@ export class FarmController {
   }
 
   async drain() {
+    const wasOwner = this.ownership === 'owner';
     this.draining = true;
+    if (this.ownershipRetryTimer) clearTimeout(this.ownershipRetryTimer);
     this.ownership = 'draining';
     this.engine.pause('Paused after backend restart. Resume explicitly.');
     if (this.pumpTimer) clearTimeout(this.pumpTimer);
@@ -368,10 +419,13 @@ export class FarmController {
         // Bounded cleanup; firmware still has its own cap.
       }
     }
-    void this.persistRuntime();
+    if (wasOwner) await this.persistRuntime();
   }
 
   async close() {
+    this.draining = true;
+    if (this.ownershipRetryTimer) clearTimeout(this.ownershipRetryTimer);
+    await this.ownershipAttempt?.catch(() => undefined);
     await this.drain();
     if (this.driveTimer) clearInterval(this.driveTimer);
     await this.link.close();
@@ -420,6 +474,8 @@ export class FarmController {
   }
 
   private drive() {
+    // A waiting process must not overwrite the owner's runtime/history.
+    if (this.ownership !== 'owner' || this.draining) return;
     if (this.seenMqttEpoch && this.seenMqttEpoch !== this.link.mqttEpoch) {
       this.engine.pause('Paused — MQTT reconnected. Resume explicitly.');
       this.markPendingUncertain('MQTT epoch changed before confirmation.');

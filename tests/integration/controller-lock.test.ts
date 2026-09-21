@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { LOCAL_FARM_ID } from '@smartfarm/contracts';
+import { DEFAULT_AUTOMATIONS, LOCAL_FARM_ID } from '@smartfarm/contracts';
 import { buildApp, createDeps } from '../../apps/api/src/app';
 import { loadConfig } from '../../apps/api/src/config';
 import { createIsolatedDatabase, databaseAvailable } from './postgres';
@@ -68,7 +68,23 @@ describe('P07 two-process controller lock', () => {
     expect(command.statusCode).toBe(503);
     expect(command.json().error.code).toBe('CONTROLLER_UNAVAILABLE');
 
-    await appA.close();
-    await appB.close();
+    try {
+      const owner = ownerA ? depsA.controller : depsB.controller;
+      const successor = ownerA ? depsB.controller : depsA.controller;
+      const saved = await owner.configure({ ...DEFAULT_AUTOMATIONS, fanOn: 32 });
+      owner.startAutomations();
+      const ownerStore = ownerA ? depsA.store : depsB.store;
+      await expect.poll(async () => (await ownerStore?.getRuntime(LOCAL_FARM_ID))?.masterEnabled).toBe(true);
+      await (ownerA ? appA : appB).close();
+      // No manual becomeOwner call: a real deployment must recover on its own.
+      await expect.poll(() => successor.ownership, { timeout: 5_000 }).toBe('owner');
+      const snapshot = successor.snapshot();
+      expect(snapshot.automations.runtime.masterEnabled).toBe(false);
+      expect(snapshot.automations.settings.fanOn).toBe(32);
+      expect(snapshot.automations.revision).toBe(saved.automations.revision);
+    } finally {
+      await appA.close();
+      await appB.close();
+    }
   });
 });

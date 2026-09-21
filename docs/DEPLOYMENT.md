@@ -1,5 +1,10 @@
 # Staging deployment (G02)
 
+Current qualification work: [P13 acceptance report](STAGING_ACCEPTANCE.md).
+On September 21 the public API answered but reported `waiting_for_owner`.
+The local handover fix must be deployed and verified before treating staging as
+operational. The September 18 observations below are historical.
+
 Do not put HiveMQ passwords, OAuth secrets, or `DATABASE_URL` in git. Live commands and pump stay **false**.
 
 Known public origins for this staging pass:

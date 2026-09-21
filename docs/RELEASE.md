@@ -34,4 +34,9 @@ Staging project names/URLs are recorded in [docs/DEPLOYMENT.md](DEPLOYMENT.md). 
 
 ## Rollback
 
+P13 evidence: [staging acceptance](STAGING_ACCEPTANCE.md) and the
+[deployment mapping](releases/staging.json). Fill missing deployment IDs from the
+providers; a null value is not a release identifier. `npm run check:staging-public`
+performs read-only anonymous proxy/remote checks and requires controller ownership.
+
 Keep host and remote as a recorded pair. Backend rollback must match the expanded schema. Automations stay paused through rollback. Unresolved commands remain `uncertain` and are not replayed.

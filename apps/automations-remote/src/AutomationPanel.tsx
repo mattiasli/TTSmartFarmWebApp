@@ -17,7 +17,6 @@ import {
   applyDraftNumber,
   classifyLighting,
   draftCanApply,
-  isStaleSaveResponse,
   nextDraftFromServer,
   parseDraftNumber,
   type NumericAutomationKey,
@@ -36,6 +35,7 @@ function sameSettings(a: AutomationSettings, b: AutomationSettings) {
 export function AutomationPanel(props: Props) {
   const settings = props.settings ?? DEFAULT_AUTOMATIONS;
   const [draft, setDraft] = useState<AutomationSettings>(settings);
+  const [baseline, setBaseline] = useState<AutomationSettings>(settings);
   const [texts, setTexts] = useState<Partial<Record<FieldKey, string>>>({});
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<NumericAutomationKey, string>>>({});
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,11 @@ export function AutomationPanel(props: Props) {
   const [busy, setBusy] = useState(false);
   const revisionRef = useRef<number | undefined>(props.settingsRevision);
   const latestRevisionRef = useRef<number | undefined>(props.settingsRevision);
-  const dirty = useMemo(() => !sameSettings(draft, settings), [draft, settings]);
+  // Incoming settings are not the draft's baseline until explicitly accepted.
+  const dirty = useMemo(
+    () => !sameSettings(draft, baseline) || Object.keys(texts).length > 0 || Object.values(fieldErrors).some(Boolean),
+    [draft, baseline, texts, fieldErrors],
+  );
   const incomplete = Object.values(texts).some((value) => value === '');
   const canEdit = props.permissions?.canEdit !== false;
   const canApply = canEdit && dirty && !busy && draftCanApply(draft, fieldErrors, incomplete);
@@ -63,6 +67,7 @@ export function AutomationPanel(props: Props) {
     });
     if (next.acceptRevision) {
       revisionRef.current = props.settingsRevision;
+      setBaseline(props.settings);
       setDraft(next.draft);
       setTexts({});
       setFieldErrors({});
@@ -111,10 +116,12 @@ export function AutomationPanel(props: Props) {
     setBusy(true);
     try {
       const result = await props.onSave(draft, startedRevision);
-      if (isStaleSaveResponse(startedRevision, latestRevisionRef.current ?? startedRevision)) {
+      // A socket can announce our own saved revision before HTTP completes.
+      if ((latestRevisionRef.current ?? startedRevision) > result.revision) {
         return;
       }
       revisionRef.current = result.revision;
+      setBaseline(result.settings);
       setDraft(result.settings);
       setTexts({});
       setFieldErrors({});
@@ -133,6 +140,7 @@ export function AutomationPanel(props: Props) {
   function reloadServer() {
     if (!props.settings) return;
     setDraft(props.settings);
+    setBaseline(props.settings);
     revisionRef.current = props.settingsRevision;
     setTexts({});
     setFieldErrors({});
@@ -150,14 +158,8 @@ export function AutomationPanel(props: Props) {
               Apply
             </Button>
             <Button
-              disabled={!dirty || busy}
-              onClick={() => {
-                setDraft(settings);
-                setTexts({});
-                setFieldErrors({});
-                setConflict(false);
-                setError(null);
-              }}
+              disabled={(!dirty && !conflict) || busy}
+              onClick={reloadServer}
             >
               Cancel
             </Button>
@@ -195,7 +197,7 @@ export function AutomationPanel(props: Props) {
                   <Title3>{card.title}</Title3>
                   <Switch
                     checked={Boolean(draft[card.rule])}
-                    disabled={!canEdit}
+                    disabled={!canEdit || busy}
                     label="On"
                     onChange={(_, data) => setDraft({ ...draft, [card.rule]: data.checked })}
                   />
@@ -217,7 +219,7 @@ export function AutomationPanel(props: Props) {
                         min={min}
                         max={max}
                         value={value}
-                        disabled={!canEdit}
+                        disabled={!canEdit || busy}
                         aria-label={field.label}
                         onChange={(_, data) => commitNumber(field.key, data.value)}
                       />
@@ -225,7 +227,7 @@ export function AutomationPanel(props: Props) {
                         type="text"
                         inputMode="numeric"
                         value={text ?? String(value)}
-                        disabled={!canEdit}
+                        disabled={!canEdit || busy}
                         aria-label={`${field.label} number`}
                         onChange={(_, data) => onNumberText(field.key, data.value)}
                       />
@@ -240,7 +242,7 @@ export function AutomationPanel(props: Props) {
                 {card.motionOnly ? (
                   <Switch
                     checked={draft.motionOnly}
-                    disabled={!canEdit}
+                    disabled={!canEdit || busy}
                     label="Only light up for motion at night"
                     onChange={(_, data) => setDraft({ ...draft, motionOnly: data.checked })}
                   />
