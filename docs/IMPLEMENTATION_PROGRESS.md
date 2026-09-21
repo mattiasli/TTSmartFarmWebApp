@@ -2,6 +2,28 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Current handoff (2026-09-21 13:40 UTC)
+
+Verified `a94f6883e5ac8e5c3cc200cab1ed1a3605967728`: all CI passed, all three
+deployments succeeded, API owner reports its exact baked source revision, public
+immutable remote assets passed, and authenticated Chromium/WebKit rendering,
+snapshots and WSS passed. Mapping: `releases/staging-a94f688.json`; browser evidence:
+`releases/staging-a94f688-browser.json`. Keep this pair as the immediately previous
+release for the next rollback; older images lose Git SHA metadata on Railway rollback.
+
+Railway deployment `8435236e-ab40-4c5d-a326-9747d8b616e7` was observed WAITING
+while the old API stayed SUCCESS, then deployed after successful CI. Both Vercel
+check runs succeeded and reference GitHub job 106355466711. Complete alias-hold
+timing and remote/API/host ordering remain unqualified. The next small API change
+logs initial/readiness ownership transitions, allowing the hosted overlap drill to
+show HTTP readiness while waiting for the old owner. Existing SIGTERM logs cover
+drain completion. No application configuration secrets are logged.
+
+S03, S05, S06, S07, S09 and calibrated latency/stale checks have evidence below.
+Remaining: S02 WebKit OAuth/SameSite qualification, S08 hosted DB outage, S10 hosted
+overlap, S11 full supported rollback pair, S13 DB size/retention, S14 ordering/IaC.
+S12 backup/restore is explicitly deferred by the user, including local logical restore.
+
 ## Hosted manual-command failure and fix (2026-09-21)
 
 **Latest verified application release:** `d3b6c445e2fb82ea7483d289402bbb6e5fb684a7`,

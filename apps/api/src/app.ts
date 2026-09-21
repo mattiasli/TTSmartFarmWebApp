@@ -242,12 +242,22 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   }
 
   app.get('/health/live', async () => ({ status: 'ok' }));
-  app.get('/health/ready', async () => ({
-    status: 'ready',
-    serverTime: new Date().toISOString(),
-    controller: controller.ownership,
-    ...redactedConfig(config),
-  }));
+  let lastReadyOwnership: string | undefined;
+  app.get('/health/ready', async () => {
+    // The new process can serve HTTP while it waits for the old owner's drain.
+    // Log only the initial observation and transitions, without configuration secrets.
+    if (lastReadyOwnership !== controller.ownership) {
+      app.log.info({ event: 'readiness_ownership', releaseSha: config.RELEASE_SHA,
+        controller: controller.ownership, httpReady: true }, 'API readiness ownership observed');
+      lastReadyOwnership = controller.ownership;
+    }
+    return {
+      status: 'ready',
+      serverTime: new Date().toISOString(),
+      controller: controller.ownership,
+      ...redactedConfig(config),
+    };
+  });
 
   app.get('/api/v1/diagnostics', async (request, reply) => {
     const id = requestId();

@@ -1,0 +1,39 @@
+{
+  "observedAt": "2026-09-21T13:40:14.083Z",
+  "results": [
+    {
+      "browser": "chromium",
+      "version": "153.0.8010.12",
+      "authenticated": true,
+      "role": "admin",
+      "secureHttpOnlyCookie": true,
+      "sameSiteReported": "Lax",
+      "sameSiteQualified": true,
+      "noStore": true,
+      "snapshot": true,
+      "editorRendered": true,
+      "wssSnapshots": 2,
+      "remoteAssets": 9,
+      "pinnedRemote": "https://smartfarm-automations-c8fiqhj6e-mattias-li-s-projects.vercel.app",
+      "pageErrors": 0,
+      "oauthFlow": "reused app session; this script does not test OAuth redirects"
+    },
+    {
+      "browser": "webkit",
+      "version": "26.6",
+      "authenticated": true,
+      "role": "admin",
+      "secureHttpOnlyCookie": true,
+      "sameSiteReported": "None",
+      "sameSiteQualified": false,
+      "noStore": true,
+      "snapshot": true,
+      "editorRendered": true,
+      "wssSnapshots": 2,
+      "remoteAssets": 11,
+      "pinnedRemote": "https://smartfarm-automations-c8fiqhj6e-mattias-li-s-projects.vercel.app",
+      "pageErrors": 0,
+      "oauthFlow": "reused app session; this script does not test OAuth redirects"
+    }
+  ]
+}

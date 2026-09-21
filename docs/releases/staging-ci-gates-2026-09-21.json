@@ -1,33 +1,51 @@
 {
-  "date": "2026-09-21",
-  "verification": "Provider create/update responses followed by independent readback",
-  "vercel": {
-    "sourceProvider": "github",
-    "externalCheckName": "smartfarm-required",
-    "blocks": "deployment-alias",
-    "targets": ["production"],
-    "timeoutSeconds": 1800,
-    "hostCheckId": "chk_61b583b6-1116-45e2-99f6-7103e3ea046a",
-    "remoteCheckId": "chk_d06b808d-94dc-46aa-b202-def14e79e86c"
-  },
-  "railway": {
-    "projectId": "285fc6b3-caef-4e86-9a03-0966a2262b2b",
-    "environmentId": "9229a204-ddea-466e-a906-438c5ed1e757",
-    "serviceId": "acac3d1f-1dc4-4f32-ba83-81a704167f31",
-    "triggerId": "b538fb7c-3c1c-4324-afcd-94eecb746dc1",
-    "repository": "mattiasli/TTSmartFarmWebApp",
-    "branch": "master",
-    "checkSuitesBefore": false,
-    "checkSuitesAfter": true,
-    "validCheckSuites": 1
-  },
-  "limitations": [
-    "Settings saved after d3b6c44 deployed; observing a subsequent release wait for CI remains pending.",
-    "Independent provider CI gates do not establish remote-to-API-to-host deployment ordering.",
-    "Railway waits for workflow conclusions rather than individual jobs; its documented cancelled/skipped workflow rules still apply."
-  ],
-  "sources": [
-    "https://vercel.com/docs/deployment-checks",
-    "https://docs.railway.com/deployments/github-autodeploys"
-  ]
+    "date":  "2026-09-21",
+    "verification":  "Provider create/update responses followed by independent readback",
+    "vercel":  {
+                   "sourceProvider":  "github",
+                   "externalCheckName":  "smartfarm-required",
+                   "blocks":  "deployment-alias",
+                   "targets":  [
+                                   "production"
+                               ],
+                   "timeoutSeconds":  1800,
+                   "hostCheckId":  "chk_61b583b6-1116-45e2-99f6-7103e3ea046a",
+                   "remoteCheckId":  "chk_d06b808d-94dc-46aa-b202-def14e79e86c"
+               },
+    "railway":  {
+                    "projectId":  "285fc6b3-caef-4e86-9a03-0966a2262b2b",
+                    "environmentId":  "9229a204-ddea-466e-a906-438c5ed1e757",
+                    "serviceId":  "acac3d1f-1dc4-4f32-ba83-81a704167f31",
+                    "triggerId":  "b538fb7c-3c1c-4324-afcd-94eecb746dc1",
+                    "repository":  "mattiasli/TTSmartFarmWebApp",
+                    "branch":  "master",
+                    "checkSuitesBefore":  false,
+                    "checkSuitesAfter":  true,
+                    "validCheckSuites":  1
+                },
+    "limitations":  [
+                        "Railway WAITING and subsequent success observed; both Vercel check runs reference the exact successful GitHub job. Vercel alias state was read only after completion, so alias-hold timing is not yet directly qualified.",
+                        "Independent provider CI gates do not establish remote-to-API-to-host deployment ordering.",
+                        "Railway waits for workflow conclusions rather than individual jobs; its documented cancelled/skipped workflow rules still apply."
+                    ],
+    "sources":  [
+                    "https://vercel.com/docs/deployment-checks",
+                    "https://docs.railway.com/deployments/github-autodeploys"
+                ],
+    "releaseObservation":  {
+                               "sourceSha":  "a94f6883e5ac8e5c3cc200cab1ed1a3605967728",
+                               "ciRun":  35606395531,
+                               "ciConclusion":  "success",
+                               "githubRequiredJob":  106355466711,
+                               "railwayDeploymentId":  "8435236e-ab40-4c5d-a326-9747d8b616e7",
+                               "railwayObservedStates":  [
+                                                             "WAITING",
+                                                             "SUCCESS"
+                                                         ],
+                               "previousApiStayedSuccessfulWhileWaiting":  true,
+                               "hostCheckRun":  "ckr_53e6a127-e5a1-4382-871a-a1f91eeb3b47",
+                               "remoteCheckRun":  "ckr_ee4e252c-97e6-44c4-8c0f-3762e9b1be56",
+                               "vercelCheckConclusions":  "succeeded",
+                               "vercelAliasesAssignedAfterObservedCompletion":  true
+                           }
 }
