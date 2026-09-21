@@ -2,8 +2,9 @@
 
 Current qualification work: [P13 acceptance report](STAGING_ACCEPTANCE.md).
 The current release mapping is in [releases/staging.json](releases/staging.json).
-Release `f7d36d9` passed required CI and deployed to all three services. Hosted S03
-manual commands and all five automations passed. The host uses the anonymously
+Release `966a6d1` passed required CI and deployed to all three services. Hosted S08
+Postgres outage recovered with the API process alive and automations paused.
+Manual commands and all five automations previously passed. The host uses the anonymously
 accessible immutable `9abcf36` remote; its protection and asset checks are recorded
 in the acceptance report. G08 remains pending the outstanding hosted drills.
 Backup/restore (S12), including logical dump/local restore, is explicitly deferred

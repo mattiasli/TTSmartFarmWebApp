@@ -9,6 +9,13 @@
 
 ## 0. Read this first
 
+**User scope exception, 21 September 2026:** Defer backup/restore entirely,
+including paid provider backups, schedules, manual backups, logical dumps and
+local restore drills. This overrides backup/restore requirements below for the
+current implementation scope (including P13 step 5 / G08 S12). Record the
+exception explicitly; do not mark backup/restore as passed or reopen it without
+a new user instruction.
+
 Build a conventional, responsive web application with **React, TypeScript, Vite, and Fluent UI v9**. It must show every available farm reading, control the existing physical farm through HiveMQ, and manage the five existing automation categories. **Do not include the 3D model, Three.js, Electron, or an Android wrapper.**
 
 The architecture is fixed as follows:

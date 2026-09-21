@@ -1,0 +1,19 @@
+{
+    "observedAt":  "2026-09-21T14:36:55.927Z",
+    "apiSha":  "966a6d18b09a22047da13d71a7fe6f7b40b83527",
+    "browser":  "153.0.8010.12",
+    "readinessSamples":  70,
+    "waitingFrames":  3,
+    "mutationStatus":  500,
+    "apiProcessSurvived":  true,
+    "settingsRetained":  true,
+    "automationsPausedAfter":  true,
+    "pumpOffAfter":  true,
+    "fanOffAfter":  true,
+    "automaticWssRecovery":  true,
+    "timeToLossMs":  26902,
+    "recoveryMs":  2967,
+    "publishEvidence":  "Hosted rejected mutation and off outputs; actual no-publish assertion is in the real PostgreSQL TCP-outage integration test.",
+    "backupRestore":  "Explicitly deferred; no backup or restore performed.",
+    "railwayPostgresRestartId":  "65e7669c-72fe-4bb5-8ed0-736c432de08f"
+}

@@ -2,6 +2,35 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Current handoff (2026-09-21 14:37 UTC)
+
+Verified release `966a6d18b09a22047da13d71a7fe6f7b40b83527` passed CI run
+35612537569 (135 unit, 32 PostgreSQL integration, federation and browser checks)
+and all three provider deployments. Mapping: `releases/staging-966a6d1.json`.
+The host retains the verified immutable 9abcf36 remote.
+
+S08 hosted database outage passed: actual Postgres restart, API process survived,
+command rejected with HTTP 500, ownership loss observed, settings retained,
+paused/off recovery in 2.97 seconds and automatic browser WSS recovery.
+The local real TCP-outage test directly asserts no publishing after ownership
+loss and covers an interrupted background runtime write. Evidence:
+`releases/staging-database-outage-2026-09-21.json`. No backup/restore occurred.
+
+Post-drill public assets and authenticated Chromium/WebKit editor, snapshots,
+no-store and WSS checks passed; zero page errors. These reuse an app session,
+so fresh WebKit OAuth/SameSite qualification remains outstanding (S02).
+Browser evidence: `releases/staging-966a6d1-browser.json`.
+
+S13 database size/retention evidence is complete as described below. Remaining
+G08 work: S02 fresh WebKit OAuth/SameSite and S14 coordinated release/IaC.
+Section 16.4 requires **API, then immutable remote, then host**; earlier notes
+referring to remote/API/host ordering were imprecise. Native independent CI gates
+are verified but do not supply this ordering. Railway `config migrate` dry-run
+omits drain/predeploy settings and emits the folder name as project; do not apply
+that generated file blindly. No IaC/provider settings changed in that dry-run.
+S12 backup/restore remains an explicit user scope exception, including local
+logical restore. Later gates require production access and supervised hardware.
+
 ## Database maintenance implementation (2026-09-21)
 
 **Verified staging release:** `b3ae50288e9f68a49c9ba7612a514a3f4e6083a3`.
