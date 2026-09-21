@@ -9,7 +9,6 @@ const project = '285fc6b3-caef-4e86-9a03-0966a2262b2b';
 const environment = '9229a204-ddea-466e-a906-438c5ed1e757';
 const service = 'acac3d1f-1dc4-4f32-ba83-81a704167f31';
 const team = 'team_G6TWPLIoH81XbfAJksQWzF6g';
-const scope = 'mattias-li-s-projects';
 const hostProject = 'prj_7vukfeWHuhz7dxS42OiBNHodnWK3';
 const remoteProject = 'prj_0bBsZ7ZVP2Sna1tFk0EyWYNLdn4G';
 const host = 'https://smartfarm-host.vercel.app';
@@ -38,11 +37,12 @@ const stage = async (name, action) => {
   }
   finally { entry.finishedAt = new Date().toISOString(); await save(); }
 };
-function cli(command, args, token) {
+function cli(command, args, token, vercelProject) {
   return new Promise((resolve, reject) => {
     // Never echo command arguments or child errors: a Vercel token is an argument.
     const child = spawn(command, token ? [...args, '--token', token] : args,
-      { env: process.env, stdio: ['ignore', 'pipe', 'pipe'], timeout: 20 * 60_000 });
+      { env: { ...process.env, ...(vercelProject ? { VERCEL_ORG_ID: team, VERCEL_PROJECT_ID: vercelProject } : {}) },
+        stdio: ['ignore', 'pipe', 'pipe'], timeout: 20 * 60_000 });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', (data) => { stdout += String(data); });
@@ -162,12 +162,13 @@ try {
 
   const metadata = ['--meta', `githubCommitSha=${sha}`, '--meta', 'githubCommitRef=master',
     '--meta', 'githubCommitOrg=mattiasli', '--meta', 'githubCommitRepo=TTSmartFarmWebApp'];
-  const deployArgs = ['deploy', '.', '--prod', '--skip-domain', '--yes', '--scope', scope,
+  // Explicit CI project context avoids --scope's unnecessary user-profile lookup.
+  const deployArgs = ['deploy', '.', '--prod', '--skip-domain', '--yes',
     '--build-env', `VITE_RELEASE_SHA=${sha}`, ...metadata];
   let remoteEntry;
   await stage('immutable remote deployment', async () => {
-    const url = immutableVercelUrl(await cli('vercel', [...deployArgs, '--project', remoteProject],
-      process.env.VERCEL_REMOTE_TOKEN), 'smartfarm-automations');
+    const url = immutableVercelUrl(await cli('vercel', deployArgs,
+      process.env.VERCEL_REMOTE_TOKEN, remoteProject), 'smartfarm-automations');
     const info = await deployment(url, process.env.VERCEL_REMOTE_TOKEN);
     assert.equal(info.readyState, 'READY');
     remoteEntry = `${url}/remoteEntry.js`;
@@ -176,9 +177,9 @@ try {
   });
   let candidate;
   await stage('host built against the immutable remote', async () => {
-    candidate = immutableVercelUrl(await cli('vercel', [...deployArgs, '--project', hostProject,
+    candidate = immutableVercelUrl(await cli('vercel', [...deployArgs,
       '--build-env', `VITE_AUTOMATIONS_REMOTE_URL=${remoteEntry}`, '--meta', `smartfarmRemoteEntry=${remoteEntry}`],
-    process.env.VERCEL_HOST_TOKEN), 'smartfarm-host');
+    process.env.VERCEL_HOST_TOKEN, hostProject), 'smartfarm-host');
     const info = await deployment(candidate, process.env.VERCEL_HOST_TOKEN);
     assert.equal(info.readyState, 'READY');
     evidence.host = { deploymentId: info.id, sourceSha: sha, deploymentUrl: candidate, publicOrigin: host };
@@ -188,7 +189,7 @@ try {
       cookie: process.env.STAGING_SESSION_COOKIE, protectionBypass: process.env.VERCEL_HOST_AUTOMATION_BYPASS });
   });
   await stage('host promotion and stable-origin qualification', async () => {
-    await cli('vercel', ['promote', candidate, '--yes', '--scope', scope], process.env.VERCEL_HOST_TOKEN);
+    await cli('vercel', ['promote', candidate, '--yes'], process.env.VERCEL_HOST_TOKEN, hostProject);
     const promoted = await deployment(host, process.env.VERCEL_HOST_TOKEN);
     assert.equal(promoted.id, evidence.host.deploymentId);
     evidence.stableSmoke = await checkReleaseCandidate({ candidate: host, remote: remoteEntry, sha,
