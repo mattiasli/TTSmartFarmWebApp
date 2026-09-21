@@ -1,8 +1,9 @@
 # P14 production connection
 
-Status: preparation only. G08 simulator qualification is recorded in
+Status: real broker read-only observation passed; hosted live deployment pending.
+G08 simulator qualification is recorded in
 [staging acceptance](STAGING_ACCEPTANCE.md), with backup/restore explicitly
-deferred. No physical connection or hardware acceptance is claimed.
+deferred. Supervised physical acceptance is not yet complete.
 
 The backend selects authenticated TLS MQTT when `FARM_MODE=live`, never the
 memory simulator. Simulator staging rejects the live adapter.
@@ -24,10 +25,33 @@ without that audit.
 ## Isolated read-only deployment
 
 Keep simulator staging intact. Provision a separate live API, database and host
-configuration, with a distinct farm ID. Record actual service IDs, source SHA,
-host/remote pin and URLs after provisioning; production is not yet provisioned.
+configuration, with a distinct farm ID. Projects/services are provisioned;
+record the source SHA and immutable host/remote mapping after deployment.
 Adapt the qualified ordered release procedure deliberately; the staging runner
 must continue rejecting live services.
+
+The production projects and domains are now reserved; actual IDs are recorded in
+`tools/deploy/production.json`. The API has its separate database reference and
+both live flags false, but has not been deployed. Its OAuth app must use
+homepage `https://smartfarm-live.vercel.app` and redirect URI
+`https://smartfarm-live.vercel.app/api/auth/github/callback`. Disable wildcard
+matching and device flow; leave user access token expiration enabled. GitHub's
+token is used during sign-in; SmartFarm subsequently uses its own session.
+
+The user has added both OAuth values to the production API; presence is verified.
+The manual `smartfarm-web-production` workflow requires successful CI and a
+successful coordinated staging release for the same SHA. Its initial scope is
+strictly read-only: provider settings and running health must both have live
+commands and pumping disabled. It verifies candidate/stable public login and
+proxy delivery, then explicitly leaves fresh OAuth and authenticated live
+telemetry for the first operator session. It does not mark G09/G10 passed.
+
+Deployment secrets belong to GitHub environment `smartfarm-production`:
+`RAILWAY_TOKEN`, `VERCEL_HOST_TOKEN`, `VERCEL_REMOTE_TOKEN`, and
+`VERCEL_HOST_AUTOMATION_BYPASS`. The bypass is configured. Token creation was
+denied by provider authorization, so the user was asked to add the other three.
+The repository variable `PRODUCTION_READONLY_RELEASE_ENABLED` remains off until
+the prerequisites are verified. Broker and OAuth credentials stay in Railway.
 
 | Backend setting | Initial live value |
 |---|---|

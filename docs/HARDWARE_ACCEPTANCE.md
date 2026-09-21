@@ -18,11 +18,20 @@ Production provisioning and physical acceptance remain outstanding. See
 
 ## Read-only
 
-- [ ] Desktop/Android controllers paused
-- [ ] Fresh telemetry observed (all 22 fields)
-- [ ] Firmware identity confirmed on the physical device
+- [x] Desktop/Android applications stopped (user confirmation, September 21)
+- [x] Fresh telemetry observed locally: 223 samples / three minutes, all 22 fields
+- [x] User confirms latest sibling `FanMqtt` source is installed; binary not read back
 - [ ] Several minutes of telemetry correlated with supervised sensor stimuli
-- [ ] No test commands sent while live commands are false
+- [x] Local read-only observation made no command publish calls; both live flags false
+
+Evidence: [read-only observation](releases/live-readonly-2026-09-21.json).
+Source hashes taken September 21 (operator-reported installed source):
+
+| File | SHA-256 |
+|---|---|
+| `FanMqtt.ino` | `87fdcb98a93aaa3d9a07647f0003e2ddec0a8c9e29aaef1d31f560fbffc397d8` |
+| `PumpProtection.h` | `a6984edb726419190b1499f8da580435b6283678abe4f8e34a447f2b29584d08` |
+| `MqttLink.cpp` | `796e34220cde4825f18f7019b227c6062cd586908ea062e61f9076f6dbc470c8` |
 
 Record observed fields: `t`, `h`, `dht`, `soil`, `water`, `light`, `steam`, `rain`,
 `dist`, `pir`, `btn`, `rssi`, `fan`, `led`, `feed`, `pump`, `buzz`, `bl`, `guard`,

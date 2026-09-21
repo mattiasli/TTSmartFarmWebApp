@@ -1,0 +1,14 @@
+{
+  "project": "65289185-ce18-4bf7-8096-3a98824e2c39",
+  "environment": "f924a3a0-58c1-469e-bb7a-6b9d3cc695ae",
+  "service": "85b0988f-f49c-4f53-8952-73a6764bac10",
+  "databaseService": "34cb5c18-86cf-47c5-abb8-d0e515055975",
+  "farmId": "cad2a8fd-265e-491d-a768-b4372580b55e",
+  "team": "team_G6TWPLIoH81XbfAJksQWzF6g",
+  "hostProject": "prj_ieE6d49geytOALL2BMfHDTeVbHyv",
+  "remoteProject": "prj_FBnZBmIKnF1CmWAFGJTJMMX9Zs7C",
+  "host": "https://smartfarm-live.vercel.app",
+  "api": "https://smartfarm-api-production.up.railway.app",
+  "hostName": "smartfarm-live",
+  "remoteName": "smartfarm-live-automations"
+}

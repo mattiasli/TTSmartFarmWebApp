@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 
 export const stagingRepository = 'mattiasli/TTSmartFarmWebApp';
+export function activeDeploymentId(settings) {
+  assert.equal(settings.activeDeployments?.length, 1, 'Expected exactly one stable active API deployment');
+  const active = settings.activeDeployments[0];
+  assert.equal(active.status, 'SUCCESS', 'Active API deployment is not stable');
+  assert.ok(active.id);
+  return active.id;
+}
 export function assertReleaseRun(run, jobs, sha) {
   assert.match(sha, /^[a-f0-9]{40}$/);
   assert.equal(run.head_sha, sha);

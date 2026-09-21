@@ -1,0 +1,42 @@
+{
+  "observedAt": "2026-09-21T17:30:52.372Z",
+  "railway": {
+    "id": "65289185-ce18-4bf7-8096-3a98824e2c39",
+    "name": "smartfarm-production",
+    "environments": [
+      {
+        "id": "f924a3a0-58c1-469e-bb7a-6b9d3cc695ae",
+        "name": "production"
+      }
+    ]
+  },
+  "vercel": [
+    {
+      "id": "prj_ieE6d49geytOALL2BMfHDTeVbHyv",
+      "name": "smartfarm-live",
+      "rootDirectory": "apps/dashboard",
+      "nodeVersion": "24.x",
+      "gitLinked": false,
+      "domains": [
+        {
+          "name": "smartfarm-live.vercel.app",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "id": "prj_FBnZBmIKnF1CmWAFGJTJMMX9Zs7C",
+      "name": "smartfarm-live-automations",
+      "rootDirectory": "apps/automations-remote",
+      "nodeVersion": "24.x",
+      "gitLinked": false,
+      "domains": [
+        {
+          "name": "smartfarm-live-automations.vercel.app",
+          "verified": true
+        }
+      ]
+    }
+  ],
+  "servicesDeployed": false
+}

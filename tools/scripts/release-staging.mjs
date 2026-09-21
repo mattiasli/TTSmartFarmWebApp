@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { request } from '@playwright/test';
-import { assertStagingHealth, immutableVercelUrl } from './staging-release-policy.mjs';
+import { activeDeploymentId, assertStagingHealth, immutableVercelUrl } from './staging-release-policy.mjs';
 import { checkReleaseCandidate, checkRemoteRelease } from './check-staging-release-candidate.mjs';
 
 const project = '285fc6b3-caef-4e86-9a03-0966a2262b2b';
@@ -114,7 +114,7 @@ try {
     const remoteEntry = currentHost.meta?.smartfarmRemoteEntry ?? previous.remote.immutableEntryUrl;
     const currentRemote = await deployment(remoteEntry, process.env.VERCEL_REMOTE_TOKEN);
     evidence.previousCompatibleRelease = {
-      api: { sourceSha: (await health()).releaseSha, deploymentId: settings.latestDeployment.id },
+      api: { sourceSha: (await health()).releaseSha, deploymentId: activeDeploymentId(settings) },
       host: { deploymentId: currentHost.id, url: `https://${currentHost.url}`, sourceSha: currentHost.meta?.githubCommitSha },
       remote: { deploymentId: currentRemote.id, immutableEntryUrl: remoteEntry },
     };

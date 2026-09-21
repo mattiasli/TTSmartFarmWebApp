@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-09-21T17:30:12.275Z",
+  "projectId": "65289185-ce18-4bf7-8096-3a98824e2c39",
+  "environmentId": "f924a3a0-58c1-469e-bb7a-6b9d3cc695ae",
+  "serviceId": "85b0988f-f49c-4f53-8952-73a6764bac10",
+  "farmId": "cad2a8fd-265e-491d-a768-b4372580b55e",
+  "configuredNames": [
+    "NODE_ENV",
+    "APP_ENV",
+    "FARM_MODE",
+    "LIVE_COMMANDS_ENABLED",
+    "LIVE_PUMP_ENABLED",
+    "PORT",
+    "HOST",
+    "FARM_ID",
+    "FARM_NAME",
+    "DATABASE_URL",
+    "PUBLIC_APP_ORIGIN",
+    "ALLOWED_BROWSER_ORIGINS",
+    "PUBLIC_WS_URL",
+    "BOOTSTRAP_ADMIN_GITHUB_ID",
+    "BOOTSTRAP_ADMIN_USERNAME",
+    "HIVEMQ_HOST",
+    "HIVEMQ_USERNAME",
+    "HIVEMQ_PASSWORD",
+    "HIVEMQ_MQTT_TLS_PORT"
+  ],
+  "appEnv": "production",
+  "farmMode": "live",
+  "liveCommandsEnabled": "false",
+  "livePumpEnabled": "false",
+  "oauthClientPresent": true,
+  "oauthSecretPresent": true,
+  "oauthVariableNames": [
+    "BOOTSTRAP_ADMIN_GITHUB_ID",
+    "GITHUB_OAUTH_CLIENT_ID",
+    "GITHUB_OAUTH_CLIENT_SECRET"
+  ],
+  "publicAppOrigin": "https://smartfarm-live.vercel.app",
+  "apiOrigin": "https://smartfarm-api-production.up.railway.app"
+}

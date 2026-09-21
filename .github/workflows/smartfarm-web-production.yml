@@ -1,0 +1,62 @@
+name: smartfarm-web-production
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Exact 40-character SHA with successful CI and staging release
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: smartfarm-production-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: vars.PRODUCTION_READONLY_RELEASE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: smartfarm-production
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: master
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .node-version
+      - name: Verify source, CI and exact staging release
+        id: source
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ inputs.sha }}
+        run: node tools/scripts/verify-production-release-source.mjs
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ steps.source.outputs.sha }}
+          persist-credentials: false
+      - run: npm ci
+      - run: npm install --global @railway/cli@5.58.0 vercel@59.23.2
+      - run: npx playwright install --with-deps chromium
+      - name: Deploy read-only production
+        env:
+          RELEASE_SHA: ${{ steps.source.outputs.sha }}
+          RELEASE_CI_URL: ${{ steps.source.outputs.ci_url }}
+          PRODUCTION_READONLY_RELEASE_ENABLED: ${{ vars.PRODUCTION_READONLY_RELEASE_ENABLED }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          VERCEL_HOST_TOKEN: ${{ secrets.VERCEL_HOST_TOKEN }}
+          VERCEL_REMOTE_TOKEN: ${{ secrets.VERCEL_REMOTE_TOKEN }}
+          VERCEL_HOST_AUTOMATION_BYPASS: ${{ secrets.VERCEL_HOST_AUTOMATION_BYPASS }}
+        run: node tools/scripts/release-production-readonly.mjs
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        if: ${{ always() }}
+        with:
+          name: production-readonly-${{ steps.source.outputs.sha || github.run_id }}
+          path: test-results/production-release.json
+          retention-days: 30
+          if-no-files-found: warn

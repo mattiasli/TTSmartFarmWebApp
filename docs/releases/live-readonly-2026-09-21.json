@@ -1,0 +1,43 @@
+{
+  "startedAt": "2026-09-21T17:06:11.144Z",
+  "transport": "mqtts",
+  "certificateVerification": true,
+  "liveCommandsEnabled": false,
+  "livePumpEnabled": false,
+  "sharedCredentialException": "User requested reuse for initial read-only connection.",
+  "commandPublishCalls": 0,
+  "samples": 223,
+  "fields": [
+    "bl",
+    "btn",
+    "buzz",
+    "dht",
+    "dist",
+    "fan",
+    "feed",
+    "guard",
+    "h",
+    "led",
+    "light",
+    "pir",
+    "pump",
+    "pumpBlocked",
+    "rain",
+    "rssi",
+    "soil",
+    "steam",
+    "t",
+    "tankLow",
+    "tankRecover",
+    "water"
+  ],
+  "epochs": [
+    "97f21a27-cf6a-4cfd-86aa-e061188754e5"
+  ],
+  "physicalSensorStimuliVerified": false,
+  "firmwareIdentityVerified": false,
+  "telemetryObserved": true,
+  "maxObservedGapMs": 1173,
+  "lastTelemetryAgeMs": 831,
+  "finishedAt": "2026-09-21T17:09:11.248Z"
+}

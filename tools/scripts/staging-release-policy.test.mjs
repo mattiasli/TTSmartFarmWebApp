@@ -1,10 +1,18 @@
 import { expect, it } from 'vitest';
-import { assertReleaseRun, assertStagingHealth, immutableVercelUrl, stagingRepository } from './staging-release-policy.mjs';
+import { activeDeploymentId, assertReleaseRun, assertStagingHealth, immutableVercelUrl, stagingRepository } from './staging-release-policy.mjs';
 
 const sha = 'a'.repeat(40);
 const run = { head_sha: sha, head_repository: { full_name: stagingRepository }, head_branch: 'master',
   path: '.github/workflows/smartfarm-web-ci.yml', event: 'push', status: 'completed', conclusion: 'success' };
 const jobs = ['checks', 'integration', 'federation', 'e2e', 'smartfarm-required'].map((name) => ({ name, conclusion: 'success' }));
+it('records the running rollback target even when the latest attempted deployment failed', () => {
+  const active = { id: 'running-api', status: 'SUCCESS' };
+  expect(activeDeploymentId({ activeDeployments: [active], latestDeployment: { id: 'failed-api', status: 'FAILED' } }))
+    .toBe('running-api');
+  for (const activeDeployments of [[], [active, active], [{ id: 'candidate', status: 'BUILDING' }]]) {
+    expect(() => activeDeploymentId({ activeDeployments })).toThrow();
+  }
+});
 it('accepts only the exact trusted CI source and every required job', () => {
   expect(() => assertReleaseRun(run, jobs, sha)).not.toThrow();
   for (const patch of [

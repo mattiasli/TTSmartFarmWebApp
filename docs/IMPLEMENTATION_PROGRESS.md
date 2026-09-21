@@ -2,12 +2,17 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21 16:49 UTC)
+## Current handoff (2026-09-21 17:31 UTC)
 
-**Verified coordinated release: 79f128b8b0af73a0b7f6e39f3bed5457ba9578d9.**
-CI 35625693558 and release workflow 35626061921 both succeeded. All six release
+**Verified coordinated release: 28c8cde67e89f1ef944fa296dec78d4500a3762b.**
+CI 35630085572 and release workflow 35630437207 both succeeded. All six release
 stages passed: preflight/previous mapping, API, immutable remote, host build,
-candidate browser, promotion/stable browser. Evidence: `releases/staging-79f128b.json`.
+candidate browser, promotion/stable browser. Evidence: `releases/staging-28c8cde.json`.
+That artifact exposed a rollback-metadata bug: its previous API ID is the failed
+7a94d608 attempt, not the running 79f128b deployment 476637bc-c083-4bdd-91a1-13d99b706281.
+The original artifact is retained. The runner now selects the single successful
+active deployment, with a regression test for a newer failed attempt. Do not use
+the failed ID as a rollback target. The earlier 79f128b qualification is retained.
 S14 coordinated deployment is demonstrated. Fresh WebKit OAuth at 16:49 UTC
 captured the original 302 cookie attributes (Secure, HttpOnly, SameSite=Lax,
 host-only, Path=/), editor, snapshot/no-store and three WSS snapshots. No cookies
@@ -18,36 +23,48 @@ was tunneled opaquely. The Windows driver's SameSite=None report is not the
 server response. No additional user sign-in is needed for S02.
 
 G08 is qualified for the agreed scope after review of S01–S14. S12 backup/restore
-remains explicitly deferred, never passed. Next: P14 dedicated broker access and
-read-only telemetry, then supervised non-pump acceptance. G09/G10 remain open.
+remains explicitly deferred, never passed. P14 has actual read-only broker evidence;
+hosted live deployment and supervised non-pump acceptance remain. G09/G10 are open.
 
 Subsequent release 35627854052 for documentation/tooling revision 3e431b6 failed
 at the API stage (Railway deployment 7a94d608-9f9c-42f3-b708-ec6dd185397f).
 The image built and migration logs reported success, but the deployment failed
 before a new API became active; provider diagnosis was null. Do not infer the
-cause from that alone. The verified 79f128b API remains healthy and owner; the
-workflow did not proceed to remote/host promotion. Inspect this failed deployment
-before retrying. This is separate from the successful fresh OAuth observation.
+cause from that alone. The prior API stayed healthy; no remote/host promotion
+occurred. A local container migration exited normally, and the subsequent 28c8cde
+release passed without a speculative migration change.
 
-P14 implementation now selects a dedicated live TLS MQTT adapter, with verified
+P14 implementation now selects a live TLS MQTT adapter, with verified
 certificate/hostname, credential validation, successful-SUBACK requirement,
 disconnect freshness reset and read-only publish rejection. The prior factory
 always selected simulator transport; live-mode policy flags alone were not a
-physical connection. Five focused tests and all 143 unit tests pass, with lint
-and typecheck. No live connection has been attempted. The saved credential matches
-the device's existing credential; a dedicated read-only backend credential has
-been requested. See `PRODUCTION_DEPLOYMENT.md` for remaining provisioning/physical
-steps. The user subsequently requested reuse of the existing credential for the
-initial read-only connection; this is an explicit dedicated-principal exception,
-not proof of a broker publish denial. A verified TLS connection/subscription has
-now succeeded with that credential, using the local read-only observer. Physical
-sensor stimuli, firmware identity and hosted live deployment remain unverified.
+physical connection. Five focused tests and all 143 unit tests passed on 28c8cde,
+with lint/types and three actual local MQTT integration tests. The user requested
+reuse of the existing device credential for the initial read-only connection;
+this is an explicit dedicated-principal exception, not a broker publish denial.
+The three-minute local observation received 223 valid samples, all 22 fields,
+one MQTT epoch, max observed gap 1173 ms and no publish calls. Evidence:
+`releases/live-readonly-2026-09-21.json`. The user confirms the latest source in
+the sibling `FanMqtt` folder is installed and other desktop/Android apps are stopped.
+This is operator-reported firmware identity, not a binary readback. Physical sensor
+stimuli and hosted live telemetry remain unverified.
 All three actual local MQTT integration tests pass after disabling automatic
 resubscription so readiness always waits for the explicit subscription's SUBACK.
-A local container migration exited normally; the Railway failure's cause
-is still unproven, so no speculative migration change was made.
 
-All five environment secrets are configured and provider access is verified.
+Production projects, separate Postgres/API services and verified Vercel domains
+are provisioned; IDs are in `tools/deploy/production.json`. API runtime variables
+are configured with APP_ENV=production, FARM_MODE=live and both command flags false.
+The user added separate production GitHub OAuth credentials; presence confirmed.
+No live API has been deployed. The manual read-only production workflow requires
+exact CI and successful staging release, and leaves OAuth/live-browser/hardware
+qualification explicitly pending after initial public login deployment.
+`smartfarm-production` GitHub environment exists with VERCEL_HOST_AUTOMATION_BYPASS.
+Railway/Vercel integrations rejected automatic deployment-token creation. The user
+has been asked to add RAILWAY_TOKEN, VERCEL_HOST_TOKEN and VERCEL_REMOTE_TOKEN there.
+Production release activation stays disabled until these are verified and the
+workflow is committed/tested. See `PRODUCTION_DEPLOYMENT.md` for exact URLs.
+
+All five staging environment secrets are configured and provider access is verified.
 `STAGING_RELEASE_ENABLED=true`; Railway has no Git deployment trigger, both
 Vercel configs disable native Git deployment, and API IaC omits a Git source.
 Vercel may create canceled/inactive Git records; these do not publish a release.

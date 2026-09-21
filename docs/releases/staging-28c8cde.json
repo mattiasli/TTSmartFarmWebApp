@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "environment": "staging",
+  "sourceSha": "28c8cde67e89f1ef944fa296dec78d4500a3762b",
+  "ciRunUrl": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35630085572",
+  "startedAt": "2026-09-21T17:13:39.180Z",
+  "stages": [
+    {
+      "name": "preflight and previous release",
+      "startedAt": "2026-09-21T17:13:39.189Z",
+      "status": "passed",
+      "finishedAt": "2026-09-21T17:13:41.132Z"
+    },
+    {
+      "name": "API deployment and paused ownership",
+      "startedAt": "2026-09-21T17:13:41.132Z",
+      "status": "passed",
+      "finishedAt": "2026-09-21T17:15:30.517Z"
+    },
+    {
+      "name": "immutable remote deployment",
+      "startedAt": "2026-09-21T17:15:30.517Z",
+      "status": "passed",
+      "finishedAt": "2026-09-21T17:16:11.439Z"
+    },
+    {
+      "name": "host built against the immutable remote",
+      "startedAt": "2026-09-21T17:16:11.440Z",
+      "status": "passed",
+      "finishedAt": "2026-09-21T17:16:53.155Z"
+    },
+    {
+      "name": "candidate browser qualification",
+      "startedAt": "2026-09-21T17:16:53.155Z",
+      "status": "passed",
+      "finishedAt": "2026-09-21T17:16:56.016Z"
+    },
+    {
+      "name": "host promotion and stable-origin qualification",
+      "startedAt": "2026-09-21T17:16:56.017Z",
+      "status": "passed",
+      "finishedAt": "2026-09-21T17:17:01.809Z"
+    }
+  ],
+  "backupRestoreDisposition": "Explicitly deferred by user; not performed by this workflow.",
+  "previousCompatibleRelease": {
+    "api": {
+      "sourceSha": "79f128b8b0af73a0b7f6e39f3bed5457ba9578d9",
+      "deploymentId": "7a94d608-9f9c-42f3-b708-ec6dd185397f"
+    },
+    "host": {
+      "deploymentId": "dpl_CDaKrCTkBYfP7GE259Bs9fX4zA9X",
+      "url": "https://smartfarm-host-cvpuq6geu-mattias-li-s-projects.vercel.app",
+      "sourceSha": "79f128b8b0af73a0b7f6e39f3bed5457ba9578d9"
+    },
+    "remote": {
+      "deploymentId": "dpl_2Q4dKCmnVBNC2msJTFmaBdx5uyde",
+      "immutableEntryUrl": "https://smartfarm-automations-2bizolrc7-mattias-li-s-projects.vercel.app/remoteEntry.js"
+    }
+  },
+  "api": {
+    "sourceSha": "28c8cde67e89f1ef944fa296dec78d4500a3762b",
+    "deploymentId": "0b5df160-4c36-4b44-8e9b-198e6d12fada",
+    "publicOrigin": "https://default-service-production.up.railway.app"
+  },
+  "remote": {
+    "deploymentId": "dpl_5NET3ZbFvLchvWyKRyduCWCt65Ki",
+    "sourceSha": "28c8cde67e89f1ef944fa296dec78d4500a3762b",
+    "immutableEntryUrl": "https://smartfarm-automations-39q7i1upr-mattias-li-s-projects.vercel.app/remoteEntry.js",
+    "contractMajor": 1
+  },
+  "remoteSmoke": {
+    "sourceSha": "28c8cde67e89f1ef944fa296dec78d4500a3762b",
+    "contractMajor": 1,
+    "publicAssets": 9,
+    "missingChunkStatus": 404
+  },
+  "host": {
+    "deploymentId": "dpl_4jaMwhy9j2qmQEYFYuqDR6F6pZpx",
+    "sourceSha": "28c8cde67e89f1ef944fa296dec78d4500a3762b",
+    "deploymentUrl": "https://smartfarm-host-itktt0yzc-mattias-li-s-projects.vercel.app",
+    "publicOrigin": "https://smartfarm-host.vercel.app"
+  },
+  "candidateSmoke": {
+    "browser": "153.0.8010.12",
+    "candidate": "https://smartfarm-host-itktt0yzc-mattias-li-s-projects.vercel.app",
+    "remote": "https://smartfarm-automations-39q7i1upr-mattias-li-s-projects.vercel.app/remoteEntry.js",
+    "sourceSha": "28c8cde67e89f1ef944fa296dec78d4500a3762b",
+    "actualCandidateAssetsAndProxy": true,
+    "authenticatedEditor": true,
+    "wssFrames": 2,
+    "historyRead": true,
+    "paused": true,
+    "oauth": "Existing staging app session; fresh OAuth is qualified separately."
+  },
+  "stableSmoke": {
+    "browser": "153.0.8010.12",
+    "candidate": "https://smartfarm-host.vercel.app",
+    "remote": "https://smartfarm-automations-39q7i1upr-mattias-li-s-projects.vercel.app/remoteEntry.js",
+    "sourceSha": "28c8cde67e89f1ef944fa296dec78d4500a3762b",
+    "actualCandidateAssetsAndProxy": true,
+    "authenticatedEditor": true,
+    "wssFrames": 2,
+    "historyRead": true,
+    "paused": true,
+    "oauth": "Existing staging app session; fresh OAuth is qualified separately."
+  },
+  "database": {
+    "migrations": [
+      "001_init.sql",
+      "002_p05_complete.sql",
+      "003_retention_indexes.sql"
+    ]
+  },
+  "qualification": "ordered staging release passed; fresh OAuth and hardware gates remain separate",
+  "finishedAt": "2026-09-21T17:17:01.816Z"
+}
