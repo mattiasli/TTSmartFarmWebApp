@@ -43,7 +43,7 @@ export function AutomationsPage({ hostMessage }: { hostMessage: string }) {
         readings: mapReadings(snapshot),
         permissions: {
           canEdit: snapshot.permissions.canControl,
-          canResume: snapshot.permissions.canControl,
+          canResume: snapshot.permissions.canControl && snapshot.connection.fresh && snapshot.connection.controllerReady && snapshot.connection.brokerReady,
         },
         connection: {
           fresh: snapshot.connection.fresh,

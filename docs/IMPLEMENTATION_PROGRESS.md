@@ -4,6 +4,27 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Hosted manual-command failure and fix (2026-09-21)
 
+The next S13 hosted run exposed a dashboard defect: the stale banner appeared but
+the Fan switch stayed enabled. The UI gated commands only on role, although the
+server rejects stale non-stop commands. The fix gates non-stop controls, host Start
+and remote resume on freshness and controller/broker readiness, preserving stop
+attempts. The browser now ages last-known telemetry using its monotonic clock even
+when updates cease. Browser regressions cover actual simulator telemetry stalling
+and browser network loss. Hosted failure evidence is preserved in
+`releases/staging-stale-before-ui-fix-2026-09-21.json`; rerun S13 after deployment.
+
+The fix is deployed as `f7d36d926f50f075b7d3c8a2ee718e025157f5c9`.
+All required CI jobs passed in run 35602322118, and all three provider deployments
+succeeded. Hosted S03 subsequently passed: manual command observations, all five
+automation sequences, guard synchronization, and irrigation on/off after browser
+closure with ten seconds without API polling. Original settings were restored and
+cleanup left the simulator normal, paused and off. The 34 command requests had
+p95 acceptance latency 599 ms and maximum 711 ms. Evidence:
+`releases/staging-automations-2026-09-21.json`.
+
+The earlier latency observer has no remaining process handle and produced no
+evidence file. It cannot qualify S13; a fresh calibrated observation is required.
+
 Release `5e2ab4e69ae5d457c594353cc27400a6e88f2b3a` deployed successfully to all
 three services and passed all CI jobs (including the additional review job):
 https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35601603610

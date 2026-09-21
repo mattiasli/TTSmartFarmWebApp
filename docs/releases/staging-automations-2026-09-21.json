@@ -1,0 +1,50 @@
+{
+  "observedAt": "2026-09-21T12:58:03.390Z",
+  "apiSha": "f7d36d926f50f075b7d3c8a2ee718e025157f5c9",
+  "browser": "153.0.8010.12",
+  "results": {
+    "manual": {
+      "fan": true,
+      "light": true,
+      "feeder": true,
+      "lcdText": true,
+      "backlight": true,
+      "simulatedPumpOnAndOff": true,
+      "buzzerStop": true,
+      "beepObserved": true,
+      "guardConfirmed": true
+    },
+    "cooling": {
+      "onAndOff": true,
+      "dhtFailureLeavesFanUnchanged": true
+    },
+    "lighting": {
+      "darkOn": true,
+      "daylightOff": true
+    },
+    "alarm": {
+      "lowTankAlarmAndLcd": true,
+      "backlightOn": true,
+      "recovery": true
+    },
+    "rain": {
+      "blockedBeyondSettlingWait": true,
+      "dryRecovery": true
+    },
+    "irrigation": {
+      "oneAutomaticPulse": true,
+      "stopped": true,
+      "afterPageClosed": true,
+      "noPollingWindowMs": 10002,
+      "recordedPulseStatus": "state_matched"
+    }
+  },
+  "commandAcceptanceMs": {
+    "count": 34,
+    "p50": 224.2412000000004,
+    "p95": 599.2676999999985,
+    "max": 710.5631999999969
+  },
+  "settingsRestored": true,
+  "outputsOffAndAutomationsPaused": true
+}

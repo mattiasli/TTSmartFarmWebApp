@@ -31,6 +31,7 @@ async function resetSimulator(page: Page) {
 
 async function openEditor(page: Page) {
   await page.goto('/automations');
+  await expect(page.getByTestId('automation-editor')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole('textbox', { name: 'Fan on at number', exact: true })).toHaveValue('29');
 }
 
@@ -54,6 +55,54 @@ test.beforeEach(async ({ page, request }) => {
 
 test.afterEach(async ({ page }) => {
   await resetSimulator(page);
+});
+
+test('stale telemetry disables starts while stop actions remain available', async ({ page }) => {
+  const session = await (await page.request.get('/api/v1/session')).json();
+  const post = (path: string, data: unknown) => page.request.post(`${farm}/${path}`, {
+    headers: { Origin: 'http://127.0.0.1:5173', 'X-CSRF-Token': session.csrfToken,
+      'Idempotency-Key': crypto.randomUUID() }, data,
+  });
+  const fan = page.getByRole('switch', { name: 'Fan', exact: true });
+  await expect(fan).toBeEnabled();
+  await page.getByTestId('start-automations').click();
+  try {
+    expect((await post('simulator/scenario', { scenario: 'telemetry-stall' })).ok()).toBe(true);
+    await expect(page.getByText('Telemetry is stale. New starts stay disabled.', { exact: true })).toBeVisible();
+    for (const name of ['Fan', 'Light', 'Feeder', 'Backlight']) {
+      await expect(page.getByRole('switch', { name, exact: true })).toBeDisabled();
+    }
+    for (const name of ['Water briefly', 'Beep']) {
+      await expect(page.getByRole('button', { name, exact: true })).toBeDisabled();
+    }
+    await expect(page.getByTestId('start-automations')).toBeDisabled();
+    for (const name of ['Stop pump', 'Silence']) {
+      await expect(page.getByRole('button', { name, exact: true })).toBeEnabled();
+    }
+    await expect(page.getByTestId('pause-automations')).toBeEnabled();
+    await expect(page.getByTestId('host-all-off')).toBeEnabled();
+    const rejected = await post('commands', { type: 'fan.set', on: true });
+    expect(rejected.status()).toBe(422);
+    expect((await rejected.json()).error.code).toBe('STALE_TELEMETRY');
+    expect((await post('commands', { type: 'pump.stop' })).ok()).toBe(true);
+    await expect(fan).toBeEnabled({ timeout: 10_000 });
+    expect((await snapshot(page)).automations.runtime.masterEnabled).toBe(false);
+  } finally {
+    expect((await post('simulator/scenario', { scenario: 'normal' })).ok()).toBe(true);
+  }
+});
+
+test('a silent browser connection ages last-known telemetry and disables starts', async ({ page, context }) => {
+  const fan = page.getByRole('switch', { name: 'Fan', exact: true });
+  await expect(fan).toBeEnabled();
+  try {
+    await context.setOffline(true);
+    await expect(page.getByText('Telemetry is stale. New starts stay disabled.', { exact: true })).toBeVisible({ timeout: 6500 });
+    await expect(fan).toBeDisabled();
+    await expect(page.getByTestId('start-automations')).toBeDisabled();
+    await expect(page.getByTestId('host-all-off')).toBeEnabled();
+  } finally { await context.setOffline(false); }
+  await expect(fan).toBeEnabled({ timeout: 15_000 });
 });
 
 test('remote load failure leaves sensors, Pause, and All off functional', async ({ page }) => {

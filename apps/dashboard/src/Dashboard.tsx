@@ -78,6 +78,7 @@ export function Dashboard() {
   const lcdInvalid = !LCD_CHAR.test(lcd1) || !LCD_CHAR.test(lcd2);
   const alarmOwnsLcd = Boolean(snapshot?.automations.runtime.messages.alarm?.toLowerCase().includes('warning'));
   const canControl = Boolean(snapshot?.permissions.canControl) && !command.isPending;
+  const canStart = canControl && Boolean(snapshot?.connection.fresh && snapshot.connection.controllerReady && snapshot.connection.brokerReady);
   const banners = useMemo(() => {
     const items: string[] = [];
     if (readings?.pumpBlocked === 1) items.push('Tank is low — automatic watering stays blocked.');
@@ -186,25 +187,25 @@ export function Dashboard() {
           <Switch
             label="Fan"
             checked={Boolean(readings?.fan)}
-            disabled={!canControl}
+            disabled={!canStart}
             onChange={(_, data) => command.mutate({ type: 'fan.set', on: data.checked })}
           />
           <Switch
             label="Light"
             checked={Boolean(readings?.led)}
-            disabled={!canControl}
+            disabled={!canStart}
             onChange={(_, data) => command.mutate({ type: 'light.set', on: data.checked })}
           />
           <Switch
             label="Feeder"
             checked={Boolean(readings?.feederOpen)}
-            disabled={!canControl}
+            disabled={!canStart}
             onChange={(_, data) => command.mutate({ type: 'feeder.set', open: data.checked })}
           />
           <Switch
             label="Backlight"
             checked={Boolean(readings?.backlight)}
-            disabled={!canControl}
+            disabled={!canStart}
             onChange={(_, data) => command.mutate({ type: 'lcd.setBacklight', on: data.checked })}
           />
         </div>
@@ -216,13 +217,13 @@ export function Dashboard() {
           {pendingAction('lcd.setBacklight') ? ' · turning…' : ''}
         </Text>
         <div className="control-row">
-          <Button appearance="primary" disabled={!canControl} onClick={() => command.mutate({ type: 'pump.pulse' })}>
+          <Button appearance="primary" disabled={!canStart} onClick={() => command.mutate({ type: 'pump.pulse' })}>
             Water briefly
           </Button>
           <Button disabled={!canControl} onClick={() => command.mutate({ type: 'pump.stop' })}>
             Stop pump
           </Button>
-          <Button disabled={!canControl} onClick={() => command.mutate({ type: 'buzzer.beep', frequencyHz: 880 })}>
+          <Button disabled={!canStart} onClick={() => command.mutate({ type: 'buzzer.beep', frequencyHz: 880 })}>
             Beep
           </Button>
           <Button disabled={!canControl} onClick={() => command.mutate({ type: 'buzzer.stop' })}>
@@ -263,13 +264,13 @@ export function Dashboard() {
                   </Text>
                 </DialogContent>
                 <DialogActions>
-                  <Button disabled={!canControl} onClick={() => command.mutate({ type: 'lcd.showStatus' })}>
+                  <Button disabled={!canStart} onClick={() => command.mutate({ type: 'lcd.showStatus' })}>
                     Restore sensor display
                   </Button>
                   <DialogTrigger disableButtonEnhancement>
                     <Button
                       appearance="primary"
-                      disabled={!canControl || lcdInvalid}
+                      disabled={!canStart || lcdInvalid}
                       onClick={() => command.mutate({ type: 'lcd.setText', line1: lcd1, line2: lcd2 })}
                     >
                       Save

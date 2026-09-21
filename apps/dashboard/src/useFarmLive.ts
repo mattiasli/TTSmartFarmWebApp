@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import type { FarmSnapshot, SessionDto } from '@smartfarm/contracts';
+import { FRESH_MS, type FarmSnapshot, type SessionDto } from '@smartfarm/contracts';
 import { ensureSession, fetchSnapshot } from './api';
 import { connectFarmSocket, type LiveState } from './realtime';
 
@@ -18,6 +18,17 @@ export function useFarmLive() {
     enabled: sessionQuery.data?.authenticated === true,
     refetchInterval: transport === 'websocket' ? false : 800,
   });
+
+  const [ageClock, setAgeClock] = useState({ revision: 0, elapsed: 0 });
+  useEffect(() => {
+    // Age the last received snapshot even when both WSS and polling go silent.
+    // dataUpdatedAt identifies receipt; wall-clock differences never measure age.
+    const receivedAt = performance.now();
+    const timer = setInterval(() => setAgeClock({
+      revision: snapshotQuery.dataUpdatedAt, elapsed: performance.now() - receivedAt,
+    }), 250);
+    return () => clearInterval(timer);
+  }, [snapshotQuery.dataUpdatedAt]);
 
   useEffect(() => {
     if (!sessionQuery.data?.authenticated) return;
@@ -39,10 +50,20 @@ export function useFarmLive() {
     return () => abort.abort();
   }, [queryClient, sessionQuery.data?.authenticated, sessionQuery.data?.role]);
 
+  const received = snapshotQuery.data as FarmSnapshot | undefined;
+  const elapsed = ageClock.revision === snapshotQuery.dataUpdatedAt ? ageClock.elapsed : 0;
+  const age = received?.connection.telemetryAgeMs;
+  const telemetryAgeMs = typeof age === 'number' ? age + elapsed : null;
+  const fresh = Boolean(received?.connection.fresh && telemetryAgeMs !== null && telemetryAgeMs < FRESH_MS);
+  const snapshot = received ? { ...received, connection: {
+    ...received.connection, telemetryAgeMs, fresh,
+    status: !fresh && received.connection.status === 'live' ? 'stale' as const : received.connection.status,
+  } } : undefined;
+
   return {
     session: sessionQuery.data as SessionDto | undefined,
     sessionPending: sessionQuery.isPending,
-    snapshot: snapshotQuery.data as FarmSnapshot | undefined,
+    snapshot,
     snapshotError: snapshotQuery.error instanceof Error ? snapshotQuery.error.message : null,
     transport,
   };

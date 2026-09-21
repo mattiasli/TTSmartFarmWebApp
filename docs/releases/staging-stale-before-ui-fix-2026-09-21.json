@@ -1,0 +1,10 @@
+{
+  "date": "2026-09-21",
+  "apiSha": "f7d36d926f50f075b7d3c8a2ee718e025157f5c9",
+  "command": "node tools/scripts/measure-staging-latency.mjs",
+  "passed": false,
+  "observed": "Stale warning became visible during the eight-second memory simulator telemetry stall, but the Fan switch remained enabled throughout the five-second disabled-control assertion.",
+  "exitCode": 1,
+  "cleanup": "The harness finally block restored normal simulator telemetry and All off before exiting.",
+  "limitation": "The failing harness did not persist latency samples; no latency qualification is inferred from this run."
+}

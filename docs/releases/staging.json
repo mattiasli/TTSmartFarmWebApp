@@ -2,16 +2,16 @@
     "schemaVersion":  1,
     "environment":  "staging",
     "qualification":  "pending",
-    "sourceSha":  "ad1706e332bd2a2679294e57c56ae4af2f7c35db",
-    "ciRunUrl":  "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35597624832",
-    "observedAt":  "2026-09-21T12:38:58.6863195Z",
+    "sourceSha":  "f7d36d926f50f075b7d3c8a2ee718e025157f5c9",
+    "ciRunUrl":  "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35602322118",
+    "observedAt":  "2026-09-21T13:06:25.2295647Z",
     "host":  {
                  "project":  "smartfarm-host",
                  "publicOrigin":  "https://smartfarm-host.vercel.app",
-                 "deploymentId":  "AzehKXdwjCBUeo5W42ckhKdKZwte",
-                 "githubDeploymentId":  6567991386,
-                 "deploymentUrl":  "https://smartfarm-host-bn3qz7rgg-mattias-li-s-projects.vercel.app",
-                 "sourceSha":  "ad1706e332bd2a2679294e57c56ae4af2f7c35db"
+                 "deploymentId":  "AZnaQcrkV6byDXjNGL7Pxqoft2qK",
+                 "githubDeploymentId":  6568874549,
+                 "deploymentUrl":  "https://smartfarm-host-1g1e4l974-mattias-li-s-projects.vercel.app",
+                 "sourceSha":  "f7d36d926f50f075b7d3c8a2ee718e025157f5c9"
              },
     "remote":  {
                    "project":  "smartfarm-automations",
@@ -32,10 +32,10 @@
                 "projectId":  "285fc6b3-caef-4e86-9a03-0966a2262b2b",
                 "serviceId":  "acac3d1f-1dc4-4f32-ba83-81a704167f31",
                 "environmentId":  "9229a204-ddea-466e-a906-438c5ed1e757",
-                "deploymentId":  "7a1db70b-d008-4059-836a-2928c3ecaae9",
-                "githubDeploymentId":  6567966489,
+                "deploymentId":  "c6ec2fb8-8a32-4bf9-82a0-0416ee6d7518",
+                "githubDeploymentId":  6568844384,
                 "imageDigest":  null,
-                "sourceSha":  "ad1706e332bd2a2679294e57c56ae4af2f7c35db"
+                "sourceSha":  "f7d36d926f50f075b7d3c8a2ee718e025157f5c9"
             },
     "database":  {
                      "schemaVersion":  null,
@@ -50,6 +50,10 @@
                             "LIVE_COMMANDS_ENABLED":  false,
                             "LIVE_PUMP_ENABLED":  false
                         },
-    "previousCompatibleRelease":  null,
+    "previousCompatibleRelease":  {
+                                      "manifest":  "staging-ad1706e.json",
+                                      "sourceSha":  "ad1706e332bd2a2679294e57c56ae4af2f7c35db",
+                                      "compatibility":  "Same database migrations and remote contract major; authenticated Chromium/WebKit pair observed. Hosted rollback pending."
+                                  },
     "acceptanceReport":  "../STAGING_ACCEPTANCE.md"
 }

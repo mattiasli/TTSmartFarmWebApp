@@ -1,10 +1,13 @@
 # Staging deployment (G02)
 
 Current qualification work: [P13 acceptance report](STAGING_ACCEPTANCE.md).
-On September 21 the public API initially reported `waiting_for_owner`. Commit
-`1c41af6` was deployed through the Git-linked projects, and public smoke subsequently
-confirmed controller `owner`. Exact remote deployment URLs still return 302 without
-authentication; public immutable remote access and full G08 drills remain pending.
+The current release mapping is in [releases/staging.json](releases/staging.json).
+Release `f7d36d9` passed required CI and deployed to all three services. Hosted S03
+manual commands and all five automations passed. The host uses the anonymously
+accessible immutable `9abcf36` remote; its protection and asset checks are recorded
+in the acceptance report. G08 remains pending the outstanding hosted drills.
+Backup/restore (S12), including logical dump/local restore, is explicitly deferred
+by the user; no paid backup feature or upgrade should be enabled for this work.
 The September 18 observations below are historical.
 
 Do not put HiveMQ passwords, OAuth secrets, or `DATABASE_URL` in git. Live commands and pump stay **false**.

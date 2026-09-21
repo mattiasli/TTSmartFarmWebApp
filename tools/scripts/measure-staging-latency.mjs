@@ -5,6 +5,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 const host = 'https://smartfarm-host.vercel.app';
 const api = 'https://default-service-production.up.railway.app';
 const browser = await chromium.launch();
+const attempt = { startedAt: new Date().toISOString(), phase: 'clock calibration' };
 try {
   const context = await browser.newContext({ baseURL: host,
     storageState: JSON.parse(await readFile(new URL('../../.infra/staging-auth.json', import.meta.url), 'utf8')) });
@@ -27,6 +28,7 @@ try {
     calibrations.push({ observedAt: new Date(received).toISOString(), ...offset });
   };
   await calibrate();
+  attempt.apiSha = sha;
   const page = await context.newPage();
   const samples = [];
   let measuring = true;
@@ -52,6 +54,9 @@ try {
     await calibrate();
   }
   measuring = false;
+  attempt.sampleCount = samples.length;
+  attempt.calibrations = calibrations;
+  attempt.phase = 'stale indication and command gating';
   const session = await (await context.request.get('/api/v1/session')).json();
   assert.equal(session.role, 'admin');
   const farm = `/api/v1/farms/${session.farmId}`;
@@ -67,8 +72,15 @@ try {
     await expect(page.getByText('Telemetry is stale. New starts stay disabled.', { exact: true })).toBeVisible({ timeout: 8000 });
     staleDetectedMs = performance.now() - started;
     await expect(page.getByRole('switch', { name: 'Fan', exact: true })).toBeDisabled();
-    staleStartStatus = (await post('commands', { type: 'fan.set', on: true })).status();
-    assert.ok(staleStartStatus >= 400 && staleStartStatus < 500);
+    await expect(page.getByTestId('start-automations')).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Water briefly', exact: true })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Stop pump', exact: true })).toBeEnabled();
+    await expect(page.getByTestId('host-all-off')).toBeEnabled();
+    const rejected = await post('commands', { type: 'fan.set', on: true });
+    staleStartStatus = rejected.status();
+    assert.equal(staleStartStatus, 422);
+    assert.equal((await rejected.json()).error.code, 'STALE_TELEMETRY');
+    assert.ok((await post('commands', { type: 'pump.stop' })).ok());
     await expect(page.getByText('Telemetry is stale. New starts stay disabled.', { exact: true })).toHaveCount(0, { timeout: 10_000 });
     const recovered = await (await context.request.get(`${farm}/snapshot`)).json();
     assert.equal(recovered.connection.fresh, true);
@@ -84,7 +96,7 @@ try {
     assumption: 'Clock offset does not jump between adjacent calibrations. Browser-observer dispatch overhead is included.',
     sampleCount: samples.length, controllerEpochs: [...epochs], calibrations,
     stale: { detectionFromRequestStartMs: staleDetectedMs, staleStartStatus, controlsDisabled: true,
-      automaticTelemetryRecovery: true, automationsRemainPaused: true },
+      automaticTelemetryRecovery: true, automationsRemainPaused: true, stopRemainsAvailableAndAccepted: true },
     upperLatencyMs: { p50: upper[Math.ceil(upper.length * 0.5) - 1], p95: upper[Math.ceil(upper.length * 0.95) - 1],
       p99: upper[Math.ceil(upper.length * 0.99) - 1], max: upper.at(-1) },
     underTwoSecondsForAllSamples: upper.every((value) => value < 2000) };
@@ -94,4 +106,10 @@ try {
   assert.equal(epochs.size, 1);
   assert.equal(evidence.underTwoSecondsForAllSamples, true);
   assert.ok(staleDetectedMs >= 3000 && staleDetectedMs < 6500, 'Stale indication outside expected scheduling window');
+} catch (error) {
+  await writeFile(new URL('../../.infra/staging-latency-failure.json', import.meta.url), JSON.stringify({
+    ...attempt, finishedAt: new Date().toISOString(), passed: false,
+    failure: error instanceof Error ? error.message.slice(0, 800) : 'Unknown failure',
+  }, null, 2));
+  throw error;
 } finally { await browser.close(); }

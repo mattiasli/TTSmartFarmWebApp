@@ -34,7 +34,7 @@ export function HostControls({
       <Button
         appearance="primary"
         data-testid="start-automations"
-        disabled={!canControl || automations.isPending}
+        disabled={!canControl || automations.isPending || !snapshot?.connection.fresh || !snapshot.connection.controllerReady || !snapshot.connection.brokerReady}
         onClick={() => automations.mutate('start')}
       >
         Start
