@@ -20,7 +20,23 @@ authentication across local revocation. Role changes revoke sessions and close a
 sockets; unchanged roles preserve sessions. Existing GitHub usernames are preserved.
 Regression coverage includes actual PostgreSQL role-change/socket/HTTP revocation,
 idle expiry, disablement, stalled/failed database checks and in-flight authentication.
-Hosted viewer/revocation qualification follows deployment.
+Deployed fix: `9b55910b01ff7b6a6f49a302e26df5812c4f43e8`.
+The actual hosted distinct-user check passed: viewer reads allowed, controls disabled,
+writes/admin changes denied; removing access closed the socket with code 4002 in
+615 ms including the administrative HTTP request. Reads, writes and new tickets
+were rejected afterward, including after refresh. Primary admin access survived;
+the temporary secondary membership/allowlist was removed and its session is now
+revoked. See `releases/staging-revocation-2026-09-21.json`. Local validation passed
+125 unit tests and 27 integration tests (one Windows process test skipped), lint
+and typecheck. Railway deployment `d5a192d2-83b0-4659-96a4-47bedcc4d492` and both
+Vercel deployments succeeded. Host deployment: `68yGi56FAky6ffWqNqtvz3W9gbEe`;
+the immutable remote remains pinned to the compatible `9abcf36` release.
+All five CI checks, including Linux integration and the aggregate gate, passed:
+https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35597251240
+
+Next distinct-user concurrency test needs temporary operator access and a fresh
+secondary sign-in: the viewer session was intentionally invalidated by S07.
+G08 remains pending for the other checklist scenarios; S07 does not prove S05.
 
 The real Railway restart drill on `e48f5db` confirmed persisted settings/revision,
 a new controller epoch, paused automations, and fan/pump off after recovery.

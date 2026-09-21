@@ -1,0 +1,16 @@
+{
+  "observedAt": "2026-09-21T12:05:15.367Z",
+  "apiSha": "9b55910b01ff7b6a6f49a302e26df5812c4f43e8",
+  "browser": "153.0.8010.12",
+  "username": "xueshanmattiasli",
+  "viewerRead": true,
+  "viewerControlsDisabled": true,
+  "viewerWriteDenied": true,
+  "viewerAdminDenied": true,
+  "socketClosedCode": 4002,
+  "closeMs": 615,
+  "revokedReadWriteAndTicketsDenied": true,
+  "refreshStillDenied": true,
+  "primaryAdminRetained": true,
+  "temporaryAccessRemoved": true
+}
