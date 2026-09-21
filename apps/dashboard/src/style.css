@@ -36,6 +36,17 @@ body {
   gap: 12px;
 }
 
+.telemetry-status {
+  white-space: nowrap;
+}
+
+.telemetry-age {
+  display: inline-block;
+  width: 7ch;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .sensor-grid.stale {
   opacity: 0.72;
 }

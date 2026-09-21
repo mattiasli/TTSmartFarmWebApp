@@ -6,6 +6,20 @@ import { logout } from './api';
 import { FarmLiveProvider, useFarmLiveContext } from './FarmLiveContext';
 import { HostControls } from './HostControls';
 
+function formatTelemetryAge(ageMs: number | null) {
+  if (ageMs === null || !Number.isFinite(ageMs)) return 'n/a';
+  const milliseconds = Math.max(0, Math.round(ageMs));
+  if (milliseconds < 1000) return `${milliseconds} ms`;
+  const seconds = Math.floor(milliseconds / 1000);
+  if (seconds < 60) return `${seconds} s`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} h`;
+  const days = Math.floor(hours / 24);
+  return days > 99 ? '99+ d' : `${days} d`;
+}
+
 export function Layout() {
   return (
     <FarmLiveProvider>
@@ -37,9 +51,9 @@ function LayoutBody() {
                 {snapshot.connection.status}
               </Badge>
               {snapshot.simulation ? <Badge appearance="outline">Simulation</Badge> : null}
-              <Text size={200}>
+              <Text size={200} className="telemetry-status">
                 {live.transport === 'websocket' ? 'live socket' : 'HTTP poll'} · age{' '}
-                {snapshot.connection.telemetryAgeMs == null ? 'n/a' : `${snapshot.connection.telemetryAgeMs} ms`}
+                <span className="telemetry-age">{formatTelemetryAge(snapshot.connection.telemetryAgeMs)}</span>
               </Text>
             </div>
           ) : null}
