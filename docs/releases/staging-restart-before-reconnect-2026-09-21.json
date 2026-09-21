@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-09-21T11:39:13.268Z",
+  "apiSha": "e48f5db2419d5f9839785d1f543db268019adb11",
+  "browser": "153.0.8010.12",
+  "oldEpoch": "a5148447-c626-47b8-a97b-4a46c43f636f",
+  "newEpoch": "396fc7bc-ed2e-4858-9258-ccbf3f441d6e",
+  "automationsRunningBefore": true,
+  "fanRunningBefore": true,
+  "settingsRetained": true,
+  "automationsPausedAfter": true,
+  "fanOffAfter": true,
+  "pumpOffAfter": true,
+  "recoveryMs": 30125,
+  "automaticWssRecovery": false
+}

@@ -104,9 +104,10 @@ export function syncGuard() {
   });
 }
 
-export function createRealtimeTicket() {
+export function createRealtimeTicket(signal?: AbortSignal) {
   return request<{ ticket: string; expiresAt: string; wsUrl: string }>('/api/v1/realtime/tickets', {
     method: 'POST',
+    signal,
     body: JSON.stringify({ farmId: LOCAL_FARM_ID }),
   });
 }

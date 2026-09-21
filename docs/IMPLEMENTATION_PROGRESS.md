@@ -2,6 +2,25 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Hosted restart exposed missing browser reconnect (2026-09-21)
+
+The real Railway restart drill on `e48f5db` confirmed persisted settings/revision,
+a new controller epoch, paused automations, and fan/pump off after recovery.
+The browser did not reconnect WSS within 40 seconds after controller recovery;
+see `releases/staging-restart-before-reconnect-2026-09-21.json`. Keep this failed
+qualification evidence; polling recovery alone does not satisfy plan section 9.3.
+
+The host now reconnects with a fresh single-use ticket for every attempt,
+exponential backoff plus jitter capped at 30 seconds, and abortable ticket/retry
+waits. A connection/authentication deadline and a silent-stream deadline restore
+polling instead of leaving a dead socket marked live. Old socket listeners/timers
+are removed when the attempt ends. Unit regressions cover fresh tickets, late
+old-socket frames, stalled streams, bounded retries, and cancellation. All 119 unit
+tests, typecheck and lint passed; hosted rerun follows deployment.
+
+The second GitHub account for distinct-user tests is `xueshanmattiasli`; its browser
+sign-in and role/revocation tests still need to be arranged. Provider login is done.
+
 ## Provider access and hosted qualification resumed (2026-09-21)
 
 Railway and Vercel CLI logins now work. The user completed GitHub OAuth in an

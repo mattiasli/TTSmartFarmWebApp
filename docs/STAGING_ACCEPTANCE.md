@@ -24,7 +24,7 @@ explicitly. Do not infer successful actuation from HTTP acceptance.
 | S03 | Exercise simulator manual commands and all five automations. Check reported vs pending states, guard synchronization, permissions, and continued server automation after browser closure. | Hosted fan on/off confirmed in Chromium/WebKit; full automation and permission checks pending |
 | S04 | Block remote requests in the browser. Verify fallback, continuing sensor updates, successful host Pause, and All off stopping a simulated running output. | Hosted Chromium/WebKit fallback, fresh telemetry, Start/Pause, fan and All off checks passed September 21; see staging-controls evidence |
 | S05 | Open two isolated sessions. An untouched editor follows another session's save. A dirty editor keeps its draft and shows conflict. Reload accepts saved settings; a save overtaken in transit returns 409 without overwrite. | Local browser regressions in `tests/e2e/recovery.spec.ts`; hosted OAuth identities pending |
-| S06 | Start simulator automations, restart the backend, reconnect browsers. Verify new controller epoch, master paused, no command replay, settings retained, and explicit resume required. | Local lifecycle/integration coverage exists; Railway restart pending |
+| S06 | Start simulator automations, restart the backend, reconnect browsers. Verify new controller epoch, master paused, no command replay, settings retained, and explicit resume required. | Actual Railway restart on e48f5db preserved settings/revision and recovered paused with fan/pump off; automatic browser WSS reconnect failed. Host reconnect fix awaits deployed rerun |
 | S07 | Revoke a signed-in user's access with a second admin. Verify socket closure and rejected reads/writes, including after refresh. Preserve the last admin. | Pending hosted execution |
 | S08 | Interrupt staging database access in a controlled window. Verify rejected mutations, no publishing after ownership loss, and paused recovery. Restore original connectivity. | Local actual lock-session termination/competing owner/paused recovery and queued no-replay regressions pass; full outage and hosted execution pending |
 | S09 | Exercise actual broker loss/reconnect with the isolated local MQTT suite; verify stale state, no queued replay, and explicit resume. Hosted memory transport has no broker; also exercise hosted backend/socket interruption. | Run and record local MQTT integration results; hosted network recovery pending |
@@ -45,6 +45,15 @@ fan/fallback/Pause/All off checks. The latter verifies hosted staging/memory/liv
 flags before mutations and runs All off cleanup. Install both Playwright browsers.
 The cookie file and raw local results stay in ignored `.infra/`; never upload
 the cookie file as a CI artifact. Committed evidence contains no session values.
+
+For a coordinated Railway restart drill, run
+`node tools/scripts/observe-staging-restart.mjs`. It verifies simulator/live flags,
+starts simulated automations and fan activity, and prints a readiness message.
+Only then restart the explicitly identified staging service with Railway CLI.
+The observer requires a new controller epoch, preserved settings/revision, paused
+automations, fan/pump off, and automatic browser WSS recovery without page reload.
+It records sanitized results locally and executes All off cleanup. A missing
+restart times out; a failed WSS recovery is recorded and exits nonzero.
 
 ```text
 node tools/scripts/run-e2e-test.mjs

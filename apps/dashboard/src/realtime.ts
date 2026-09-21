@@ -33,50 +33,76 @@ export async function connectFarmSocket(
   onStatus: (transport: LiveState['transport']) => void,
   signal: AbortSignal,
 ) {
-  try {
-    const ticket = await createRealtimeTicket();
+  let failures = 0;
+  while (!signal.aborted) {
+    try {
+      // Tickets are single-use. Every connection attempt obtains a new one.
+      const ticket = await createRealtimeTicket(AbortSignal.any([signal, AbortSignal.timeout(10_000)]));
+      if (signal.aborted) return;
+      const receivedSnapshot = await new Promise<boolean>((resolve) => {
+        const socket = new WebSocket(wsUrlFromTicket(ticket.wsUrl));
+        let epoch: string | null = null;
+        let sequence = -1;
+        let settled = false;
+        let received = false;
+        let deadline: ReturnType<typeof setTimeout>;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(deadline);
+          signal.removeEventListener('abort', finish);
+          socket.removeEventListener('open', opened);
+          socket.removeEventListener('message', message);
+          socket.removeEventListener('close', finish);
+          socket.removeEventListener('error', finish);
+          try { socket.close(); } catch { /* already disconnected */ }
+          resolve(received);
+        };
+        const opened = () => {
+          try { socket.send(JSON.stringify({ type: 'authenticate', ticket: ticket.ticket })); }
+          catch { finish(); }
+        };
+        const message = (event: MessageEvent) => {
+          try {
+            const parsed = realtimeEnvelopeSchema.parse(JSON.parse(String(event.data)));
+            if (parsed.type !== 'snapshot' || !shouldAcceptEnvelope({ epoch, sequence }, parsed)) return;
+            epoch = parsed.serverEpoch;
+            sequence = parsed.sequence;
+            received = true;
+            clearTimeout(deadline);
+            // A silent socket must not disable HTTP polling indefinitely.
+            deadline = setTimeout(finish, 5_000);
+            onSnapshot(parsed.data as FarmSnapshot);
+            onStatus('websocket');
+          } catch {
+            // Invalid messages do not extend the snapshot deadline.
+          }
+        };
+        deadline = setTimeout(finish, 10_000);
+        signal.addEventListener('abort', finish, { once: true });
+        socket.addEventListener('open', opened);
+        socket.addEventListener('message', message);
+        socket.addEventListener('close', finish);
+        socket.addEventListener('error', finish);
+        if (signal.aborted) finish();
+      });
+      if (receivedSnapshot) failures = 0;
+    } catch {
+      // Ticket/connection failures use polling while the next attempt backs off.
+    }
     if (signal.aborted) return;
+    onStatus('poll');
+    const base = Math.min(30_000, 1_000 * 2 ** failures);
+    failures = Math.min(failures + 1, 5);
     await new Promise<void>((resolve) => {
-      const socket = new WebSocket(wsUrlFromTicket(ticket.wsUrl));
-      let epoch: string | null = null;
-      let sequence = -1;
-      let settled = false;
-      const finish = (fallback: boolean) => {
-        if (settled) return;
-        settled = true;
-        signal.removeEventListener('abort', onAbort);
-        if (fallback && !signal.aborted) onStatus('poll');
+      const finish = () => {
+        clearTimeout(timer);
+        signal.removeEventListener('abort', finish);
         resolve();
       };
-      const onAbort = () => {
-        try {
-          socket.close();
-        } catch {
-          // ignore
-        }
-        finish(false);
-      };
-      signal.addEventListener('abort', onAbort);
-      socket.addEventListener('open', () => {
-        socket.send(JSON.stringify({ type: 'authenticate', ticket: ticket.ticket }));
-      });
-      socket.addEventListener('message', (event) => {
-        try {
-          const parsed = realtimeEnvelopeSchema.parse(JSON.parse(String(event.data)));
-          if (parsed.type !== 'snapshot') return;
-          if (!shouldAcceptEnvelope({ epoch, sequence }, parsed)) return;
-          epoch = parsed.serverEpoch;
-          sequence = parsed.sequence;
-          onSnapshot(parsed.data as FarmSnapshot);
-          onStatus('websocket');
-        } catch {
-          // Ignore malformed frames; HTTP poll remains the fallback.
-        }
-      });
-      socket.addEventListener('close', () => finish(true));
-      socket.addEventListener('error', () => finish(true));
+      const timer = setTimeout(finish, Math.ceil(base * (0.5 + Math.random() * 0.5)));
+      signal.addEventListener('abort', finish, { once: true });
+      if (signal.aborted) finish();
     });
-  } catch {
-    if (!signal.aborted) onStatus('poll');
   }
 }
