@@ -13,7 +13,7 @@ import {
   type RuleId,
   type SessionDto,
 } from '@smartfarm/contracts';
-import { CommandPolicyError } from '@smartfarm/domain';
+import { CommandPolicyError, SCENARIO_NAMES, type ScenarioName } from '@smartfarm/domain';
 import { registerGithubOAuth } from './auth/oauth';
 import { RealtimeHub, registerRealtime } from './auth/realtime';
 import { clearSessionCookie } from './auth/cookies';
@@ -31,7 +31,7 @@ import {
   seedLocal,
   type FarmRole,
 } from './db';
-import { createFarmLink } from './farm-link';
+import { createFarmLink, MemoryFarmLink } from './farm-link';
 import { MemorySessionStore } from './sessions';
 
 function requestId() {
@@ -297,6 +297,32 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     if (!session) return;
     return withPermissions(controller.snapshot(), session);
   });
+
+  // Environmental fixtures are available only on the memory simulator. Never
+  // register this route in production, even with NODE_ENV=test or simulator mode.
+  if (config.APP_ENV !== 'production' && config.FARM_MODE === 'simulator'
+    && config.SIMULATOR_TRANSPORT === 'memory' && !config.LIVE_COMMANDS_ENABLED
+    && !config.LIVE_PUMP_ENABLED && controller.link instanceof MemoryFarmLink) {
+    const simulator = controller.link;
+    app.post('/api/v1/farms/:farmId/simulator/scenario', async (request, reply) => {
+      const id = requestId();
+      const { farmId } = request.params as { farmId: string };
+      const session = await requireRole(request, reply, id, farmId, 'admin');
+      if (!session) return;
+      if (controller.ownership !== 'owner') {
+        return sendError(reply, 503, 'UNAVAILABLE', 'Simulator controller is not the active owner.', id);
+      }
+      const body = request.body as { scenario?: unknown };
+      if (typeof body?.scenario !== 'string' || body.scenario === 'legacy'
+        || !SCENARIO_NAMES.includes(body.scenario as ScenarioName)) {
+        return sendError(reply, 400, 'VALIDATION', 'Choose a supported environmental simulator scenario.', id);
+      }
+      simulator.setScenario(body.scenario as ScenarioName);
+      const next = withPermissions(controller.snapshot(), session);
+      hub.publish('snapshot', next, farmId);
+      return next;
+    });
+  }
 
   app.get('/api/v1/farms/:farmId/commands/:commandId', async (request, reply) => {
     const id = requestId();

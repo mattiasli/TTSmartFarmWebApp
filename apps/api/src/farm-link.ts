@@ -1,6 +1,6 @@
 import mqtt, { type MqttClient } from 'mqtt';
 import { TELEMETRY_TOPIC, type WireTelemetry } from '@smartfarm/contracts';
-import { assertLoopbackMqttUrl, parseTelemetry } from '@smartfarm/domain';
+import { assertLoopbackMqttUrl, parseTelemetry, scenarioTelemetry, type ScenarioName } from '@smartfarm/domain';
 import { SimulatedFarm } from '@smartfarm/simulator';
 
 export type LatestTelemetry = {
@@ -47,6 +47,16 @@ export class MemoryFarmLink implements FarmLink {
 
   latest() {
     return this.current;
+  }
+
+  setScenario(name: ScenarioName) {
+    // Change sensor conditions without fabricating actuator confirmations or
+    // losing the pump guard settings already applied by the controller.
+    const { fan, led, feed, pump, buzz, bl, guard, tankLow, tankRecover, pumpBlocked } = this.farm.data;
+    this.farm.data = { ...scenarioTelemetry(name), fan, led, feed, pump, buzz, bl,
+      guard, tankLow, tankRecover, pumpBlocked };
+    this.farm.tick(Date.now() - this.started);
+    this.capture();
   }
 
   async publish(topic: string, payload: string) {

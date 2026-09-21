@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-09-21T12:23:48.898Z",
+  "apiSha": "ad1706e332bd2a2679294e57c56ae4af2f7c35db",
+  "browser": "153.0.8010.12",
+  "identities": [
+    "mattiasli",
+    "xueshanmattiasli"
+  ],
+  "untouchedEditorUpdates": true,
+  "dirtyDraftPreserved": true,
+  "conflictReload": true,
+  "overtakenSaveStatus": 409,
+  "noOverwrite": true,
+  "operatorSaveAllowed": true
+}

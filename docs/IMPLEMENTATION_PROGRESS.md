@@ -2,6 +2,46 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Backup facility limitation and measurements (2026-09-21)
+
+Hosted S05 passed on `ad1706e` with distinct GitHub identities `mattiasli` and
+`xueshanmattiasli`. The untouched editor followed saves, dirty drafts survived
+conflicts, reload accepted saved settings, an overtaken request returned 409
+without overwriting, and the operator could save successfully. Cleanup restored
+the original settings and removed temporary operator access. Evidence:
+`releases/staging-concurrency-2026-09-21.json`.
+
+The next implementation adds an admin-only environmental fixture route for the
+memory simulator (`POST /api/v1/farms/:farmId/simulator/scenario`). It is absent in
+production, MQTT configurations, and either live-command flag configuration.
+Fixtures change sensor conditions while preserving actuator state and applied
+guard thresholds, allowing actual hosted rain/night/empty-tank/DHT-failure tests.
+The corresponding hosted automation harness is prepared but has not run; deploy
+it after the active 30-minute measurement finishes, then execute
+`tools/scripts/check-staging-automations.mjs`. It restores original settings,
+normal simulator conditions and paused/off outputs in cleanup. Do not mark S03
+passed until the hosted results exist.
+
+The user reports that their Railway plan does not include the backup functionality
+and explicitly wants to avoid it. Do not upgrade the plan or enable paid provider
+backups. Actual provider reads returned no backups, no schedules and PITR disabled.
+Attempts to create a manual snapshot and configure daily/weekly backups returned
+`OAUTH_INSUFFICIENT_GRANT`, including after successful reauthorization; neither
+change was applied. The paid provider feature is no longer being pursued.
+The user subsequently explicitly chose **defer backup/restore entirely**, including
+logical dump/local restore. S12 is an accepted scope deferral, not a passed test.
+Do not perform backup/restore work unless the user reopens that scope. Keep this
+exception visible in the eventual G08/release assessment; other G08 checks continue.
+
+A read-only 30-minute Chromium observation started at `2026-09-21T12:13:42.167Z`
+against API `ad1706e332bd2a2679294e57c56ae4af2f7c35db` using
+`tools/scripts/measure-staging-browser.mjs`. It records browser JS heap, snapshot
+intervals and approximate delivery/telemetry age; cross-machine clock offset is
+not independently measured, so these ages alone cannot prove the latency target.
+The active process must be polled to completion before recording results or
+deploying a new API during this observation. Provider memory metrics are accessible
+and will be collected for the matching window separately.
+
 ## Hosted restart exposed missing browser reconnect (2026-09-21)
 
 The deployed rerun on `62259e8449493af48a037e054d89665253d941dc` passed:
