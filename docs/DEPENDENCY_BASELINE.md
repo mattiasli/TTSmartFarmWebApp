@@ -50,3 +50,13 @@ Results:
 - npm warned that ESLint 9.39.5 is outside current ESLint version support; it remains pinned because typescript-eslint 8 accepts ESLint 9 and ESLint 10 was not required for G01.
 
 Shared runtime: React 19.3.0, react-dom 19.3.0, react/jsx-runtime, and `@fluentui/react-components` as singletons. Fluent/Griffel produced large shared chunks; that is acceptable for the proof and will be watched for production budgets.
+
+## Build dependency audit follow-up — 2026-09-21
+
+The federation DTS plugin's transitive `adm-zip` 0.6.0 had advisories
+[GHSA-7q85-xj36-vmfc](https://github.com/advisories/GHSA-7q85-xj36-vmfc) and
+[GHSA-vwc7-r8mq-g2x9](https://github.com/advisories/GHSA-vwc7-r8mq-g2x9).
+A scoped npm override pins that plugin's `adm-zip` to 0.6.1. The lockfile and
+installed tree agree; full `npm audit --audit-level=high` reports zero vulnerabilities.
+The production federation build and Chromium hook/dialog/callback proof passed
+with the patched dependency. CI runs the high/critical audit on each change.

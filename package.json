@@ -36,6 +36,11 @@
     "preview:host": "npm run preview -w @smartfarm/dashboard",
     "preview:remote": "npm run preview -w @smartfarm/automations-remote"
   },
+  "overrides": {
+    "@module-federation/dts-plugin": {
+      "adm-zip": "0.6.1"
+    }
+  },
   "devDependencies": {
     "@eslint/js": "9.39.5",
     "@playwright/test": "1.63.0",

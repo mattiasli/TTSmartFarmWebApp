@@ -4,7 +4,7 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Shutdown and release metadata follow-up (2026-09-21)
 
-Source: `11d629d` plus this follow-up. Provider integrations remain unconfirmed;
+Deployed source: `a355e207aa3aaeeee64a0bac71b2acf2c2079473`. Provider integrations remain unconfirmed;
 GitHub CI and automatic Railway/Vercel deployment access work through Git.
 
 Implemented:
@@ -31,12 +31,17 @@ Evidence before deployment:
 - `docker build -t smartfarm-g08-shutdown:local .` passed. `test:container-shutdown`
   tested the actual image entrypoint with network disabled: SIGTERM, exit 0,
   shutdown complete in 424 ms. It removes only its temporary test container.
-- The image install reported 2 moderate and 1 high npm audit findings. Dependency
-  audit/triage remains required; do not run `npm audit fix --force` blindly.
+- Follow-up dependency triage resolved the build-tool advisories with a scoped
+  `adm-zip` 0.6.1 override under the federation DTS plugin. Full npm audit reports
+  zero vulnerabilities; federation production build/browser proof passed again.
+  CI now rejects high/critical dependency advisories.
 
 G08 remains pending: immutable remote access/pinning, authenticated browser and
 provider recovery drills, backup restore, coordinated release gating, and measurements.
-Deployment results for this follow-up must be verified after push.
+All four CI jobs passed in run 35587182640. Railway and both Vercel deployments
+succeeded. Public smoke at `2026-09-21T10:11:38.456Z` confirmed controller owner,
+both live flags false, and API/remote identities matching the deployed source.
+See STAGING_ACCEPTANCE.md for the observed deployment IDs.
 
 ## Previous deployed handoff (2026-09-21)
 

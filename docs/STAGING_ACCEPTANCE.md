@@ -104,6 +104,18 @@ G08 is still pending; the immediate waiting-controller incident is resolved.
 
 ## Reproduce container shutdown
 
+Shutdown/release-identity commit `a355e207aa3aaeeee64a0bac71b2acf2c2079473`
+passed all four jobs in [CI run 35587182640](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35587182640),
+including the Linux process-signal test. Observed successful deployments:
+
+- Railway: `db52457d-24e8-4f7e-8424-37ce8fdb59b4`.
+- Host Vercel: `Bhg7MqnvqEdXRkinutBXcYuRLytJ`.
+- Remote Vercel: `F28r9wP54WTH3XpFsXL6nRGYmdt9`.
+
+At `2026-09-21T10:11:38.456Z`, public smoke passed with controller owner,
+live flags false, and API/remote release identities matching that commit.
+This observation still uses the mutable remote alias and does not complete G08.
+
 ```text
 docker build -t smartfarm-g08-shutdown:local .
 npm run test:container-shutdown
