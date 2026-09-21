@@ -31,19 +31,19 @@ describe('P05 postgres repositories', () => {
     await db?.close();
   });
 
-  it('applies both migrations onto an empty database', async () => {
+  it('applies all migrations onto an empty database', async () => {
     const versions = await appliedMigrations(db.url);
-    expect(versions.map((row) => row.version)).toEqual(['001_init.sql', '002_p05_complete.sql']);
+    expect(versions.map((row) => row.version)).toEqual(['001_init.sql', '002_p05_complete.sql', '003_retention_indexes.sql']);
   });
 
-  it('upgrades a 001-only fixture schema with 002', async () => {
+  it('upgrades a 001-only fixture schema through the current migration', async () => {
     const fixture = await createInitOnlyDatabase();
     try {
       const before = await appliedMigrations(fixture.url);
       expect(before.map((row) => row.version)).toEqual(['001_init.sql']);
       await migrate(fixture.url);
       const after = await appliedMigrations(fixture.url);
-      expect(after.map((row) => row.version)).toEqual(['001_init.sql', '002_p05_complete.sql']);
+      expect(after.map((row) => row.version)).toEqual(['001_init.sql', '002_p05_complete.sql', '003_retention_indexes.sql']);
     } finally {
       await fixture.close();
     }

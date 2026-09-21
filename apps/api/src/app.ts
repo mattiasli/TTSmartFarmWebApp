@@ -1,6 +1,6 @@
 import cookie from '@fastify/cookie';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
-import type pg from 'pg';
+import pg from 'pg';
 import { ZodError } from 'zod';
 import {
   HISTORY_SERIES,
@@ -33,6 +33,7 @@ import {
 } from './db';
 import { createFarmLink, MemoryFarmLink } from './farm-link';
 import { MemorySessionStore } from './sessions';
+import { DatabaseMaintenance } from './db/maintenance';
 
 function requestId() {
   return crypto.randomUUID();
@@ -113,6 +114,16 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   });
   await app.register(cookie);
 
+  // Isolate maintenance load and bound database waits during shutdown/outages.
+  const maintenancePool = store && config.DATABASE_URL ? new pg.Pool({
+    connectionString: config.DATABASE_URL, max: 1, connectionTimeoutMillis: 2000,
+    statement_timeout: 1000, query_timeout: 2000, idleTimeoutMillis: 5000,
+  }) : null;
+  maintenancePool?.on('error', () => app.log.warn({ event: 'maintenance_connection_lost' }, 'Database maintenance connection lost'));
+  const maintenance = maintenancePool ? new DatabaseMaintenance(new FarmStore(maintenancePool),
+    (event) => app.log.info(event, 'Database maintenance')) : null;
+  app.addHook('onReady', async () => { maintenance?.start(); });
+
   const origins = new Set(
     config.ALLOWED_BROWSER_ORIGINS.split(',')
       .map((value) => value.trim())
@@ -129,12 +140,14 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   hub.start();
 
   app.addHook('preClose', async () => {
-    await controller.drain();
+    await Promise.all([controller.drain(), maintenance?.close()]);
   });
 
   app.addHook('onClose', async () => {
     await hub.close();
     await controller.close();
+    await maintenance?.close();
+    await maintenancePool?.end();
     await resolved.pool?.end();
   });
 
@@ -264,6 +277,15 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
     const session = await requireSession(request, reply, id);
     if (!session) return;
     return controller.diagnostics();
+  });
+
+  app.get<{ Params: { farmId: string } }>('/api/v1/farms/:farmId/diagnostics/database', async (request, reply) => {
+    const id = requestId();
+    const session = await requireFarm(request, reply, id, request.params.farmId);
+    if (!session) return;
+    if (session.role !== 'admin') return sendError(reply, 403, 'FORBIDDEN', 'Admin role required.', id);
+    if (!store) return sendError(reply, 503, 'UNAVAILABLE', 'Persistent database is not configured.', id);
+    return { ...(await store.databaseStatus(request.params.farmId)), maintenance: maintenance?.status() ?? null };
   });
 
   registerGithubOAuth(app, config, sessions, store, resolved.githubFetch);

@@ -2,7 +2,28 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21 13:56 UTC)
+## Database maintenance implementation (2026-09-21)
+
+Backup/restore remains explicitly deferred, including logical dump/local restore.
+The evidence-only release `6e6df4113d01c85ef9421eb5c883bd6e64364167` passed
+CI run 35609030418 and all three provider deployments.
+
+S13 investigation found retention and expired-auth cleanup methods were never
+scheduled. The API now runs bounded cleanup on a separate, time-limited database
+pool: auth every minute, retention at startup and daily. Migration 003 adds
+retention indexes and permits expired commands to be deleted across batch
+boundaries while retaining newer optional references as null. An admin-only,
+no-store diagnostics endpoint reports farm row counts, relation/index sizes,
+migrations and maintenance results without private row contents.
+
+Validation: 135 unit tests passed; PostgreSQL maintenance tests passed with 1,005
+expired rows per retained table, newer linked records, scheduled cleanup and
+anonymous/viewer/admin permissions. Full integration run had only a stale
+migration-list assertion failure; after updating it, all 14 repository tests
+passed. Typecheck and lint passed. Hosted migration/metrics verification is pending.
+Use `node tools/scripts/inspect-staging-database.mjs` after deployment.
+
+## Previous verified handoff (2026-09-21 13:56 UTC)
 
 Latest verified runtime is `05cc832d62deac0e0ea88ac3faaec10bb973d422`.
 All CI jobs passed in run 35607375925. **S10 hosted handover passed:** new API

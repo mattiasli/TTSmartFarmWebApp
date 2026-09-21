@@ -806,7 +806,9 @@ export class FarmStore {
     );
     const sessions = await this.pool.query(
       `UPDATE sessions SET revoked_at = $1
-       WHERE revoked_at IS NULL AND (expires_at < $1 OR idle_expires_at < $1)`,
+       WHERE id IN (SELECT id FROM sessions
+         WHERE revoked_at IS NULL AND (expires_at < $1 OR idle_expires_at < $1)
+         LIMIT ${AUTH_SWEEP_BATCH})`,
       [now],
     );
     return {
@@ -855,6 +857,29 @@ export class FarmStore {
     );
     if (!result.rows[0]) throw new Error('Farm not found.');
     return Number(result.rows[0].controller_lock_key);
+  }
+
+  async databaseStatus(farmId: string) {
+    return withTransaction(this.pool, async (client) => {
+      await client.query('SET TRANSACTION READ ONLY');
+      await client.query("SET LOCAL statement_timeout = '5s'");
+      const tables = [];
+      for (const [table, timestamp, days] of [
+        ['telemetry_samples', 'sampled_at', 30], ['events', 'created_at', 90], ['commands', 'requested_at', 30],
+      ] as const) {
+        const result = await client.query(`SELECT count(*)::int AS rows,
+          min(${timestamp}) AS oldest,
+          count(*) FILTER (WHERE ${timestamp} < now() - $2 * interval '1 day')::int AS expired_rows,
+          pg_table_size($3::regclass)::float8 AS table_bytes,
+          pg_indexes_size($3::regclass)::float8 AS index_bytes
+          FROM ${table} WHERE farm_id = $1`, [farmId, days, table]);
+        tables.push({ table, retentionDays: days, ...result.rows[0] });
+      }
+      const migrations = await client.query('SELECT version FROM schema_migrations ORDER BY version');
+      return { observedAt: new Date().toISOString(), tables,
+        migrations: migrations.rows.map((row) => String(row.version)),
+        sizeScope: 'Physical table/index bytes include the database relation; row counts are restricted to this farm.' };
+    });
   }
 }
 
