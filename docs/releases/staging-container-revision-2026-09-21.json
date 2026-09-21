@@ -1,0 +1,16 @@
+{
+  "date": "2026-09-21",
+  "image": "smartfarm-g08-shutdown:local",
+  "buildArgument": "RAILWAY_GIT_COMMIT_SHA=0123456789abcdef0123456789abcdef01234567",
+  "runtimeGitMetadataProvided": false,
+  "runtimeReleaseShaProvided": false,
+  "bakedReleaseShaRetained": true,
+  "controllerOwner": true,
+  "transport": "memory",
+  "containerNetwork": "none",
+  "containerSignal": "SIGTERM",
+  "exitCode": 0,
+  "shutdownMs": 408,
+  "shutdownComplete": true,
+  "limitation": "Local image evidence; hosted rollback of a revision-bearing image remains pending."
+}

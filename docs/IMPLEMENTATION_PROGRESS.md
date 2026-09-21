@@ -4,6 +4,29 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Hosted manual-command failure and fix (2026-09-21)
 
+**Latest verified application release:** `d3b6c445e2fb82ea7483d289402bbb6e5fb684a7`,
+all CI jobs passed in run 35604666400. Hosted calibrated latency/stale checks passed:
+154 samples, upper latency p95 419 ms/max 515 ms, stale indication at 4.22 seconds,
+disabled starts, API 422 STALE_TELEMETRY, accepted pump stop, automatic telemetry
+recovery with automations paused. Evidence: `releases/staging-latency-2026-09-21.json`.
+
+The subsequent rollback drill failed qualification. Railway restored the requested
+image and became owner but reported SHA `dev`: runtime Git-trigger variables do
+not survive image rollback. The Dockerfile now retains the build SHA in RELEASE_SHA
+and an OCI revision label; deploy and test that fix before another drill. The
+original d3b6c44 API image was restored (provider deployment
+`e2ed897c-881a-458f-b877-ce9436a78332`), still with the same missing-metadata defect.
+Vercel rejected the older ad1706e host rollback with 402 because this plan permits
+only the immediately previous production deployment. Its host alias stayed on
+d3b6c44. Keep the next rollback pair immediately adjacent and record both before
+switching. Failure: `releases/staging-rollback-before-metadata-fix-2026-09-21.json`.
+
+Provider CI gates are now saved and independently read back: Vercel host and remote
+require GitHub `smartfarm-required` before production alias assignment; Railway's
+exact staging GitHub trigger has checkSuites=true (Wait for CI). Evidence:
+`releases/staging-ci-gates-2026-09-21.json`. Observe these gates on the next release;
+full remote/API/host ordering and IaC remain incomplete. Backup/restore stays deferred.
+
 The next S13 hosted run exposed a dashboard defect: the stale banner appeared but
 the Fan switch stayed enabled. The UI gated commands only on role, although the
 server rejects stale non-stop commands. The fix gates non-stop controls, host Start

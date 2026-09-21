@@ -10,6 +10,12 @@ COPY tsconfig.base.json tsconfig.json ./
 
 RUN npm ci
 
+# Git-trigger metadata is absent when Railway restores an existing image.
+# Retain the built source revision inside the artifact for restart/rollback.
+ARG RAILWAY_GIT_COMMIT_SHA=dev
+ENV RELEASE_SHA=${RAILWAY_GIT_COMMIT_SHA}
+LABEL org.opencontainers.image.revision=${RAILWAY_GIT_COMMIT_SHA}
+
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 

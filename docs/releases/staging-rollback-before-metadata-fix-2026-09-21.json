@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-21",
+  "passed": false,
+  "fromSha": "d3b6c445e2fb82ea7483d289402bbb6e5fb684a7",
+  "requestedPreviousSha": "ad1706e332bd2a2679294e57c56ae4af2f7c35db",
+  "railway": {
+    "targetDeploymentId": "7a1db70b-d008-4059-836a-2928c3ecaae9",
+    "rollbackAccepted": true,
+    "rollbackDeploymentId": "1f41fd77-3dee-4a37-b03e-e4aee29425af",
+    "deploymentStatus": "SUCCESS",
+    "observedController": "owner",
+    "observedReleaseSha": "dev",
+    "observerExitCode": 1,
+    "observerFailure": "Expected source SHA never appeared within 180 seconds. Image did not persist Git-trigger release metadata.",
+    "restoreTargetDeploymentId": "e2e024a2-f6e7-44e6-935d-2d945813235f",
+    "restoreAccepted": true,
+    "restoreDeploymentId": "e2ed897c-881a-458f-b877-ce9436a78332",
+    "restoreStatus": "SUCCESS",
+    "restoreReleaseSha": "dev"
+  },
+  "vercel": {
+    "requestedHostDeploymentId": "AzehKXdwjCBUeo5W42ckhKdKZwte",
+    "rollbackAccepted": false,
+    "status": 402,
+    "reason": "Current plan only permits rollback to the immediately previous production deployment.",
+    "hostAliasChanged": false
+  },
+  "safety": "Simulator only; both live flags false; All off before the drill and in observer cleanup. No backup or database restore performed.",
+  "nextAction": "Bake source SHA into the API image, deploy and verify it, then test a recorded immediately previous host/API pair supported by the provider plan."
+}

@@ -2,16 +2,16 @@
     "schemaVersion":  1,
     "environment":  "staging",
     "qualification":  "pending",
-    "sourceSha":  "f7d36d926f50f075b7d3c8a2ee718e025157f5c9",
-    "ciRunUrl":  "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35602322118",
-    "observedAt":  "2026-09-21T13:06:25.2295647Z",
+    "sourceSha":  "d3b6c445e2fb82ea7483d289402bbb6e5fb684a7",
+    "ciRunUrl":  "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35604666400",
+    "observedAt":  "2026-09-21T13:32:47.3305117Z",
     "host":  {
                  "project":  "smartfarm-host",
                  "publicOrigin":  "https://smartfarm-host.vercel.app",
-                 "deploymentId":  "AZnaQcrkV6byDXjNGL7Pxqoft2qK",
-                 "githubDeploymentId":  6568874549,
-                 "deploymentUrl":  "https://smartfarm-host-1g1e4l974-mattias-li-s-projects.vercel.app",
-                 "sourceSha":  "f7d36d926f50f075b7d3c8a2ee718e025157f5c9"
+                 "deploymentId":  "ChDGaYS4FTocUXFBksLS6hpZm9Vh",
+                 "githubDeploymentId":  6569301879,
+                 "deploymentUrl":  "https://smartfarm-host-bicvjhbpr-mattias-li-s-projects.vercel.app",
+                 "sourceSha":  "d3b6c445e2fb82ea7483d289402bbb6e5fb684a7"
              },
     "remote":  {
                    "project":  "smartfarm-automations",
@@ -32,10 +32,12 @@
                 "projectId":  "285fc6b3-caef-4e86-9a03-0966a2262b2b",
                 "serviceId":  "acac3d1f-1dc4-4f32-ba83-81a704167f31",
                 "environmentId":  "9229a204-ddea-466e-a906-438c5ed1e757",
-                "deploymentId":  "c6ec2fb8-8a32-4bf9-82a0-0416ee6d7518",
-                "githubDeploymentId":  6568844384,
+                "deploymentId":  "e2ed897c-881a-458f-b877-ce9436a78332",
+                "githubDeploymentId":  null,
                 "imageDigest":  null,
-                "sourceSha":  "f7d36d926f50f075b7d3c8a2ee718e025157f5c9"
+                "sourceSha":  "d3b6c445e2fb82ea7483d289402bbb6e5fb684a7",
+                "runtimeReportedSha":  "dev",
+                "sourceEvidence":  "Restored from d3b6c44 deployment e2e024a2-f6e7-44e6-935d-2d945813235f; runtime fingerprint failed after rollback. Metadata fix pending deployment."
             },
     "database":  {
                      "schemaVersion":  null,
@@ -53,7 +55,7 @@
     "previousCompatibleRelease":  {
                                       "manifest":  "staging-ad1706e.json",
                                       "sourceSha":  "ad1706e332bd2a2679294e57c56ae4af2f7c35db",
-                                      "compatibility":  "Same database migrations and remote contract major; authenticated Chromium/WebKit pair observed. Hosted rollback pending."
+                                      "compatibility":  "Same migrations and remote contract; archived pair rendered, but Vercel rejected rollback beyond the immediately previous deployment. Do not use this older pair for the next drill."
                                   },
     "acceptanceReport":  "../STAGING_ACCEPTANCE.md"
 }

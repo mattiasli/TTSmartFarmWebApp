@@ -6,7 +6,7 @@ function docker(args) {
 const id = docker(['run', '-d', '--network', 'none',
   '-e', 'APP_ENV=staging', '-e', 'FARM_MODE=simulator', '-e', 'SIMULATOR_TRANSPORT=memory',
   '-e', 'LIVE_COMMANDS_ENABLED=false', '-e', 'LIVE_PUMP_ENABLED=false',
-  '-e', 'RELEASE_SHA=container-signal-test', 'smartfarm-g08-shutdown:local']);
+  'smartfarm-g08-shutdown:local']);
 assert.match(id, /^[a-f0-9]{64}$/);
 try {
   let ready = false;
@@ -18,6 +18,7 @@ try {
       assert.equal(health.controller, 'owner');
       assert.equal(health.farmMode, 'simulator');
       assert.equal(health.liveCommandsEnabled, false);
+      assert.equal(health.releaseSha, '0123456789abcdef0123456789abcdef01234567', 'Image must retain its built SHA without Git-trigger runtime variables');
       ready = true;
       break;
     } catch {
@@ -33,7 +34,7 @@ try {
   assert.match(logs, /API draining after SIGTERM/);
   assert.match(logs, /API shutdown complete/);
   assert.ok(elapsedMs < 15_000);
-  console.log(JSON.stringify({ containerSignal: 'SIGTERM', exitCode: 0, elapsedMs, shutdownComplete: true }));
+  console.log(JSON.stringify({ containerSignal: 'SIGTERM', exitCode: 0, elapsedMs, shutdownComplete: true, bakedReleaseShaRetained: true }));
 } finally {
   docker(['rm', '-f', id]);
 }

@@ -1,0 +1,108 @@
+{
+  "startedAt": "2026-09-21T13:20:59.434Z",
+  "finishedAt": "2026-09-21T13:23:12.578Z",
+  "apiSha": "d3b6c445e2fb82ea7483d289402bbb6e5fb684a7",
+  "browser": "153.0.8010.12",
+  "source": "Memory simulator telemetry receipt at API through authenticated WSS to browser observer",
+  "method": "Bound API clock offset using client send/receive times around an API-generated millisecond timestamp; recalibrate every 10 seconds. Upper latency bounds include request round-trip uncertainty.",
+  "assumption": "Clock offset does not jump between adjacent calibrations. Browser-observer dispatch overhead is included.",
+  "sampleCount": 154,
+  "controllerEpochs": [
+    "e0a24f5c-6fc0-46e8-9f91-00d3e0ccfb0a"
+  ],
+  "calibrations": [
+    {
+      "observedAt": "2026-09-21T13:20:53.586Z",
+      "lower": -178,
+      "upper": 126,
+      "roundTripMs": 304
+    },
+    {
+      "observedAt": "2026-09-21T13:21:09.619Z",
+      "lower": -176,
+      "upper": 6,
+      "roundTripMs": 182
+    },
+    {
+      "observedAt": "2026-09-21T13:21:19.807Z",
+      "lower": -170,
+      "upper": 3,
+      "roundTripMs": 173
+    },
+    {
+      "observedAt": "2026-09-21T13:21:29.994Z",
+      "lower": -170,
+      "upper": 1,
+      "roundTripMs": 171
+    },
+    {
+      "observedAt": "2026-09-21T13:21:40.170Z",
+      "lower": -172,
+      "upper": -1,
+      "roundTripMs": 171
+    },
+    {
+      "observedAt": "2026-09-21T13:21:50.352Z",
+      "lower": -173,
+      "upper": 5,
+      "roundTripMs": 178
+    },
+    {
+      "observedAt": "2026-09-21T13:22:00.619Z",
+      "lower": -261,
+      "upper": 0,
+      "roundTripMs": 261
+    },
+    {
+      "observedAt": "2026-09-21T13:22:10.798Z",
+      "lower": -172,
+      "upper": 0,
+      "roundTripMs": 172
+    },
+    {
+      "observedAt": "2026-09-21T13:22:20.975Z",
+      "lower": -172,
+      "upper": -1,
+      "roundTripMs": 171
+    },
+    {
+      "observedAt": "2026-09-21T13:22:31.162Z",
+      "lower": -171,
+      "upper": 0,
+      "roundTripMs": 171
+    },
+    {
+      "observedAt": "2026-09-21T13:22:41.333Z",
+      "lower": -171,
+      "upper": -3,
+      "roundTripMs": 168
+    },
+    {
+      "observedAt": "2026-09-21T13:22:51.530Z",
+      "lower": -180,
+      "upper": 2,
+      "roundTripMs": 182
+    },
+    {
+      "observedAt": "2026-09-21T13:23:01.709Z",
+      "lower": -160,
+      "upper": 26,
+      "roundTripMs": 186
+    }
+  ],
+  "stale": {
+    "detectionFromRequestStartMs": 4222.379000000001,
+    "staleStartStatus": 422,
+    "controlsDisabled": true,
+    "automaticTelemetryRecovery": true,
+    "automationsRemainPaused": true,
+    "stopRemainsAvailableAndAccepted": true
+  },
+  "upperLatencyMs": {
+    "p50": 310,
+    "p95": 419,
+    "p99": 513,
+    "max": 515
+  },
+  "underTwoSecondsForAllSamples": true
+}

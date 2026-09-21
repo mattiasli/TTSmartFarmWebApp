@@ -39,9 +39,10 @@ try {
   await expect.poll(() => epochs.size).toBeGreaterThan(0);
   console.log(JSON.stringify({ ready: true, fromSha: initial.releaseSha, targetSha, pausedAndOff: true }));
   const started = Date.now();
+  let lastHealth = initial;
   try {
     await expect.poll(async () => {
-      try { const h = await health(); return h.releaseSha === targetSha && h.controller === 'owner'; }
+      try { lastHealth = await health(); return lastHealth.releaseSha === targetSha && lastHealth.controller === 'owner'; }
       catch { return false; }
     }, { timeout: 180_000, intervals: [1000] }).toBe(true);
     const after = await snapshot();
@@ -58,5 +59,13 @@ try {
       limitation: 'Observer readiness to recovery includes operator/provider command time.' };
     await writeFile(new URL(`../../.infra/staging-rollback-${targetSha.slice(0, 7)}.json`, import.meta.url), JSON.stringify(evidence, null, 2));
     console.log(JSON.stringify(evidence, null, 2));
+  } catch (error) {
+    await writeFile(new URL(`../../.infra/staging-rollback-${targetSha.slice(0, 7)}-failure.json`, import.meta.url), JSON.stringify({
+      observedAt: new Date().toISOString(), passed: false, fromSha: initial.releaseSha, targetSha,
+      lastObservedSha: lastHealth.releaseSha, lastObservedController: lastHealth.controller,
+      observationMs: Date.now() - started,
+      failure: error instanceof Error ? error.message.slice(0, 800) : 'Unknown failure',
+    }, null, 2));
+    throw error;
   } finally { await allOff(); }
 } finally { await browser.close(); }

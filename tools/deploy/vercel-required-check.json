@@ -1,0 +1,12 @@
+{
+  "name": "smartfarm-required",
+  "requires": "none",
+  "targets": ["production"],
+  "blocks": "deployment-alias",
+  "source": {
+    "kind": "git-provider",
+    "externalCheckName": "smartfarm-required",
+    "provider": "github"
+  },
+  "timeout": 1800
+}
