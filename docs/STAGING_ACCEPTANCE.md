@@ -19,10 +19,10 @@ explicitly. Do not infer successful actuation from HTTP acceptance.
 
 | ID | Procedure and required result | Evidence/status |
 |---|---|---|
-| S01 | From a logged-out browser, load the pinned remote entry and all imported JS/CSS. Verify content types, CORS, no login interstitial, and a genuine 404 for a missing chunk. Render the editor with no unexpected script errors. | Public alias import/nine assets passed September 21; exact deployment URL returns 302, immutable pin blocked |
-| S02 | Sign in through the host `/api` rewrite; inspect secure HttpOnly host cookie, private/no-store responses, snapshot and authenticated WSS. Repeat in Chromium and WebKit. | Basic Chromium topology reported September 18; complete rerun pending |
-| S03 | Exercise simulator manual commands and all five automations. Check reported vs pending states, guard synchronization, permissions, and continued server automation after browser closure. | Pending hosted execution |
-| S04 | Block remote requests in the browser. Verify fallback, continuing sensor updates, successful host Pause, and All off stopping a simulated running output. | Local browser regression in `tests/e2e/recovery.spec.ts`; hosted pending |
+| S01 | From a logged-out browser, load the pinned remote entry and all imported JS/CSS. Verify content types, CORS, no login interstitial, and a genuine 404 for a missing chunk. Render the editor with no unexpected script errors. | Passed September 21 on recorded 9abcf36 pair: anonymous immutable asset smoke and authenticated Chromium/WebKit render |
+| S02 | Sign in through the host `/api` rewrite; inspect secure HttpOnly host cookie, private/no-store responses, snapshot and authenticated WSS. Repeat in Chromium and WebKit. | Chromium OAuth and cookie checks passed; both browsers pass authenticated snapshot/WSS. WebKit uses imported app session; its OAuth/cookie qualification pending |
+| S03 | Exercise simulator manual commands and all five automations. Check reported vs pending states, guard synchronization, permissions, and continued server automation after browser closure. | Hosted fan on/off confirmed in Chromium/WebKit; full automation and permission checks pending |
+| S04 | Block remote requests in the browser. Verify fallback, continuing sensor updates, successful host Pause, and All off stopping a simulated running output. | Hosted Chromium/WebKit fallback, fresh telemetry, Start/Pause, fan and All off checks passed September 21; see staging-controls evidence |
 | S05 | Open two isolated sessions. An untouched editor follows another session's save. A dirty editor keeps its draft and shows conflict. Reload accepts saved settings; a save overtaken in transit returns 409 without overwrite. | Local browser regressions in `tests/e2e/recovery.spec.ts`; hosted OAuth identities pending |
 | S06 | Start simulator automations, restart the backend, reconnect browsers. Verify new controller epoch, master paused, no command replay, settings retained, and explicit resume required. | Local lifecycle/integration coverage exists; Railway restart pending |
 | S07 | Revoke a signed-in user's access with a second admin. Verify socket closure and rejected reads/writes, including after refresh. Preserve the last admin. | Pending hosted execution |
@@ -35,6 +35,16 @@ explicitly. Do not infer successful actuation from HTTP acceptance.
 | S14 | Verify CI for the exact release SHA; coordinated deploy authority, immutable remote URL, compatible previous pair, backup policy, one replica, sleep disabled, and deployed flags. | CI and Git-linked deployments passed for 1c41af6; CI-gated ordered release, immutable pin and remaining provider settings pending |
 
 ## How to run the local browser regressions
+
+Hosted checks are separate from the local mutating suite. On this authorized
+simulator staging project, run `node tools/scripts/capture-staging-session.mjs`
+and complete the interactive GitHub sign-in. Then run
+`node tools/scripts/check-staging-authenticated.mjs --webkit` for authenticated
+rendering/WSS, or `node tools/scripts/check-staging-controls.mjs` for simulator
+fan/fallback/Pause/All off checks. The latter verifies hosted staging/memory/live
+flags before mutations and runs All off cleanup. Install both Playwright browsers.
+The cookie file and raw local results stay in ignored `.infra/`; never upload
+the cookie file as a CI artifact. Committed evidence contains no session values.
 
 ```text
 node tools/scripts/run-e2e-test.mjs

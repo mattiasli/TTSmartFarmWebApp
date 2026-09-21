@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "environment": "staging",
   "qualification": "pending",
-  "sourceSha": "1c41af6cf605de8e7578292993e1b1c48b66372a",
-  "ciRunUrl": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35575055409",
-  "observedAt": "2026-09-21T07:56:27.187Z",
+  "sourceSha": "9abcf36427e88af87992a9004e444631fe6359ba",
+  "ciRunUrl": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35591755526",
+  "observedAt": "2026-09-21T11:28:00.326Z",
   "host": {
     "project": "smartfarm-host",
     "publicOrigin": "https://smartfarm-host.vercel.app",
-    "deploymentId": "2gQF5urr9ddherRp3DeLecfMiqNE",
-    "githubDeploymentId": 6564006027,
-    "deploymentUrl": "https://smartfarm-host-383y3lj4m-mattias-li-s-projects.vercel.app"
+    "deploymentId": "3VDzyA5SJaWovBphE2sv5xiZPfHS",
+    "githubDeploymentId": null,
+    "deploymentUrl": "https://smartfarm-host-ccfrduvim-mattias-li-s-projects.vercel.app"
   },
   "remote": {
     "project": "smartfarm-automations",
     "publicOrigin": "https://smartfarm-automations.vercel.app",
-    "deploymentId": "6eBnJq8S8JahpebDXUF4MLS5Z2Yu",
-    "githubDeploymentId": 6564015688,
-    "deploymentUrl": "https://smartfarm-automations-fsf4qflqz-mattias-li-s-projects.vercel.app",
-    "candidateImmutableEntryUrl": "https://smartfarm-automations-fsf4qflqz-mattias-li-s-projects.vercel.app/remoteEntry.js",
-    "anonymousCandidateStatus": 302,
-    "immutableEntryUrl": null,
+    "deploymentId": "EjzSvygbe8y4uLqXFVoasG6cpuB2",
+    "githubDeploymentId": 6566903839,
+    "deploymentUrl": "https://smartfarm-automations-c8fiqhj6e-mattias-li-s-projects.vercel.app",
+    "candidateImmutableEntryUrl": "https://smartfarm-automations-c8fiqhj6e-mattias-li-s-projects.vercel.app/remoteEntry.js",
+    "anonymousCandidateStatus": 200,
+    "immutableEntryUrl": "https://smartfarm-automations-c8fiqhj6e-mattias-li-s-projects.vercel.app/remoteEntry.js",
     "contractMajor": 1
   },
   "api": {
@@ -30,8 +30,8 @@
     "projectId": "285fc6b3-caef-4e86-9a03-0966a2262b2b",
     "serviceId": "acac3d1f-1dc4-4f32-ba83-81a704167f31",
     "environmentId": "9229a204-ddea-466e-a906-438c5ed1e757",
-    "deploymentId": "952865fb-fdb1-4a50-aa7e-93f8f8b73496",
-    "githubDeploymentId": 6563994533,
+    "deploymentId": "16259dd1-6d92-491f-b3af-7e036f82a376",
+    "githubDeploymentId": 6566893985,
     "imageDigest": null
   },
   "database": {

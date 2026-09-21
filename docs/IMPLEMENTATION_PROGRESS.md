@@ -2,6 +2,36 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
+## Provider access and hosted qualification resumed (2026-09-21)
+
+Railway and Vercel CLI logins now work. The user completed GitHub OAuth in an
+isolated Chromium browser. Only its SmartFarm session cookie is stored locally
+in ignored `.infra/staging-auth.json`; no GitHub cookies are saved or committed.
+
+- Removed Vercel SSO protection on the compiled automations remote project.
+  The immutable `9abcf36` remote now loads anonymously, including child assets.
+- Pinned the host's production build variable to that immutable URL and rebuilt
+  the tested source. Host deployment `3VDzyA5SJaWovBphE2sv5xiZPfHS` is Ready and
+  aliased to `smartfarm-host.vercel.app`; authenticated browser requests prove it
+  actually loads the pinned remote. The observed pair is in `releases/staging.json`.
+- Chromium and WebKit render the editor, receive authenticated WSS snapshots, and
+  pass manual fan/All off plus remote-failure fallback/Start/Pause/control checks.
+  Sanitized results are in `releases/staging-browser-2026-09-21.json` and
+  `releases/staging-controls-2026-09-21.json`. Outputs are off and automations paused.
+- WebKit on Windows reports imported Lax cookies as None, reproduced with a
+  synthetic cookie. Its OAuth redirect/cookie qualification remains pending;
+  imported-session rendering is separate evidence, not a replacement.
+- Railway reported no resolved repository config. Linking `railway.toml` was
+  rejected as deprecated. Applied supported service settings directly: one
+  replica, sleep false, `/health/ready` with 30-second timeout, 15-second drain,
+  and `npm run db:migrate` pre-deploy (120-second timeout). API reads confirmed
+  saved settings; inspect the next deployment to verify execution. Migrate to
+  Railway's supported infrastructure configuration in the coordinated CD work.
+
+G08 is still pending: full WebKit OAuth, all automations, distinct-user role and
+revocation tests, concurrent editing, provider outage/restart/overlap/rollback,
+backup restore, measurements, and CI-gated ordered deployment.
+
 ## CI evidence and aggregate gate (2026-09-21)
 
 CI now emits JUnit reports for unit, integration, federation and E2E suites,

@@ -1,0 +1,29 @@
+{
+  "observedAt": "2026-09-21T11:28:00.326Z",
+  "results": [
+    {
+      "browser": "chromium",
+      "version": "153.0.8010.12",
+      "apiSha": "9abcf36427e88af87992a9004e444631fe6359ba",
+      "fanOnObserved": true,
+      "fanOffObserved": true,
+      "remoteFailureFallback": true,
+      "remoteFailureStartPause": true,
+      "remoteFailureManualControls": true,
+      "freshTelemetry": true,
+      "editorRecovery": true
+    },
+    {
+      "browser": "webkit",
+      "version": "26.6",
+      "apiSha": "9abcf36427e88af87992a9004e444631fe6359ba",
+      "fanOnObserved": true,
+      "fanOffObserved": true,
+      "remoteFailureFallback": true,
+      "remoteFailureStartPause": true,
+      "remoteFailureManualControls": true,
+      "freshTelemetry": true,
+      "editorRecovery": true
+    }
+  ]
+}
