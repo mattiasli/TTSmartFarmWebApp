@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { HEALTHY_TELEMETRY_FIXTURE, TELEMETRY_TOPIC } from '@smartfarm/contracts';
 import { loadConfig } from '../../apps/api/src/config';
 import { FarmController } from '../../apps/api/src/controller';
+import { DEFAULT_AUTOMATIONS } from '@smartfarm/contracts';
 import { MqttFarmLink } from '../../apps/api/src/farm-link';
 import { startLoopbackBroker } from '../../tools/simulator/src/broker';
 
@@ -37,7 +38,7 @@ describe('P08 local MQTT command confirmation', () => {
     });
   }
 
-  it('T021/T022/T028 matches only newer local-broker telemetry and does not queue while offline', async () => {
+  it('T021/T022 matches only newer local-broker telemetry', async () => {
     const url = `mqtt://127.0.0.1:${broker.port}`;
     const link = new MqttFarmLink(url);
     await link.whenReady?.(8000);
@@ -67,6 +68,46 @@ describe('P08 local MQTT command confirmation', () => {
         await new Promise((resolve) => setTimeout(resolve, 50));
         controller.snapshot();
       }
+    } finally {
+      await controller.close();
+    }
+  });
+
+  it('T028/S09 survives a real broker restart without queued actuation or automatic resume', async () => {
+    const port = broker.port;
+    const link = new MqttFarmLink(`mqtt://127.0.0.1:${port}`);
+    await link.whenReady(8000);
+    const controller = new FarmController(
+      loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: 'simulator' }), link,
+      () => Date.now(), null, { ownership: 'owner', settings: { ...DEFAULT_AUTOMATIONS,
+        irrigation: false, alarm: false, cooling: false, lighting: true, lightOn: 3380, lightOff: 3560 } },
+    );
+    try {
+      await publishTelemetry({ ...HEALTHY_TELEMETRY_FIXTURE, light: 2559, led: 0 });
+      await expect.poll(() => controller.snapshot().connection.fresh).toBe(true);
+      controller.startAutomations();
+      expect(controller.snapshot().automations.runtime.masterEnabled).toBe(true);
+      const oldEpoch = link.mqttEpoch;
+      await broker.close();
+      await expect.poll(() => link.ready).toBe(false);
+      await expect.poll(() => controller.snapshot().automations.runtime.masterEnabled).toBe(false);
+      await expect(controller.command({ type: 'fan.set', on: true }, crypto.randomUUID())).rejects.toThrow();
+      await expect(link.publish('smartfarm/cmd/fan', 'on')).rejects.toThrow(/not ready/);
+      const received: Array<{ topic: string; payload: string }> = [];
+      broker = await startLoopbackBroker(port, (topic, payload) => {
+        if (topic.startsWith('smartfarm/cmd/')) received.push({ topic, payload: payload.toString() });
+      });
+      await link.whenReady(8000);
+      await expect.poll(() => publisher.connected).toBe(true);
+      expect(link.mqttEpoch).not.toBe(oldEpoch);
+      expect(controller.snapshot().connection.fresh).toBe(false);
+      await publishTelemetry({ ...HEALTHY_TELEMETRY_FIXTURE, light: 2559, led: 0 });
+      await expect.poll(() => controller.snapshot().connection.fresh).toBe(true);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      expect(controller.snapshot().automations.runtime.masterEnabled).toBe(false);
+      expect(received.some((item) => item.payload === 'on' || item.payload === 'pulse')).toBe(false);
+      controller.startAutomations();
+      await expect.poll(() => received.some((item) => item.topic.endsWith('/led') && item.payload === 'on')).toBe(true);
     } finally {
       await controller.close();
     }

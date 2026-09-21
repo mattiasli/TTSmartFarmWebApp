@@ -11,6 +11,18 @@ without overwriting, and the operator could save successfully. Cleanup restored
 the original settings and removed temporary operator access. Evidence:
 `releases/staging-concurrency-2026-09-21.json`.
 
+S09's local MQTT audit found that the old test title claimed offline/no-queue
+coverage without actually disconnecting the broker. A new integration test now
+shuts down the actual loopback broker with clients connected, rejects offline
+actuation, restarts on the same port, observes a new MQTT epoch and fresh telemetry,
+checks no queued actuation and paused automations, then explicitly resumes and
+observes a new command. This exposed a deadlock in the test broker's shutdown:
+TCP server close waited for clients before MQTT broker close disconnected them.
+Both shutdown operations now start together. All three local MQTT tests passed;
+sanitized JUnit-derived evidence and source hashes are in
+`releases/staging-local-mqtt-2026-09-21.json`. The hosted memory transport's browser
+interruption/recovery evidence is the actual Railway restart record in S06.
+
 The next implementation adds an admin-only environmental fixture route for the
 memory simulator (`POST /api/v1/farms/:farmId/simulator/scenario`). It is absent in
 production, MQTT configurations, and either live-command flag configuration.

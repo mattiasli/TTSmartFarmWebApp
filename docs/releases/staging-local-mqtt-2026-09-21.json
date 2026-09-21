@@ -1,0 +1,35 @@
+{
+    "scope":  "Actual loopback MQTT broker shutdown/restart; hosted memory transport has no broker",
+    "observedAt":  "2026-09-21T12:31:56.1040294Z",
+    "sourceHashes":  [
+                         {
+                             "sha256":  "357530f0f7686f34d4d0274d0b6604383fdbfeb2883c572b45efe46d924ec457",
+                             "path":  "tools/simulator/src/broker.ts"
+                         },
+                         {
+                             "sha256":  "1d3b4e3caf6f31ba49ad6f58b433d2d896fb89a4a1a0da1b24cd7bd57fb2fecd",
+                             "path":  "tests/integration/command-mqtt.test.ts"
+                         },
+                         {
+                             "sha256":  "77763bfe958084c89720b201568519ca20231e1f034f95239f7eb9bacd07b4a2",
+                             "path":  "tests/integration/automation-mqtt.test.ts"
+                         }
+                     ],
+    "errors":  0,
+    "tests":  3,
+    "failures":  0,
+    "cases":  [
+                  {
+                      "name":  "P09 local MQTT automation sequences \u003e emits an automation command sequence on the local broker",
+                      "seconds":  0.1732684
+                  },
+                  {
+                      "name":  "P08 local MQTT command confirmation \u003e T021/T022 matches only newer local-broker telemetry",
+                      "seconds":  0.2582971
+                  },
+                  {
+                      "name":  "P08 local MQTT command confirmation \u003e T028/S09 survives a real broker restart without queued actuation or automatic resume",
+                      "seconds":  3.7727391
+                  }
+              ]
+}
