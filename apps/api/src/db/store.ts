@@ -718,7 +718,8 @@ export class FarmStore {
     }
     params.push(limit + 1);
     const result = await this.pool.query(
-      `SELECT * FROM events WHERE ${where} ORDER BY created_at DESC, id DESC LIMIT $${params.length}`,
+      `SELECT *, to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS cursor_created_at
+       FROM events WHERE ${where} ORDER BY created_at DESC, id DESC LIMIT $${params.length}`,
       params,
     );
     const rows = result.rows.map((row) => mapEvent(asRow(row)));
@@ -727,7 +728,10 @@ export class FarmStore {
     const last = events[events.length - 1];
     return {
       events,
-      nextCursor: hasMore && last ? { createdAt: last.createdAt.toISOString(), id: last.id } : null,
+      // PostgreSQL microseconds must survive the cursor; JS Date truncates them.
+      nextCursor: hasMore && last ? {
+        createdAt: String(result.rows[events.length - 1]!.cursor_created_at), id: last.id,
+      } : null,
     };
   }
 

@@ -228,13 +228,17 @@ describe('P05 postgres repositories', () => {
   });
 
   it('paginates events with a created_at/id cursor', async () => {
+    const ids = [];
     for (let i = 0; i < 3; i += 1) {
-      await store.recordEvent({
+      const event = await store.recordEvent({
         farmId: LOCAL_FARM_ID,
         category: 'test.page',
         severity: 'info',
         details: { i },
       });
+      ids.push(event.id);
+      await db.pool.query('UPDATE events SET created_at = $2::timestamptz WHERE id = $1',
+        [event.id, `2026-09-21T12:00:00.123${i}00Z`]);
     }
     const page = await store.listEvents({ farmId: LOCAL_FARM_ID, category: 'test.page', limit: 2 });
     expect(page.events).toHaveLength(2);
@@ -245,7 +249,9 @@ describe('P05 postgres repositories', () => {
       limit: 2,
       cursor: page.nextCursor,
     });
-    expect(next.events.length).toBeGreaterThanOrEqual(1);
+    expect(next.events).toHaveLength(1);
+    expect(next.nextCursor).toBeNull();
+    expect([...page.events, ...next.events].map((event) => event.id)).toEqual([...ids].reverse());
   });
 
   it('holds a session advisory lock on a dedicated connection', async () => {

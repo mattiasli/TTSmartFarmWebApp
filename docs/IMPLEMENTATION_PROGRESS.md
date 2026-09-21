@@ -22,6 +22,15 @@ settings/revision retention and paused recovery, including an in-flight write.
 It and both controller lock tests pass; all 135 unit tests, typecheck and lint
 pass. This outage fix still needs deployment and the hosted S08 drill.
 
+The first outage-fix candidate `d7c8d67` was held by CI run 35611966639:
+its outage test passed, but event-pagination integration failed. Investigation
+confirmed PostgreSQL microseconds were truncated by JavaScript Date in the cursor,
+skipping events within one millisecond. Cursors now preserve the exact database
+timestamp. A deterministic three-event microsecond fixture and all 14 repository
+tests pass, with typecheck/lint. The controlled hosted observer is prepared at
+`tools/scripts/observe-staging-database-outage.mjs <deployed-sha>`; wait for its
+ready message before restarting only the staging Postgres service.
+
 Backup/restore remains explicitly deferred, including logical dump/local restore.
 The evidence-only release `6e6df4113d01c85ef9421eb5c883bd6e64364167` passed
 CI run 35609030418 and all three provider deployments.
