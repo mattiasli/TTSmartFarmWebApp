@@ -4,6 +4,16 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-21 14:37 UTC)
 
+### Release activation preparation (September 21, after f4d8aff)
+
+All five GitHub staging environment secret names are now present. Native Railway
+Git source disconnection succeeded; both Vercel app configs now disable native
+Git deployments and API IaC no longer declares a Git source. The running f4d8aff
+release passed all CI/provider deployments and public plus authenticated
+Chromium/WebKit smokes. The new activation revision must pass CI before enabling
+and dispatching smartfarm-web-staging. Secret presence is not yet proof of token
+validity. Coordinated release qualification remains pending.
+
 ### Coordinated release implementation (2026-09-21 15:17 UTC)
 
 Added the disabled smartfarm-web-staging workflow, exact-source/CI policy checks,

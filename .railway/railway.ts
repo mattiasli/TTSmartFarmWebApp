@@ -1,4 +1,4 @@
-import { defineRailway, github, preserve, project, service } from "railway/iac";
+import { defineRailway, preserve, project, service } from "railway/iac";
 import type { DeployConfig } from "railway/iac";
 
 // Own only the existing staging API. Database and volume are managed separately.
@@ -11,7 +11,7 @@ export default defineRailway(() => {
     sleepApplication: false, restartPolicyType: "ON_FAILURE",
   };
   const defaultService = service("default-service", {
-    source: github("mattiasli/TTSmartFarmWebApp", { branch: "master", checkSuites: true }),
+    // Source uploads are owned by smartfarm-web-staging after exact CI validation.
     build: { builder: "DOCKERFILE", dockerfilePath: "Dockerfile" },
     healthcheck: "/health/ready",
     healthcheckTimeout: 30,

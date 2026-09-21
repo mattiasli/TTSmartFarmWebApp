@@ -38,9 +38,10 @@ The direct service API reports builder RAILPACK even though the configuration
 graph specifies DOCKERFILE. The applied deployment's build log explicitly loads
 the Dockerfile; preserve that runtime evidence when verifying future releases.
 
-This file has been applied to staging; it does not yet provide GitHub Actions
-release ordering. The remaining workflow must deploy API, immutable remote, then
-host for the exact successful CI revision, with environment concurrency and a
-recorded release manifest. Existing independent provider CI gates remain enabled.
+The staging Git source is disconnected and intentionally absent from this partial.
+The `smartfarm-web-staging` workflow owns source uploads after exact CI validation,
+then deploys the immutable remote and host under one concurrency group. Do not
+reconnect independent Git deploys. First coordinated-release qualification remains
+pending; see `docs/RELEASE.md` for activation and evidence requirements.
 
 Reference: https://docs.railway.com/infrastructure-as-code
