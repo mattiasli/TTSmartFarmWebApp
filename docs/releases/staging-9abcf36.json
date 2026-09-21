@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "environment": "staging",
+  "qualification": "pending",
+  "sourceSha": "9abcf36427e88af87992a9004e444631fe6359ba",
+  "ciRunUrl": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35591755526",
+  "observedAt": "2026-09-21T11:28:00.326Z",
+  "host": {
+    "project": "smartfarm-host",
+    "publicOrigin": "https://smartfarm-host.vercel.app",
+    "deploymentId": "3VDzyA5SJaWovBphE2sv5xiZPfHS",
+    "githubDeploymentId": null,
+    "deploymentUrl": "https://smartfarm-host-ccfrduvim-mattias-li-s-projects.vercel.app"
+  },
+  "remote": {
+    "project": "smartfarm-automations",
+    "publicOrigin": "https://smartfarm-automations.vercel.app",
+    "deploymentId": "EjzSvygbe8y4uLqXFVoasG6cpuB2",
+    "githubDeploymentId": 6566903839,
+    "deploymentUrl": "https://smartfarm-automations-c8fiqhj6e-mattias-li-s-projects.vercel.app",
+    "candidateImmutableEntryUrl": "https://smartfarm-automations-c8fiqhj6e-mattias-li-s-projects.vercel.app/remoteEntry.js",
+    "anonymousCandidateStatus": 200,
+    "immutableEntryUrl": "https://smartfarm-automations-c8fiqhj6e-mattias-li-s-projects.vercel.app/remoteEntry.js",
+    "contractMajor": 1
+  },
+  "api": {
+    "project": "smartfarm-staging",
+    "service": "_default-service",
+    "publicOrigin": "https://default-service-production.up.railway.app",
+    "projectId": "285fc6b3-caef-4e86-9a03-0966a2262b2b",
+    "serviceId": "acac3d1f-1dc4-4f32-ba83-81a704167f31",
+    "environmentId": "9229a204-ddea-466e-a906-438c5ed1e757",
+    "deploymentId": "16259dd1-6d92-491f-b3af-7e036f82a376",
+    "githubDeploymentId": 6566893985,
+    "imageDigest": null
+  },
+  "database": {
+    "schemaVersion": null,
+    "backupObservedAt": null,
+    "restoreEvidence": null
+  },
+  "requiredRuntime": {
+    "APP_ENV": "staging",
+    "FARM_MODE": "simulator",
+    "SIMULATOR_TRANSPORT": "memory",
+    "LIVE_COMMANDS_ENABLED": false,
+    "LIVE_PUMP_ENABLED": false
+  },
+  "previousCompatibleRelease": null,
+  "acceptanceReport": "../STAGING_ACCEPTANCE.md"
+}

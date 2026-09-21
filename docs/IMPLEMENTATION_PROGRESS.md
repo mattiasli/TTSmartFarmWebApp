@@ -34,6 +34,16 @@ it after the active 30-minute measurement finishes, then execute
 normal simulator conditions and paused/off outputs in cleanup. Do not mark S03
 passed until the hosted results exist.
 
+The protected fixture route also supports `telemetry-stall`, which suppresses
+telemetry capture for exactly eight seconds while device timers continue running.
+It automatically recovers; selecting a normal scenario ends it early. A regression
+checks that the simulated pump stops on time even while telemetry is suppressed.
+The readiness response now includes API-generated millisecond `serverTime` for
+clock calibration. `tools/scripts/measure-staging-latency.mjs` bounds clock offset
+with request round trips, samples WSS latency for two minutes, then checks the
+hosted stale warning/control rejection and paused recovery. These hosted checks
+are prepared, not yet observed; run them after deployment.
+
 The user reports that their Railway plan does not include the backup functionality
 and explicitly wants to avoid it. Do not upgrade the plan or enable paid provider
 backups. Actual provider reads returned no backups, no schedules and PITR disabled.

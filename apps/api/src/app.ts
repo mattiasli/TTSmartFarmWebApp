@@ -244,6 +244,7 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   app.get('/health/live', async () => ({ status: 'ok' }));
   app.get('/health/ready', async () => ({
     status: 'ready',
+    serverTime: new Date().toISOString(),
     controller: controller.ownership,
     ...redactedConfig(config),
   }));
@@ -314,10 +315,11 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
       }
       const body = request.body as { scenario?: unknown };
       if (typeof body?.scenario !== 'string' || body.scenario === 'legacy'
-        || !SCENARIO_NAMES.includes(body.scenario as ScenarioName)) {
+        || (body.scenario !== 'telemetry-stall' && !SCENARIO_NAMES.includes(body.scenario as ScenarioName))) {
         return sendError(reply, 400, 'VALIDATION', 'Choose a supported environmental simulator scenario.', id);
       }
-      simulator.setScenario(body.scenario as ScenarioName);
+      if (body.scenario === 'telemetry-stall') simulator.silenceTelemetry();
+      else simulator.setScenario(body.scenario as ScenarioName);
       const next = withPermissions(controller.snapshot(), session);
       hub.publish('snapshot', next, farmId);
       return next;

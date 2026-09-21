@@ -30,6 +30,7 @@ export class MemoryFarmLink implements FarmLink {
   mqttEpoch = newEpoch();
   farm = new SimulatedFarm();
   private started = Date.now();
+  private telemetryMutedUntil = 0;
   private current: LatestTelemetry | null = null;
   private timer: ReturnType<typeof setInterval>;
 
@@ -50,6 +51,7 @@ export class MemoryFarmLink implements FarmLink {
   }
 
   setScenario(name: ScenarioName) {
+    this.telemetryMutedUntil = 0;
     // Change sensor conditions without fabricating actuator confirmations or
     // losing the pump guard settings already applied by the controller.
     const { fan, led, feed, pump, buzz, bl, guard, tankLow, tankRecover, pumpBlocked } = this.farm.data;
@@ -57,6 +59,11 @@ export class MemoryFarmLink implements FarmLink {
       guard, tankLow, tankRecover, pumpBlocked };
     this.farm.tick(Date.now() - this.started);
     this.capture();
+  }
+
+  silenceTelemetry() {
+    // A bounded fixture: device timers keep running and telemetry always recovers.
+    this.telemetryMutedUntil = Date.now() + 8000;
   }
 
   async publish(topic: string, payload: string) {
@@ -69,6 +76,7 @@ export class MemoryFarmLink implements FarmLink {
   }
 
   private capture() {
+    if (Date.now() < this.telemetryMutedUntil) return;
     this.current = { data: this.farm.snapshot(), receivedAtMs: Date.now() };
   }
 }

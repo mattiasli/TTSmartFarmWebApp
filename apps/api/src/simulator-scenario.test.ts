@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LOCAL_FARM_ID } from '@smartfarm/contracts';
 import { buildApp, createDeps } from './app';
 import { loadConfig } from './config';
@@ -8,6 +8,23 @@ describe('environmental simulator controls', () => {
   const apps: Array<{ close(): Promise<void> }> = [];
   afterEach(async () => { while (apps.length) await apps.pop()!.close(); });
   const url = `/api/v1/farms/${LOCAL_FARM_ID}/simulator/scenario`;
+
+  it('bounds a telemetry stall while keeping device pulse timers running', async () => {
+    vi.useFakeTimers();
+    const link = new MemoryFarmLink();
+    try {
+      await link.publish('smartfarm/cmd/pump', 'pulse');
+      expect(link.latest()?.data.pump).toBe(1);
+      const received = link.latest()!.receivedAtMs;
+      link.silenceTelemetry();
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(link.latest()!.receivedAtMs).toBe(received);
+      expect(link.farm.snapshot().pump).toBe(0);
+      await vi.advanceTimersByTimeAsync(3250);
+      expect(link.latest()!.receivedAtMs).toBeGreaterThan(received);
+      expect(link.latest()?.data.pump).toBe(0);
+    } finally { await link.close(); vi.useRealTimers(); }
+  });
 
   it('changes environmental readings while preserving applied guard and output state', async () => {
     const config = loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: 'simulator' });
