@@ -41,7 +41,7 @@ the Dockerfile; preserve that runtime evidence when verifying future releases.
 The staging Git source is disconnected and intentionally absent from this partial.
 The `smartfarm-web-staging` workflow owns source uploads after exact CI validation,
 then deploys the immutable remote and host under one concurrency group. Do not
-reconnect independent Git deploys. First coordinated-release qualification remains
-pending; see `docs/RELEASE.md` for activation and evidence requirements.
+reconnect independent Git deploys. The coordinated release passed on 79f128b;
+see `docs/RELEASE.md` for the workflow and evidence requirements.
 
 Reference: https://docs.railway.com/infrastructure-as-code

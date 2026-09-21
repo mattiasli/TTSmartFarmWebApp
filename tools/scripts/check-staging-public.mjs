@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { chromium } from '@playwright/test';
 
 // Read-only public smoke. No stored browser profile, session, or provider token.
-const release = JSON.parse(await readFile(new URL('../../docs/releases/staging.json', import.meta.url), 'utf8'));
+const release = JSON.parse(await readFile(process.env.STAGING_RELEASE_MANIFEST ?? new URL('../../docs/releases/staging.json', import.meta.url), 'utf8'));
 const hostOrigin = release.host.publicOrigin;
 const apiOrigin = release.api.publicOrigin;
 const remoteEntry = release.remote.immutableEntryUrl ?? `${release.remote.publicOrigin}/remoteEntry.js`;

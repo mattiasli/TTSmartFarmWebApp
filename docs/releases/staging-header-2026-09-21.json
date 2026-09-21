@@ -1,0 +1,54 @@
+{
+  "observedAt": "2026-09-21T16:37:38.171Z",
+  "sourceSha": "79f128b8b0af73a0b7f6e39f3bed5457ba9578d9",
+  "results": [
+    {
+      "browser": "chromium",
+      "viewport": 630,
+      "ageWidth": 45.28125,
+      "samples": [
+        "756 ms",
+        "1 s",
+        "50 ms",
+        "306 ms",
+        "555 ms",
+        "99 ms",
+        "365 ms",
+        "602 ms",
+        "856 ms",
+        "148 ms",
+        "405 ms",
+        "653 ms",
+        "197 ms",
+        "448 ms",
+        "699 ms",
+        "247 ms"
+      ],
+      "navigationStable": true
+    },
+    {
+      "browser": "webkit",
+      "viewport": 630,
+      "ageWidth": 45.28125,
+      "samples": [
+        "426 ms",
+        "197 ms",
+        "454 ms",
+        "718 ms",
+        "246 ms",
+        "503 ms",
+        "754 ms",
+        "45 ms",
+        "45 ms",
+        "305 ms",
+        "569 ms",
+        "94 ms",
+        "346 ms",
+        "609 ms",
+        "143 ms",
+        "396 ms"
+      ],
+      "navigationStable": true
+    }
+  ]
+}

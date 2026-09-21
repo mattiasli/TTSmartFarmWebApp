@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { chromium, webkit, expect } from '@playwright/test';
 import { readFile, writeFile } from 'node:fs/promises';
 
-const release = JSON.parse(await readFile(new URL('../../docs/releases/staging.json', import.meta.url), 'utf8'));
+const release = JSON.parse(await readFile(process.env.STAGING_RELEASE_MANIFEST ?? new URL('../../docs/releases/staging.json', import.meta.url), 'utf8'));
 const origin = release.host.publicOrigin;
 assert.equal(origin, 'https://smartfarm-host.vercel.app');
 assert.ok(release.remote.immutableEntryUrl, 'An immutable remote pin is required.');

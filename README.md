@@ -8,10 +8,11 @@ This folder is the application repository (`https://github.com/mattiasli/TTSmart
 
 Local packages **P00–P12** are in `master`. Hosted **simulator staging (G02)** was demonstrated on September 18: GitHub OAuth through Vercel `/api` to Railway, live WebSocket, dashboard UI. Live commands and pumping stay disabled. Next: remaining P13/G08 qualification, then P14 hardware (pump still off).
 
-Latest verified staging release: `966a6d1`, with all CI checks and deployments
-passed. Hosted database outage/recovery, handover, rollback, permissions,
-automation and latency/storage checks have evidence. Remaining G08 work is fresh
-WebKit OAuth/SameSite qualification and coordinated release/IaC. Backup/restore
+Recorded verified staging release: `79f128b`, with all CI checks and the ordered
+API/remote/host release workflow passed. Hosted database outage/recovery, handover,
+rollback, permissions, automation and latency/storage checks have evidence.
+Remaining G08 work is WebKit SameSite cookie qualification; fresh WebKit OAuth
+itself has passed. Backup/restore
 is explicitly deferred by the user, including local logical restores.
 See [staging acceptance](docs/STAGING_ACCEPTANCE.md).
 

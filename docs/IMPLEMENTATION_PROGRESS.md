@@ -2,7 +2,40 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21 14:37 UTC)
+## Current handoff (2026-09-21 16:37 UTC)
+
+**Verified coordinated release: 79f128b8b0af73a0b7f6e39f3bed5457ba9578d9.**
+CI 35625693558 and release workflow 35626061921 both succeeded. All six release
+stages passed: preflight/previous mapping, API, immutable remote, host build,
+candidate browser, promotion/stable browser. Evidence: `releases/staging-79f128b.json`.
+S14 coordinated deployment is now demonstrated; S02 WebKit SameSite evidence is
+the remaining G08 item. S12 backup/restore remains explicitly deferred.
+
+All five environment secrets are configured and provider access is verified.
+`STAGING_RELEASE_ENABLED=true`; Railway has no Git deployment trigger, both
+Vercel configs disable native Git deployment, and API IaC omits a Git source.
+Vercel may create canceled/inactive Git records; these do not publish a release.
+Use VERCEL_ORG_ID/VERCEL_PROJECT_ID for CLI deployment: --scope requires a user
+profile that these tokens cannot read (404). Promotion uses the project API
+directly for the same reason, then polls the stable host deployment ID.
+
+The 88ccd03 candidate refusal was reproduced with master automations running.
+Railway recorded POST /automations/start at 16:18:45 UTC, after the release paused
+them. The user did not remember using the control. No background restart was
+demonstrated. After an explicit pause, that candidate passed; 79f128b then passed
+the whole release. Do not weaken the paused-state assertion.
+
+79f128b also fixes the reported header jump: rounded age values, bounded units,
+fixed-width tabular numerals. Hosted Chromium and WebKit at 630px retained exact
+navigation geometry across live updates. Evidence: `releases/staging-header-2026-09-21.json`.
+
+`releases/staging.json` is a recorded release, not an automatically updated live
+pointer. For subsequent releases download the successful workflow's manifest and
+set STAGING_RELEASE_MANIFEST for the public/authenticated smoke scripts. Never
+qualify the old immutable remote as if it were the current host's pin.
+
+The following entries are historical and superseded where they describe missing
+credentials, inactive deployment authority or outstanding S14 work.
 
 ### Release activation preparation (September 21, after f4d8aff)
 
