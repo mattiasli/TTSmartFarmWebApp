@@ -147,7 +147,7 @@ export class FarmController {
       wire: latest?.data ?? null,
       lcd: this.link.lcd,
       pendingCommands: [...this.commands.values()].filter(isPendingCommand),
-      permissions: { canControl: true, canView: true },
+      permissions: { canControl: this.config.FARM_MODE === 'simulator' || this.config.LIVE_COMMANDS_ENABLED, canView: true },
       automations: {
         revision: this.settingsRevision,
         settings: this.engine.settings,
@@ -240,6 +240,7 @@ export class FarmController {
 
   startAutomations() {
     this.assertOwner();
+    this.assertCommandsEnabled();
     this.drive();
     this.engine.start();
     this.persistInBackground(this.persistRuntime());
@@ -255,6 +256,7 @@ export class FarmController {
 
   resumeRule(rule: RuleId) {
     this.assertOwner();
+    this.assertCommandsEnabled();
     this.engine.resumeRule(rule);
     this.drive();
     return this.snapshot();
@@ -290,6 +292,7 @@ export class FarmController {
 
   syncGuard() {
     this.assertOwner();
+    this.assertCommandsEnabled();
     this.engine.syncGuard();
     this.drive();
     return this.snapshot();
@@ -468,7 +471,14 @@ export class FarmController {
     }
   }
 
+  private assertCommandsEnabled() {
+    if (this.config.FARM_MODE === 'live' && !this.config.LIVE_COMMANDS_ENABLED) {
+      throw new CommandPolicyError('LIVE_COMMANDS_DISABLED', 'Live commands are disabled.');
+    }
+  }
+
   private async assertCanPublish() {
+    this.assertCommandsEnabled();
     this.assertOwner();
     if (this.lock && !(await this.lock.isHealthy())) {
       this.loseOwnership();

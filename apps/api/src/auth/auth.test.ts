@@ -4,6 +4,9 @@ import { buildApp } from '../app';
 import { loadConfig } from '../config';
 import { LOCAL_OAUTH_COOKIE } from './cookies';
 import { pkceChallenge } from './pkce';
+import { FarmController } from '../controller';
+import { ScriptedFarmLink } from '../farm-link';
+import { MemorySessionStore } from '../sessions';
 
 describe('P06 auth gates', () => {
   const apps: Array<{ close: () => Promise<void> }> = [];
@@ -23,6 +26,17 @@ describe('P06 auth gates', () => {
     const cookie = response.cookies.find((entry) => entry.name === 'smartfarm_session');
     return { csrf, cookie: `smartfarm_session=${cookie?.value}` };
   }
+
+  it('keeps read-only deployment permissions on authenticated HTTP snapshots', async () => {
+    const config = loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: 'live', LIVE_COMMANDS_ENABLED: 'false' });
+    const controller = new FarmController(config, new ScriptedFarmLink());
+    const app = await buildApp(config, { controller, memorySessions: new MemorySessionStore(), store: null, pool: null });
+    apps.push(app);
+    const { cookie } = await login(app);
+    const response = await app.inject({ method: 'GET', url: `/api/v1/farms/${LOCAL_FARM_ID}/snapshot`, headers: { cookie } });
+    expect(response.statusCode).toBe(200);
+    expect(response.json().permissions).toEqual({ canView: true, canControl: false });
+  });
 
   it('T063 rejects a missing CSRF token on commands', async () => {
     const app = await localApp();

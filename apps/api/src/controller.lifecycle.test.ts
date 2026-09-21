@@ -163,6 +163,21 @@ describe('P07 controller lifecycle', () => {
     expect(lock.held).toBe(false);
   });
 
+  it('read-only live mode exposes no control permission and rejects rule starts and guard synchronization', async () => {
+    const link = new ScriptedFarmLink();
+    link.inject(HEALTHY_TELEMETRY_FIXTURE);
+    const controller = new FarmController(loadConfig({ NODE_ENV: 'test', FARM_MODE: 'live', LIVE_COMMANDS_ENABLED: 'false' }), link);
+    controllers.push(controller);
+    expect(controller.snapshot().permissions.canControl).toBe(false);
+    expect(() => controller.startAutomations()).toThrow('Live commands are disabled');
+    expect(() => controller.resumeRule('cooling')).toThrow('Live commands are disabled');
+    expect(() => controller.syncGuard()).toThrow('Live commands are disabled');
+    await expect(controller.command({ type: 'fan.set', on: true }, crypto.randomUUID()))
+      .rejects.toMatchObject({ code: 'LIVE_COMMANDS_DISABLED' });
+    expect(controller.snapshot().automations.runtime.masterEnabled).toBe(false);
+    expect(link.published).toEqual([]);
+  });
+
   it('T079 bounds drain and ignores a late ownership health result', async () => {
     vi.useFakeTimers();
     let healthy!: (value: boolean) => void;

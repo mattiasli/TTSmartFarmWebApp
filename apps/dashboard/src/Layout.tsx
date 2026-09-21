@@ -51,6 +51,7 @@ function LayoutBody() {
                 {snapshot.connection.status}
               </Badge>
               {snapshot.simulation ? <Badge appearance="outline">Simulation</Badge> : null}
+              {!snapshot.permissions.canControl ? <Badge appearance="outline">Read-only</Badge> : null}
               <Text size={200} className="telemetry-status">
                 {live.transport === 'websocket' ? 'live socket' : 'HTTP poll'} · age{' '}
                 <span className="telemetry-age">{formatTelemetryAge(snapshot.connection.telemetryAgeMs)}</span>

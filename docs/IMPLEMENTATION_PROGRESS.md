@@ -58,11 +58,14 @@ The user added separate production GitHub OAuth credentials; presence confirmed.
 No live API has been deployed. The manual read-only production workflow requires
 exact CI and successful staging release, and leaves OAuth/live-browser/hardware
 qualification explicitly pending after initial public login deployment.
-`smartfarm-production` GitHub environment exists with VERCEL_HOST_AUTOMATION_BYPASS.
-Railway/Vercel integrations rejected automatic deployment-token creation. The user
-has been asked to add RAILWAY_TOKEN, VERCEL_HOST_TOKEN and VERCEL_REMOTE_TOKEN there.
-Production release activation stays disabled until these are verified and the
-workflow is committed/tested. See `PRODUCTION_DEPLOYMENT.md` for exact URLs.
+All four required secret names are now verified in `smartfarm-production` after
+the user added the three deployment tokens. Revision 792223c passed CI 35632974217
+and coordinated staging release 35633226711. Before production activation, the
+subsequent read-only permission fix must pass the same gates: HTTP and WebSocket
+snapshots preserve disabled control permissions even for operators, the header
+shows Read-only, and live automation starts/resumes and guard sync reject commands.
+Actual token validity will be established by the first production workflow.
+See `PRODUCTION_DEPLOYMENT.md` for exact URLs.
 
 All five staging environment secrets are configured and provider access is verified.
 `STAGING_RELEASE_ENABLED=true`; Railway has no Git deployment trigger, both

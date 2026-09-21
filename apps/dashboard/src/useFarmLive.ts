@@ -40,7 +40,7 @@ export function useFarmLive() {
           ...snapshot,
           permissions: {
             canView: true,
-            canControl: role === 'operator' || role === 'admin',
+            canControl: snapshot.permissions.canControl && (role === 'operator' || role === 'admin'),
           },
         });
       },

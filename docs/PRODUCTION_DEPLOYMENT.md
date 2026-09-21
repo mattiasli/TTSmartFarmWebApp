@@ -48,8 +48,8 @@ telemetry for the first operator session. It does not mark G09/G10 passed.
 
 Deployment secrets belong to GitHub environment `smartfarm-production`:
 `RAILWAY_TOKEN`, `VERCEL_HOST_TOKEN`, `VERCEL_REMOTE_TOKEN`, and
-`VERCEL_HOST_AUTOMATION_BYPASS`. The bypass is configured. Token creation was
-denied by provider authorization, so the user was asked to add the other three.
+`VERCEL_HOST_AUTOMATION_BYPASS`. All four secret names are verified after the
+user added the deployment tokens. Their validity awaits the first deployment.
 The repository variable `PRODUCTION_READONLY_RELEASE_ENABLED` remains off until
 the prerequisites are verified. Broker and OAuth credentials stay in Railway.
 
