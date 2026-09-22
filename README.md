@@ -6,22 +6,22 @@ This folder is the application repository (`https://github.com/mattiasli/TTSmart
 
 ## Status
 
-Local packages **P00–P12** are in `master`. Hosted simulator staging **P13/G08** is qualified for the agreed scope, with backup/restore deferred. GitHub OAuth through Vercel `/api` to Railway, live WebSocket and dashboard UI work. Next: P14 read-only farm connection and supervised hardware acceptance. Live commands and pumping stay disabled.
+Local packages **P00–P12** are in `master`. Hosted simulator staging **P13/G08** is qualified for the agreed scope, with backup/restore deferred. GitHub OAuth through Vercel `/api` to Railway, live WebSocket and dashboard UI work. P14 read-only production is deployed; next is supervised hardware acceptance. Live commands and pumping stay disabled.
 
-Recorded verified staging release: `afc31b1`, with all CI checks and the ordered
+Recorded verified staging release: `1c6eb41`, with all CI checks and the ordered
 API/remote/host release workflow passed. Hosted database outage/recovery, handover,
 rollback, permissions, automation and latency/storage checks have evidence.
 G08 is qualified for the agreed scope: fresh WebKit OAuth and original-response
-cookie attributes passed on September 21. Next is P14 read-only farm connection,
-then supervised physical acceptance. Backup/restore
+cookie attributes passed on September 21. P14 read-only production is deployed; supervised physical acceptance remains. Backup/restore
 is explicitly deferred by the user, including local logical restores.
 See [staging acceptance](docs/STAGING_ACCEPTANCE.md).
 
 P14 progress: the real broker delivered 223 valid samples with all 22 telemetry
 fields over a three-minute read-only observation. No commands were published.
 Read-only production is deployed at [smartfarm-live.vercel.app](https://smartfarm-live.vercel.app)
-on `afc31b1`. The first authenticated live-browser check and supervised hardware
-checks remain. See [production setup](docs/PRODUCTION_DEPLOYMENT.md).
+on `1c6eb41`. Fresh GitHub sign-in, live WebSocket updates, all 22 fields and
+disabled controls are verified. Supervised hardware checks remain.
+See [production setup](docs/PRODUCTION_DEPLOYMENT.md).
 
 See `IMPLEMENTATION_PLAN.md`, `docs/IMPLEMENTATION_PROGRESS.md` (handoff at the top), and `docs/DEPLOYMENT.md`.
 

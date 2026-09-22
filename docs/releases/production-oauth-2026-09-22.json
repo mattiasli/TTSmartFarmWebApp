@@ -1,0 +1,23 @@
+{
+  "observedAt": "2026-09-22T07:42:54.263Z",
+  "host": "https://smartfarm-live.vercel.app",
+  "actualGithubOAuth": true,
+  "user": "mattiasli",
+  "role": "admin",
+  "callbackCookie": {
+    "secure": true,
+    "httpOnly": true,
+    "sameSiteLax": true,
+    "hostOnly": true
+  },
+  "importedCookies": false,
+  "githubCookiesSaved": false,
+  "appCookie": {
+    "name": "__Host-smartfarm_session",
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "Lax",
+    "hostOnly": true,
+    "path": "/"
+  }
+}

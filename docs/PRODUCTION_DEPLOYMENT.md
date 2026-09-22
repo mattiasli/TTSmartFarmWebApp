@@ -1,9 +1,10 @@
 # P14 production connection
 
 Status: read-only production deployed at https://smartfarm-live.vercel.app on
-afc31b1; CI, staging and production release passed. See
-[release evidence](releases/production-afc31b1.json). Fresh authenticated browser
-verification and supervised physical acceptance remain separate checks.
+1c6eb41; CI, staging and production release passed. See
+[release evidence](releases/production-1c6eb41.json). Fresh OAuth and authenticated
+live WebSocket verification passed with all 22 fields and disabled controls.
+Supervised physical acceptance remains incomplete.
 G08 simulator qualification is recorded in
 [staging acceptance](STAGING_ACCEPTANCE.md), with backup/restore explicitly
 deferred. Supervised physical acceptance is not yet complete.

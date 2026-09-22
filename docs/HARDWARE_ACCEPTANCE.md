@@ -20,11 +20,20 @@ Read-only production is deployed; physical acceptance remains outstanding. See
 
 - [x] Desktop/Android applications stopped (user confirmation, September 21)
 - [x] Fresh telemetry observed locally: 223 samples / three minutes, all 22 fields
+- [x] Production OAuth, live WSS telemetry, all 22 fields and disabled controls verified on 1c6eb41
+- [x] Three-minute hosted observation: 197/197 fresh snapshots, one controller epoch
 - [x] User confirms latest sibling `FanMqtt` source is installed; binary not read back
 - [ ] Several minutes of telemetry correlated with supervised sensor stimuli
 - [x] Local read-only observation made no command publish calls; both live flags false
 
 Evidence: [read-only observation](releases/live-readonly-2026-09-21.json).
+Hosted evidence: [browser verification](releases/production-authenticated-2026-09-22.json)
+and [sensor baseline](releases/production-sensors-2026-09-22.json). The baseline
+included transient DHT failure values (-99/-1); physical correlation is not yet
+qualified. The user reported completing light-cover and near/far distance steps,
+but these did not establish a clear light response or intended distance match.
+Manual sensor inspection is pending at the user's request. Command and pump
+flags remain false; do not infer physical acceptance from fresh transport.
 Source hashes taken September 21 (operator-reported installed source):
 
 | File | SHA-256 |

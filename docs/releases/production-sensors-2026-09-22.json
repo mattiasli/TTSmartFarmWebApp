@@ -1,0 +1,331 @@
+{
+  "startedAt": "2026-09-22T08:01:01.114Z",
+  "scope": "hosted read-only sensor observation",
+  "commandRequestsSent": 0,
+  "samples": 197,
+  "freshSamples": 197,
+  "fields": [
+    "bl",
+    "btn",
+    "buzz",
+    "dht",
+    "dist",
+    "fan",
+    "feed",
+    "guard",
+    "h",
+    "led",
+    "light",
+    "pir",
+    "pump",
+    "pumpBlocked",
+    "rain",
+    "rssi",
+    "soil",
+    "steam",
+    "t",
+    "tankLow",
+    "tankRecover",
+    "water"
+  ],
+  "controllerEpochs": [
+    "2261eca3-e661-44b2-9ef7-b7a0ee14a3e0"
+  ],
+  "ranges": {
+    "t": {
+      "min": -99,
+      "max": 23
+    },
+    "h": {
+      "min": -1,
+      "max": 34
+    },
+    "dht": {
+      "min": 0,
+      "max": 1
+    },
+    "soil": {
+      "min": 0,
+      "max": 0
+    },
+    "water": {
+      "min": 0,
+      "max": 0
+    },
+    "light": {
+      "min": 3434,
+      "max": 3509
+    },
+    "steam": {
+      "min": 0,
+      "max": 0
+    },
+    "rain": {
+      "min": 0,
+      "max": 0
+    },
+    "dist": {
+      "min": 17,
+      "max": 43
+    },
+    "pir": {
+      "min": 0,
+      "max": 0
+    },
+    "btn": {
+      "min": 0,
+      "max": 0
+    },
+    "rssi": {
+      "min": -73,
+      "max": -64
+    },
+    "fan": {
+      "min": 0,
+      "max": 0
+    },
+    "led": {
+      "min": 0,
+      "max": 0
+    },
+    "feed": {
+      "min": 0,
+      "max": 0
+    },
+    "pump": {
+      "min": 0,
+      "max": 0
+    },
+    "buzz": {
+      "min": 0,
+      "max": 0
+    },
+    "bl": {
+      "min": 1,
+      "max": 1
+    },
+    "guard": {
+      "min": 1,
+      "max": 1
+    },
+    "tankLow": {
+      "min": 8,
+      "max": 8
+    },
+    "tankRecover": {
+      "min": 10,
+      "max": 10
+    },
+    "pumpBlocked": {
+      "min": 1,
+      "max": 1
+    }
+  },
+  "observations": [
+    {
+      "at": "2026-09-22T08:01:02.228Z",
+      "light": 3471,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:01:12.380Z",
+      "light": 3472,
+      "dist": 17,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:01:22.382Z",
+      "light": 3443,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:01:32.402Z",
+      "light": 3478,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:01:43.255Z",
+      "light": 3447,
+      "dist": 17,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:01:54.127Z",
+      "light": 3481,
+      "dist": 17,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:02:05.014Z",
+      "light": 3474,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:02:15.020Z",
+      "light": 3442,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:02:25.220Z",
+      "light": 3471,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:02:35.486Z",
+      "light": 3471,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:02:45.540Z",
+      "light": 3450,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:02:55.611Z",
+      "light": 3466,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:03:06.503Z",
+      "light": 3446,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:03:17.398Z",
+      "light": 3457,
+      "dist": 17,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:03:27.454Z",
+      "light": 3464,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 34,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:03:38.370Z",
+      "light": 3462,
+      "dist": 17,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:03:49.222Z",
+      "light": 3463,
+      "dist": 43,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    },
+    {
+      "at": "2026-09-22T08:04:00.036Z",
+      "light": 3473,
+      "dist": 17,
+      "pir": 0,
+      "btn": 0,
+      "t": 23,
+      "h": 33,
+      "soil": 0,
+      "water": 0
+    }
+  ],
+  "operatorCorrelations": "Record separately from operator responses.",
+  "sourceSha": "1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1",
+  "finishedAt": "2026-09-22T08:04:01.756Z",
+  "transportObservationPassed": true,
+  "physicalSensorResponseQualified": false,
+  "operatorReport": "No timed stimulus correlation established.",
+  "interpretation": "Fresh telemetry is verified. Light-cover and intended distance correlation are inconclusive; transient DHT failure sentinels were observed. Manual inspection pending."
+}

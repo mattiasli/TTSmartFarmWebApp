@@ -2,26 +2,42 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21 18:24 UTC)
+## Current handoff (2026-09-22)
 
 **Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
-afc31b1c6fd340bca92cd9c39c5c540aad8295e5. CI 35636526365, staging release
-35636857184 and production release 35637433047 all passed. Evidence:
-`releases/production-afc31b1.json` and `releases/staging-afc31b1.json`.
-Live API 9222e105-f06d-4ff4-b8f5-b67ecf770c3c reports healthy ownership, live mode,
-and both command flags false. Candidate/stable public login and proxy passed.
-Fresh production OAuth and authenticated live telemetry are being checked next;
-supervised sensor stimuli and non-pump acceptance remain. G09/G10 are not passed.
+1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1. CI 35700323331, staging release
+35701046216 and production release 35701555060 all passed. Evidence:
+`releases/production-1c6eb41.json`. Live API 54068ed8-ab88-4c15-8123-dc43de6a8d71
+reports healthy ownership, live mode and both command flags false.
+Fresh OAuth at 07:42 UTC verified the original production cookie attributes;
+authenticated browser verification at 07:56 received seven live WSS snapshots,
+all 22 fields, rendered the editor, verified no-store and disabled controls,
+and observed zero page errors. Evidence: `releases/production-oauth-2026-09-22.json`
+and `releases/production-authenticated-2026-09-22.json`.
 
-18:32 update: actual production GitHub sign-in as mattiasli and fresh Chromium
-__Host-smartfarm_session attributes passed (Secure, HttpOnly, Lax, host-only, /).
-The initial observer wrongly used staging's cookie name; this was a test helper
-issue, not failed app authentication. Saved app session is `.infra/production-auth.json`;
-do not request another sign-in while valid. The real API returns fresh live samples
-with all 22 fields, and disabled controls render correctly. Hosted browser remains
-on HTTP polling because dashboard API code hardcoded LOCAL_FARM_ID for ticket
-requests. The session-farm fix and two regression tests pass locally; next deploy
-it through CI/staging/production, then run `.infra/check-production-oauth.mjs --reuse`.
+The dashboard now uses the authenticated session's farm ID for HTTP requests and
+WSS tickets. Previously the hardcoded simulator ID forced production onto HTTP
+polling and misdirected history/membership reads. Two regression tests and all
+nine browser tests passed. Production cookies use __Host-smartfarm_session;
+the early observer's staging-cookie-name assumption was a helper bug, now fixed.
+Sessions last 12 hours. Staging release 35700595946 stopped at preflight after
+overnight expiry, before deployment. Both app sessions were refreshed in one
+browser, and the encrypted STAGING_SESSION_COOKIE secret was replaced before retry.
+Saved app sessions are `.infra/staging-auth.json` and `.infra/production-auth.json`.
+Do not ask for more sign-ins while valid; use `.infra/check-production-oauth.mjs --reuse`.
+
+The first three-minute hosted sensor observation recorded 197/197 fresh HTTP
+snapshots, all 22 fields and one controller epoch. It included transient DHT
+failure sentinels (-99/-1), light 3434–3509 and distance 17–43 cm. Transport
+freshness does not prove physical sensor response. The user reported completing
+light cover/uncover and near/far distance steps during a second observation.
+No clear light-cover response or intended 10/30-cm distance correlation was
+established. The user wants to inspect the sensors manually; leave physical
+acceptance open and wait for their findings before further hardware tests.
+No hardware commands have been sent. G09/G10 remain open; backup/restore remains
+explicitly deferred, and the shared MQTT credential exception covers initial read-only use.
+
+## Earlier release notes
 
 Update 18:07 UTC: 03e0edf passed CI 35634180123 and staging release 35634568197.
 Production deployment tokens passed preflight in first live release 35635193382.
