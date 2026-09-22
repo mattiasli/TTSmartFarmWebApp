@@ -4,6 +4,15 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+The approved plain login page is deployed on dashboard **983dece**, with exactly
+14 locally served technology icons and “Web app carefully crafted by Mattias Li.”
+API and automation remote remain on **b26f67b**. CI 35742325722 and staging
+35742757929 passed before dashboard-only promotion. Chromium/WebKit on the custom
+domain verified all icons, credit and no overflow at 1440/390/320 pixels. Local
+typecheck, lint and all 15 end-to-end tests passed. No backend restart, hardware
+commands or automation changes were required. See
+[dashboard release evidence](releases/production-login-983dece.json).
+
 The custom-domain and Settings follow-up is deployed on **b26f67b**.
 Password users can sign in at https://ttsmartfarm.mattias.li/login. Railway now
 allows this exact origin plus the existing Vercel origin; production release

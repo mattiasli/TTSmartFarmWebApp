@@ -1,0 +1,42 @@
+{
+  "sourceSha": "983dece52290ee50053820259d53d4211b3e05e6",
+  "scope": "dashboard-only",
+  "startedAt": "2026-09-22T14:55:29.435Z",
+  "actuatorCommands": 0,
+  "apiRedeployed": false,
+  "apiSourceSha": "b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e",
+  "controlFlags": {
+    "liveCommandsEnabled": true,
+    "livePumpEnabled": true
+  },
+  "smartfarm-web-ci.yml": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35742325722",
+  "smartfarm-web-staging.yml": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35742757929",
+  "previousHost": {
+    "id": "dpl_H7LwMVD8DurwA11sA4zsu6i7Gm8W",
+    "url": "smartfarm-live-y3shxyqhh-mattias-li-s-projects.vercel.app",
+    "sourceSha": "b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e"
+  },
+  "remoteEntry": "https://smartfarm-live-automations-69dp31j9m-mattias-li-s-projects.vercel.app/remoteEntry.js",
+  "host": {
+    "deploymentId": "dpl_7b1oGVvFwJjcpmHb7QCRyTEZfQQH",
+    "deploymentUrl": "https://smartfarm-live-klmg2hhdo-mattias-li-s-projects.vercel.app",
+    "sourceSha": "983dece52290ee50053820259d53d4211b3e05e6"
+  },
+  "candidateSmoke": {
+    "browser": "153.0.8010.12",
+    "actualHostProxy": true,
+    "loginRendered": true,
+    "freshOAuthVerified": false,
+    "authenticatedTelemetryVerified": false
+  },
+  "candidateIconsLoaded": 14,
+  "promotionRequestedAt": "2026-09-22T14:58:28.929Z",
+  "stableSmoke": {
+    "browser": "153.0.8010.12",
+    "actualHostProxy": true,
+    "loginRendered": true,
+    "freshOAuthVerified": false,
+    "authenticatedTelemetryVerified": false
+  },
+  "finishedAt": "2026-09-22T14:58:37.663Z"
+}

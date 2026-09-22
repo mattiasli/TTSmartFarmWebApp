@@ -1,0 +1,9 @@
+{
+  "observedAt": "2026-09-22T15:07:56.867Z",
+  "project": "prj_ieE6d49geytOALL2BMfHDTeVbHyv",
+  "environment": "smartfarm-production",
+  "secretName": "VERCEL_HOST_AUTOMATION_BYPASS",
+  "githubSecretUpdated": true,
+  "replacementVerified": true,
+  "previousBypassRevoked": true
+}

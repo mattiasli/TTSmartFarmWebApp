@@ -10,7 +10,19 @@ source-level assertions or the operator's explicit scope decisions.
 - Registered GitHub sign-in origin: https://smartfarm-live.vercel.app
 - Simulator staging: https://smartfarm-host.vercel.app
 - Production API: https://smartfarm-api-production.up.railway.app
-- Deployed application source: b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e.
+- Dashboard source: 983dece52290ee50053820259d53d4211b3e05e6.
+  The approved plain login design adds exactly 14 technology icons and the Mattias Li credit.
+  [Dashboard release](releases/production-login-983dece.json) passed CI 35742325722
+  and staging 35742757929 before dashboard-only promotion. Hosted Chromium and
+  WebKit checks passed at 1440, 390 and 320 pixels, including every icon and no overflow.
+  Local typecheck, lint and all 15 end-to-end tests passed. No backend restart,
+  automation setting changes or actuator commands were made for this release.
+  A browser cleanup failure stopped the first publishing attempt before promotion;
+  the helper was corrected and resumed using the same candidate. Its diagnostic
+  exposed a deployment-preview bypass token. The token was replaced, the GitHub
+  environment secret updated, and all superseded bypasses revoked and verified.
+  [Sanitized rotation evidence](releases/production-login-983dece-bypass-rotation.json).
+- API and automation remote source: b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e.
   [Release manifest](releases/production-b26f67b.json).
 - CI [35737107748](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35737107748),
   staging [35737539519](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35737539519)

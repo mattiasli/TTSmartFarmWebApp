@@ -1,6 +1,13 @@
 # P14 production connection
 
-Status: production is deployed at https://ttsmartfarm.mattias.li on b26f67b.
+Status: production is deployed at https://ttsmartfarm.mattias.li with dashboard
+983dece and API/automation remote b26f67b. The approved plain login technology
+credits were promoted as a dashboard-only update after CI 35742325722 and staging
+35742757929 passed. Hosted Chromium/WebKit checks passed at desktop and mobile
+widths. No API restart or automation changes were made.
+See [dashboard release evidence](releases/production-login-983dece.json).
+
+For the preceding b26f67b API/remote release:
 CI 35737107748, staging 35737539519 and production 35738228290 passed.
 See [release evidence](releases/production-b26f67b.json),
 [account/browser checks](releases/production-b26f67b-accounts.json) and
