@@ -1,23 +1,24 @@
 # P14 production connection
 
-Status: production control enabled at https://smartfarm-live.vercel.app on
-9a42efa; CI 35715195863, staging 35715501791 and production 35716021873 passed. See
-[release evidence](releases/production-9a42efa.json). Fresh OAuth was qualified
-on the earlier same-day release; the valid app session verified the new release's
-live WebSocket, all 22 fields, disabled controls and correct pending guard status:
-[browser evidence](releases/production-9a42efa-browser.json). The separate pumping
-permission is false in HTTP and WebSocket snapshots; Water briefly is disabled.
-Current API deployment: 22ffd13a-395e-4323-9211-364840631131, same 9a42efa source.
-Both live flags are true at the operator's explicit request to skip remaining pump
-tests and enable pump control. Master remains paused. Earlier read-only evidence
-below records historical test cleanup, not the current control permissions.
-Current [enablement evidence](releases/production-pump-enabled-2026-09-22.json)
-verifies the live flags, HTTP/WSS permissions and enabled Water briefly/stop
-controls. The operator confirmed actual pump operation and stop separately.
-The operator synchronized tank protection to 20/30; the latest browser check
-verifies matching thresholds and visible guard confirmed, paused automations and
-outputs off: [after-alarm evidence](releases/production-after-alarm-2026-09-22.json).
-Supervised physical acceptance remains incomplete.
+Status: production is deployed at https://smartfarm-live.vercel.app on
+247b525. CI 35725070292, staging 35725407854 and production 35726197685 passed.
+See [release evidence](releases/production-247b525.json) and
+[final handoff](FINAL_HANDOFF.md) for the exact source, API/host/remote IDs,
+requirement checklist and scope decisions.
+
+Both live flags remain true at the operator's request. The post-release
+[authenticated browser check](releases/production-247b525-browser.json) verified
+fresh telemetry, enabled Water briefly/Stop pump/All off, HTTP/WSS canPump=true,
+unchanged settings and guard confirmed at 20/30. Master automations are paused
+after maintenance/restart; the operator can resume with Start. The browser check
+sent no actuator commands. Pump operation and stop were separately confirmed by
+the operator; further pump qualification was explicitly skipped. Requested
+non-pump/manual checks are complete. Other physical sensor failures were not induced.
+
+Earlier read-only evidence below describes historical test cleanup, not current
+permissions. Fresh OAuth was qualified on the earlier same-day release; the
+post-release check reused that valid session and does not claim a new sign-in.
+
 G08 simulator qualification is recorded in
 [staging acceptance](STAGING_ACCEPTANCE.md), with backup/restore explicitly
 deferred. Supervised physical acceptance is not yet complete.

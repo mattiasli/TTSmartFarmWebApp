@@ -4,6 +4,24 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+P15/G10 handoff is complete for the agreed scope. Production source 247b525
+passed CI 35725070292, staging 35725407854 and production 35726197685. Both live
+flags stayed true; authenticated live HTTP/WSS and enabled controls passed after
+deployment with no actuator commands. Master automations were paused for
+maintenance and remain paused; the operator resumes with Start when ready.
+The final checklist records all 18 requirements, remaining protocol limitations,
+deferred backup/restore and skipped pump qualification. No further physical test
+session is pending. Full original pump qualification is not claimed.
+See [release manifest](releases/production-247b525.json),
+[browser evidence](releases/production-247b525-browser.json) and
+[final handoff](FINAL_HANDOFF.md). Earlier entries below retain historical states.
+
+Start with [the final requirement and operations review](FINAL_HANDOFF.md).
+It consolidates current release evidence and operator scope decisions. Entries
+below are a chronological record: earlier read-only cleanup and proposed pump
+test sessions are historical, not instructions to undo the enabled controls or
+repeat completed tests.
+
 The remaining manual distance no-echo/recovery check passed: the operator saw
 Unavailable and then a sensible number. The 11:54–11:57 read-only recording has
 147 snapshots, eight no-echo readings mapped from -1 to null, valid recovery,

@@ -6,24 +6,17 @@ This folder is the application repository (`https://github.com/mattiasli/TTSmart
 
 ## Status
 
-Local packages **P00–P12** are in `master`. Hosted simulator staging **P13/G08** is qualified for the agreed scope, with backup/restore deferred. GitHub OAuth through Vercel `/api` to Railway, live WebSocket and dashboard UI work. P14 has verified manual outputs, cooling/manual takeover/Pause, All off, lighting and motion hold, including an automatic change with the browser closed. Manual alarm/Beep/Silence checks also passed. Remaining failure-display checks are open. The operator requested skipping remaining pump qualification and enabling pump control; both live flags are now true, with master automations paused.
+The web app is implemented and deployed at [smartfarm-live.vercel.app](https://smartfarm-live.vercel.app). Local packages **P00–P12**, hosted simulator **P13/G08**, and the requested non-pump hardware checks are complete for the agreed scope. Manual outputs, cooling, lighting/motion, alarm/Beep/Silence and distance Unavailable/recovery passed. The operator confirmed pump operation and stop, requested enabled pump control, and skipped further pump qualification. Backup/restore is deferred.
 
-Recorded verified staging release: `9a42efa`, with all CI checks and the ordered
-API/remote/host release workflow passed. Hosted database outage/recovery, handover,
-rollback, permissions, automation and latency/storage checks have evidence.
-G08 is qualified for the agreed scope: fresh WebKit OAuth and original-response
-cookie attributes passed on September 21. P14 read-only production is deployed; supervised physical acceptance remains. Backup/restore
-is explicitly deferred by the user, including local logical restores.
-See [staging acceptance](docs/STAGING_ACCEPTANCE.md).
+See the [current release and final checklist](docs/FINAL_HANDOFF.md) for source and
+deployment IDs, evidence, scope exceptions and operations. The
+[staging acceptance record](docs/STAGING_ACCEPTANCE.md) covers hosted OAuth,
+permissions, database outage/recovery, ownership handover, rollback and automations.
 
-P14 progress: the real broker delivered 223 valid samples with all 22 telemetry
-fields over a three-minute read-only observation. No commands were published.
-Production is deployed at [smartfarm-live.vercel.app](https://smartfarm-live.vercel.app)
-on `9a42efa`. The original GitHub sign-in qualified OAuth; the current release
-passed authenticated live WebSocket, all 22 fields and disabled-control checks
-using that valid session. Guard confirmation now requires matching device/app
-thresholds. Water briefly now also respects a separate pumping permission without
-blocking separately enabled non-pump controls. Supervised hardware checks remain.
+Automations run on Railway and continue when the browser closes. Backend restart
+or freshness loss pauses them; use **Start** to resume explicitly. Manual pump
+availability is separate from this master state. Production releases preserve
+the enabled control flags through the explicit `preserve-control-flags` mode.
 See [production setup](docs/PRODUCTION_DEPLOYMENT.md).
 
 See `IMPLEMENTATION_PLAN.md`, `docs/IMPLEMENTATION_PROGRESS.md` (handoff at the top), and `docs/DEPLOYMENT.md`.

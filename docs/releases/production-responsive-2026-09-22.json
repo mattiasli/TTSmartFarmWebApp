@@ -1,0 +1,39 @@
+{
+  "observedAt": "2026-09-22T12:24:44.621Z",
+  "commandRequestsSent": 0,
+  "results": [
+    {
+      "browser": "chromium",
+      "width": 390,
+      "height": 844,
+      "sourceSha": "247b525a45e18d4c061c5aa871bda55ea06831ff",
+      "liveSocket": true,
+      "dashboardAndEditorWithoutHorizontalOverflow": true,
+      "ageFormatAndNavigationStable": true,
+      "waterAndAllOffVisible": true,
+      "pageErrors": 0
+    },
+    {
+      "browser": "chromium",
+      "width": 1440,
+      "height": 900,
+      "sourceSha": "247b525a45e18d4c061c5aa871bda55ea06831ff",
+      "liveSocket": true,
+      "dashboardAndEditorWithoutHorizontalOverflow": true,
+      "ageFormatAndNavigationStable": true,
+      "waterAndAllOffVisible": true,
+      "pageErrors": 0
+    },
+    {
+      "browser": "webkit",
+      "width": 390,
+      "height": 844,
+      "sourceSha": "247b525a45e18d4c061c5aa871bda55ea06831ff",
+      "liveSocket": true,
+      "dashboardAndEditorWithoutHorizontalOverflow": true,
+      "ageFormatAndNavigationStable": true,
+      "waterAndAllOffVisible": true,
+      "pageErrors": 0
+    }
+  ]
+}

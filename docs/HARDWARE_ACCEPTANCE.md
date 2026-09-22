@@ -6,8 +6,10 @@ Preparation: the live TLS adapter is implemented. The user authorized reuse of
 the existing MQTT credential for the initial read-only observation and explicitly
 extended that exception to supervised non-pump tests on September 22; it has not
 been reset. This is not evidence of broker-enforced read-only permissions.
-Read-only production is deployed; physical acceptance remains outstanding. See
-[production connection](PRODUCTION_DEPLOYMENT.md).
+Production control is enabled. Requested non-pump/manual acceptance is complete;
+remaining pump qualification was explicitly skipped, and other physical sensor
+failures were not induced. See [current handoff](FINAL_HANDOFF.md) for the release,
+evidence and operator scope decisions.
 
 - Date: 2026-09-22
 - Operator: user, confirming physical observations in this session

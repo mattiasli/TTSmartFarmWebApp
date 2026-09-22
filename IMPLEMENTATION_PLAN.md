@@ -1,7 +1,7 @@
 # SmartFarm Remote Web Application — Concrete Implementation Plan
 
 **Prepared:** 17 September 2026  
-**Status:** implementation specification; application implementation and cloud/hardware acceptance have not been performed by writing this document.  
+**Status:** original implementation specification. The September 22 implementation, deployed release and requirement-by-requirement acceptance dispositions are recorded in [the final handoff](docs/FINAL_HANDOFF.md). Original gate/checklist wording below is retained; backup/restore and pump scope exceptions are not unqualified passes.
 **Intended implementer:** an AI coding agent or human developer working in this repository.  
 **Project directory:** `smartFarmRemoteWebApp/` (the existing Windows folder corresponding to the requested `smartfarmremotewebapp`).
 
