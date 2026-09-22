@@ -1,0 +1,111 @@
+{
+    "startedAt":  "2026-09-22T08:40:32.814Z",
+    "sourceSha":  "1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1",
+    "farmId":  "cad2a8fd-265e-491d-a768-b4372580b55e",
+    "authorization":  "Operator ready, can interrupt power, other controllers closed; existing credential authorized for fan only.",
+    "requestedDurationMs":  2000,
+    "commands":  [
+                     {
+                         "on":  true,
+                         "requestedAt":  "2026-09-22T08:41:26.593Z",
+                         "idempotencyKey":  "03f0d84b-6fc5-4e00-b02d-c2894b143abc",
+                         "httpStatus":  202,
+                         "id":  "1755a496-f892-4742-85cd-633fe6324eb2",
+                         "status":  "sent",
+                         "responseAt":  "2026-09-22T08:41:26.808Z"
+                     },
+                     {
+                         "on":  false,
+                         "requestedAt":  "2026-09-22T08:41:28.595Z",
+                         "idempotencyKey":  "924c49b7-4832-4019-bfc1-03c475300f3f",
+                         "httpStatus":  202,
+                         "id":  "d5351648-5638-4ca5-b260-6783ddd24226",
+                         "status":  "sent",
+                         "responseAt":  "2026-09-22T08:41:28.897Z"
+                     }
+                 ],
+    "deployments":  [
+                        {
+                            "at":  "2026-09-22T08:40:37.761Z",
+                            "enabled":  true,
+                            "result":  {
+                                           "id":  "6fbd84b9-1996-4860-8ab4-6e3b276124ec"
+                                       }
+                        },
+                        {
+                            "at":  "2026-09-22T08:41:34.684Z",
+                            "enabled":  false,
+                            "result":  {
+                                           "id":  "5720a640-198e-478b-acb2-71eacc89c1f0"
+                                       }
+                        }
+                    ],
+    "samples":  [
+                    {
+                        "at":  "2026-09-22T08:40:33.622Z",
+                        "fan":  0,
+                        "pump":  0,
+                        "fresh":  true,
+                        "epoch":  "2261eca3-e661-44b2-9ef7-b7a0ee14a3e0",
+                        "enabled":  false
+                    },
+                    {
+                        "at":  "2026-09-22T08:41:26.176Z",
+                        "fan":  0,
+                        "pump":  0,
+                        "fresh":  true,
+                        "epoch":  "fc127999-fd04-4faf-acd2-83438bc7f2df",
+                        "enabled":  true
+                    },
+                    {
+                        "at":  "2026-09-22T08:41:26.592Z",
+                        "fan":  0,
+                        "pump":  0,
+                        "fresh":  true,
+                        "epoch":  "fc127999-fd04-4faf-acd2-83438bc7f2df",
+                        "enabled":  true
+                    },
+                    {
+                        "at":  "2026-09-22T08:41:29.167Z",
+                        "fan":  1,
+                        "pump":  0,
+                        "fresh":  true,
+                        "epoch":  "fc127999-fd04-4faf-acd2-83438bc7f2df",
+                        "enabled":  true
+                    },
+                    {
+                        "at":  "2026-09-22T08:41:29.672Z",
+                        "fan":  0,
+                        "pump":  0,
+                        "fresh":  true,
+                        "epoch":  "fc127999-fd04-4faf-acd2-83438bc7f2df",
+                        "enabled":  true
+                    },
+                    {
+                        "at":  "2026-09-22T08:42:10.016Z",
+                        "fan":  0,
+                        "pump":  0,
+                        "fresh":  true,
+                        "epoch":  "fb9c4e24-8ced-4dc0-83a1-a30c4cd19ff1",
+                        "enabled":  false
+                    }
+                ],
+    "pumpEnabled":  false,
+    "physicalObservation":  "Operator confirms: Yes, it ran and stopped.",
+    "fanOffObservedAt":  "2026-09-22T08:41:29.672Z",
+    "onResult":  {
+                     "id":  "1755a496-f892-4742-85cd-633fe6324eb2",
+                     "status":  "state_matched",
+                     "sentAt":  "2026-09-22T08:41:26.685Z",
+                     "stateMatchedAt":  "2026-09-22T08:41:27.140Z"
+                 },
+    "offResult":  {
+                      "id":  "d5351648-5638-4ca5-b260-6783ddd24226",
+                      "status":  "state_matched",
+                      "sentAt":  "2026-09-22T08:41:28.751Z",
+                      "stateMatchedAt":  "2026-09-22T08:41:29.548Z"
+                  },
+    "readOnlyRestoredAt":  "2026-09-22T08:42:10.016Z",
+    "completed":  true,
+    "finishedAt":  "2026-09-22T08:42:10.016Z"
+}

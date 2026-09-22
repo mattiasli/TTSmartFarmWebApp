@@ -7,7 +7,7 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 **Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
 1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1. CI 35700323331, staging release
 35701046216 and production release 35701555060 all passed. Evidence:
-`releases/production-1c6eb41.json`. Live API 54068ed8-ab88-4c15-8123-dc43de6a8d71
+`releases/production-1c6eb41.json`. Live API 5720a640-198e-478b-acb2-71eacc89c1f0
 reports healthy ownership, live mode and both command flags false.
 Fresh OAuth at 07:42 UTC verified the original production cookie attributes;
 authenticated browser verification at 07:56 received seven live WSS snapshots,
@@ -45,11 +45,24 @@ zero publish calls and zero messages cleared. Evidence:
 `releases/command-retention-2026-09-22.json`. The new audit tool's actual local
 broker test verifies canonical/nested/legacy retained-topic detection and that
 retained messages remain unchanged. Run `node tools/scripts/audit-live-command-retention.mjs`
-for a fresh bounded audit before cutover. Next: confirm current operator
-supervision/controller shutdown and credential choice for the first temporary
-fan on/off test. No actuator tests have yet been performed.
-No hardware commands have been sent. G09/G10 remain open; backup/restore remains
-explicitly deferred, and the shared MQTT credential exception covers initial read-only use.
+for a fresh bounded audit before cutover.
+
+First supervised actuator test passed at 08:41 UTC: the operator confirmed
+readiness, power interruption access, other controllers stopped and reuse of the
+existing credential. Temporary command enablement on the same source SHA allowed
+exactly two fan requests (on, then off 2.002 seconds later). Both reached
+`state_matched`; the operator confirms the physical fan ran and stopped.
+Commands were restored disabled at 08:42:10 UTC; pump enablement remained false.
+Evidence: `releases/production-fan-2026-09-22.json`. The restored dashboard passed
+an authenticated browser check with seven live WSS snapshots, all 22 fields,
+disabled controls and zero page errors (`releases/production-after-fan-2026-09-22.json`).
+This reused the valid app session, not a new OAuth sign-in. Local cleanup tests
+cover ambiguous enable/on errors, failed off/observation and restoration failures:
+`npm run test:unit -- tools/scripts/supervised-fan-window.test.mjs` (7 passed).
+Next: arrange a supervised scope for remaining LED/backlight/beep/feeder/LCD and
+automation checks. No further actuator commands are authorized by the fan test.
+G09/G10 remain open; backup/restore remains explicitly deferred. The shared MQTT
+credential exception covers initial read-only use and this supervised fan test.
 
 ## Earlier release notes
 

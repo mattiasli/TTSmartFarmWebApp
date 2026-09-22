@@ -3,7 +3,8 @@
 This file is a template. Fill it during a supervised window. Do not write credentials.
 
 Preparation: the live TLS adapter is implemented. The user authorized reuse of
-the existing MQTT credential for the initial read-only observation; it has not
+the existing MQTT credential for the initial read-only observation and explicitly
+extended that exception to the supervised fan test on September 22; it has not
 been reset. This is not evidence of broker-enforced read-only permissions.
 Read-only production is deployed; physical acceptance remains outstanding. See
 [production connection](PRODUCTION_DEPLOYMENT.md).
@@ -59,7 +60,8 @@ Record observed fields: `t`, `h`, `dht`, `soil`, `water`, `light`, `steam`, `rai
 ## Non-pump controls
 
 - [x] Read-only command-retention audit: no retained/live commands observed across firmware filters in 30 seconds; 37 fresh telemetry packets (September 22)
-- [ ] Confirm current supervision, power interruption access and other controllers stopped before enabling commands
+- [x] Operator confirmed supervision, power interruption access and other controllers stopped for September 22 fan test
+- [x] Fan on/off: two-second request interval, both states matched telemetry; operator confirms physical run and stop
 - [ ] Fan, LED, backlight, beep, feeder, LCD text/status
 - [ ] Master pause / browser close does not stop the server engine
 - [ ] Night-light 2559 vs 3380/3560 classification
@@ -68,9 +70,15 @@ Audit evidence: [command retention](releases/command-retention-2026-09-22.json).
 The audit subscribed to `smartfarm/cmd/#`, legacy `smartfarm/fan/set`, and telemetry,
 with verified TLS. It sent no publish packets and cleared nothing. This bounded
 observation does not establish that other controllers are permanently stopped.
-First proposed actuator check: temporarily enable non-pump commands, fan on for
-about two seconds, fan off, then restore commands disabled. Pump remains disabled.
-Await operator readiness and confirmation of credential use before execution.
+First actuator check completed September 22 at 08:41 UTC. Fan-on and fan-off
+requests were 2.002 seconds apart; both reached `state_matched`. The operator
+confirmed that the physical fan ran and stopped. Commands were restored disabled
+at 08:42:10 UTC; pumping remained disabled throughout. The original qualified
+source SHA 1c6eb41 was redeployed for each configuration change. Evidence:
+[fan test](releases/production-fan-2026-09-22.json) and
+[restored dashboard](releases/production-after-fan-2026-09-22.json).
+LED, backlight, beep, feeder, LCD and automation checks remain outstanding.
+Arrange a new supervised scope before sending further actuator commands.
 
 ## Pump
 

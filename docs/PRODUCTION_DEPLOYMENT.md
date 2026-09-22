@@ -19,6 +19,11 @@ The private setup credential matched the existing device credential on September
 changing or resetting it. This is an exception to the plan's dedicated-principal
 requirement for this initial connection. Read-only enforcement is in the app;
 the shared credential is not claimed to have a broker-enforced publish denial.
+On September 22 the user explicitly extended reuse to the supervised two-second
+fan test. Both fan states matched telemetry and the operator confirmed run/stop.
+Commands were restored disabled; pumping remained disabled. See
+[fan evidence](releases/production-fan-2026-09-22.json). Further actuator tests
+require their own supervised scope.
 Save values only in ignored private setup and production backend secret variables,
 never Vercel or GitHub CI. Actual permissions still need verification.
 
