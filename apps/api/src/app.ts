@@ -172,6 +172,7 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
           username: session.username,
           githubLoginEnabled: Boolean(config.GITHUB_OAUTH_CLIENT_ID && store),
           passwordLoginEnabled: Boolean(store),
+          githubLoginUrl: `${config.PUBLIC_APP_ORIGIN}/api/auth/github/start`,
         }
       : {
           authenticated: false,
@@ -182,6 +183,7 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
           username: null,
           githubLoginEnabled: Boolean(config.GITHUB_OAUTH_CLIENT_ID && store),
           passwordLoginEnabled: Boolean(store),
+          githubLoginUrl: `${config.PUBLIC_APP_ORIGIN}/api/auth/github/start`,
         };
   }
 

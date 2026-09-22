@@ -4,6 +4,17 @@ An admin can open **Settings → Add a user**, choose a user ID and password, an
 select **Viewer**, **Operator** or **Admin**. No GitHub account or external identity
 provider is needed for that user. Existing GitHub sign-in remains available.
 
+Production password sign-in is available at `https://ttsmartfarm.mattias.li/login`
+and `https://smartfarm-live.vercel.app/login`. Both exact origins are configured in
+Railway's `ALLOWED_BROWSER_ORIGINS` and checked against `browserOrigins` in
+`tools/deploy/production.json` during releases. DNS routing alone does not authorize
+an origin. Unknown, missing and `null` origins remain rejected.
+
+GitHub sign-in starts on `smartfarm-live.vercel.app`, which owns the registered
+OAuth callback and binding cookie. The session DTO supplies this absolute
+`githubLoginUrl`; password sign-in and its host-only session remain on the domain
+where the user signed in. `PUBLIC_APP_ORIGIN` stays on the registered GitHub origin.
+
 User IDs are case-insensitive, 3–64 characters, beginning with a letter or number;
 subsequent characters may include dots, underscores and hyphens. Passwords are
 15–128 characters, with no mandatory character composition. Give initial or reset

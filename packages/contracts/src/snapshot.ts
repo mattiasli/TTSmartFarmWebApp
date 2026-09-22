@@ -74,6 +74,7 @@ export type SessionDto = {
   username: string | null;
   githubLoginEnabled: boolean;
   passwordLoginEnabled?: boolean;
+  githubLoginUrl?: string;
 };
 
 export type HistorySeriesPointDto = {

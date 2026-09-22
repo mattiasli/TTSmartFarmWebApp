@@ -14,12 +14,12 @@ export function Login() {
   if (session.data?.authenticated) return <Navigate to="/dashboard" replace />;
 
   return (
-    <main className="page">
-      <section className="section">
+    <main className="page login-page">
+      <section className="section login-panel">
         <Title1>TT SmartFarm</Title1>
         <Text as="p">Sign in with an account added by your farm administrator.</Text>
         {session.data?.passwordLoginEnabled ? (
-          <form style={{ display: 'grid', gap: 12, maxWidth: 360 }} onSubmit={(event) => {
+          <form className="account-form" onSubmit={(event) => {
             event.preventDefault(); if (!login.isPending) login.mutate();
           }}>
             <Field label="User ID"><Input autoComplete="username" name="username" required
@@ -33,7 +33,7 @@ export function Login() {
           </form>
         ) : null}
         {session.data?.githubLoginEnabled ? (
-          <Button appearance="primary" as="a" href="/api/auth/github/start">
+          <Button appearance="secondary" as="a" href={session.data.githubLoginUrl ?? '/api/auth/github/start'}>
             Sign in with GitHub
           </Button>
         ) : null}

@@ -35,7 +35,7 @@ export function productionHostConfig(config, api) {
 export function assertProductionVariables(variables, expected, flags = readOnlyFlags) {
   for (const [name, value] of Object.entries({ APP_ENV: 'production', FARM_MODE: 'live',
     LIVE_COMMANDS_ENABLED: String(flags.liveCommandsEnabled), LIVE_PUMP_ENABLED: String(flags.livePumpEnabled), FARM_ID: expected.farmId,
-    PUBLIC_APP_ORIGIN: expected.host, ALLOWED_BROWSER_ORIGINS: expected.host,
+    PUBLIC_APP_ORIGIN: expected.host, ALLOWED_BROWSER_ORIGINS: (expected.browserOrigins ?? [expected.host]).join(','),
     PUBLIC_WS_URL: expected.api.replace('https:', 'wss:') + '/ws' })) {
     // Do not include provider values in assertion diagnostics.
     assert.ok(variables[name] === value, `Production setting does not match: ${name}`);

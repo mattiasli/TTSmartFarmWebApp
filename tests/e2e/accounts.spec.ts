@@ -6,6 +6,7 @@ test('password sign-in and admin account creation show errors and submit the sel
   expect(health).toMatchObject({ appEnv: 'local', farmMode: 'simulator', databaseConfigured: false });
   let authenticated = false;
   const session = () => ({ authenticated, localLogin: false, passwordLoginEnabled: true, githubLoginEnabled: true,
+    githubLoginUrl: 'https://smartfarm-live.vercel.app/api/auth/github/start',
     csrfToken: authenticated ? 'fixture-csrf' : null, farmId: authenticated ? LOCAL_FARM_ID : null,
     username: authenticated ? 'password.admin' : null, role: authenticated ? 'admin' : null });
   await page.route('**/api/v1/session', (route) => route.fulfill({ json: session() }));
@@ -25,6 +26,8 @@ test('password sign-in and admin account creation show errors and submit the sel
     await route.fulfill({ status: 201, json: { members: [] } });
   });
   await page.goto('/login');
+  await expect(page.getByLabel('User ID', { exact: true })).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('a').filter({ hasText: 'Sign in with GitHub' })).toHaveAttribute('href', 'https://smartfarm-live.vercel.app/api/auth/github/start');
   await page.getByLabel('User ID', { exact: true }).fill('password.admin');
   await page.getByLabel('Password', { exact: true }).fill('fixture-password-123');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
@@ -39,4 +42,34 @@ test('password sign-in and admin account creation show errors and submit the sel
   await expect(page.getByRole('status')).toContainText('User created.');
   expect(created).toBe(true);
   await expect(page.getByLabel('Password', { exact: true })).toHaveValue('');
+});
+
+test('Settings keeps member controls usable at desktop and phone widths and opens diagnostics on demand', async ({ page }) => {
+  await page.route('**/api/v1/session', (route) => route.fulfill({ json: { authenticated: true,
+    csrfToken: 'fixture-csrf', farmId: LOCAL_FARM_ID, username: 'farm.admin', role: 'admin' } }));
+  const username = 'long.user.id.'.padEnd(64, 'x');
+  await page.route('**/api/v1/farms/*/members', (route) => route.fulfill({ json: { members: [
+    { userId: 'fixture-user', username, role: 'viewer', loginType: 'password', githubId: null },
+    { userId: 'fixture-admin', username: 'farm.admin', role: 'admin', loginType: 'github', githubId: '123' },
+  ] } }));
+  let diagnosticsRequests = 0;
+  await page.route('**/api/v1/diagnostics', (route) => {
+    diagnosticsRequests++;
+    return route.fulfill({ json: { connection: 'fixture' } });
+  });
+  await page.goto('/settings');
+  await expect(page.getByLabel(`Role for ${username}`)).toBeVisible({ timeout: 30000 });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(page.getByRole('button', { name: 'Create user' })).toBeVisible();
+    await page.getByRole('button', { name: 'Reset password', exact: true }).click();
+    await expect(page.getByLabel(`New password for ${username}`)).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: `test-results/settings-${width}.png`, fullPage: true });
+    await page.getByRole('button', { name: 'Reset password', exact: true }).click();
+  }
+  expect(diagnosticsRequests).toBe(0);
+  await page.getByText('Diagnostics', { exact: true }).click();
+  await expect.poll(() => diagnosticsRequests).toBe(1);
+  await expect(page.locator('.diagnostics')).toContainText('fixture');
 });

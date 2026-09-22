@@ -8,6 +8,7 @@
   "hostProject": "prj_ieE6d49geytOALL2BMfHDTeVbHyv",
   "remoteProject": "prj_FBnZBmIKnF1CmWAFGJTJMMX9Zs7C",
   "host": "https://smartfarm-live.vercel.app",
+  "browserOrigins": ["https://smartfarm-live.vercel.app", "https://ttsmartfarm.mattias.li"],
   "api": "https://smartfarm-api-production.up.railway.app",
   "hostName": "smartfarm-live",
   "remoteName": "smartfarm-live-automations"

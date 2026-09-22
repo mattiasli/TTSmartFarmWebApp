@@ -11,12 +11,13 @@ describe('Independent password accounts', () => {
   let app: Awaited<ReturnType<typeof buildApp>>;
   let admin: Record<string, string>;
   const origin = 'http://127.0.0.1:5173';
+  const customOrigin = 'https://ttsmartfarm.mattias.li';
   const farm = `/api/v1/farms/${LOCAL_FARM_ID}`;
   const password = 'isolated-test-password-123!';
   beforeAll(async () => {
     db = await createIsolatedDatabase();
     app = await buildApp(loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: 'simulator',
-      SIMULATOR_TRANSPORT: 'memory', DATABASE_URL: db.url, ALLOWED_BROWSER_ORIGINS: origin }));
+      SIMULATOR_TRANSPORT: 'memory', DATABASE_URL: db.url, ALLOWED_BROWSER_ORIGINS: `${origin},${customOrigin}` }));
     const login = await app.inject({ method: 'POST', url: '/api/v1/local/login' });
     admin = { cookie: `smartfarm_session=${login.cookies[0]!.value}`, origin, 'x-csrf-token': login.json().csrfToken };
   });
@@ -51,6 +52,14 @@ describe('Independent password accounts', () => {
   it('rejects cross-origin login, invalid credentials and malformed account creation', async () => {
     expect((await login('example.user', password, { origin: 'https://attacker.invalid' })).statusCode).toBe(403);
     expect((await login('example.user', password, {})).statusCode).toBe(403);
+    expect((await login('example.user', password, { origin: 'null' })).statusCode).toBe(403);
+    expect((await login('example.user', password, { origin: `${customOrigin}.attacker.invalid` })).statusCode).toBe(403);
+    const customLogin = await login('example.user', password, { origin: customOrigin });
+    expect(customLogin.statusCode).toBe(200);
+    expect(customLogin.json()).toMatchObject({ authenticated: true, githubLoginUrl: `${origin}/api/auth/github/start` });
+    const customHeaders = { ...headers(customLogin), origin: customOrigin };
+    const ticket = await app.inject({ method: 'POST', url: '/api/v1/realtime/tickets', headers: customHeaders, payload: { farmId: LOCAL_FARM_ID } });
+    expect(ticket.statusCode).toBe(200);
     const wrong = await login('example.user', 'this-is-the-wrong-password');
     const absent = await login('missing.user', password);
     expect(wrong.statusCode).toBe(401);

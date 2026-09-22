@@ -57,6 +57,10 @@ it('rejects unsafe provider configuration without disclosing variable values', (
     HIVEMQ_HOST: 'broker.test', HIVEMQ_USERNAME: 'fixture', HIVEMQ_PASSWORD: 'sensitive-fixture',
     DATABASE_URL: 'sensitive-database', GITHUB_OAUTH_CLIENT_ID: 'fixture', GITHUB_OAUTH_CLIENT_SECRET: 'sensitive-oauth' };
   expect(() => assertProductionVariables(variables, expected)).not.toThrow();
+  const custom = { ...expected, browserOrigins: [expected.host, 'https://ttsmartfarm.mattias.li'] };
+  expect(() => assertProductionVariables({ ...variables, ALLOWED_BROWSER_ORIGINS: custom.browserOrigins.join(',') }, custom)).not.toThrow();
+  expect(() => assertProductionVariables(variables, custom)).toThrow('ALLOWED_BROWSER_ORIGINS');
+  expect(() => assertProductionVariables({ ...variables, ALLOWED_BROWSER_ORIGINS: '*' }, custom)).toThrow('ALLOWED_BROWSER_ORIGINS');
   const enabled = { ...variables, LIVE_COMMANDS_ENABLED: 'true', LIVE_PUMP_ENABLED: 'true' };
   const flags = productionControlFlags(enabled, 'preserve-control-flags');
   expect(() => assertProductionVariables(enabled, expected, flags)).not.toThrow();
