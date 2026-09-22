@@ -32,8 +32,13 @@ failure sentinels (-99/-1), light 3434–3509 and distance 17–43 cm. Transport
 freshness does not prove physical sensor response. The user reported completing
 light cover/uncover and near/far distance steps during a second observation.
 No clear light-cover response or intended 10/30-cm distance correlation was
-established. The user wants to inspect the sensors manually; leave physical
-acceptance open and wait for their findings before further hardware tests.
+established in that recording. On September 22 the user subsequently confirmed
+that rain/steam, distance and light sensors work correctly. Record these as
+operator-confirmed checks without rewriting the earlier measured evidence.
+The user also confirms that displayed temperature and humidity look reasonable;
+the transient DHT failure readings remain recorded separately.
+Next: confirm PIR, brief yellow-button response and soil/tank readings; then
+coordinate retained-command audit and supervised non-pump checks.
 No hardware commands have been sent. G09/G10 remain open; backup/restore remains
 explicitly deferred, and the shared MQTT credential exception covers initial read-only use.
 

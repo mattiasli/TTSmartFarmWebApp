@@ -23,6 +23,10 @@ Read-only production is deployed; physical acceptance remains outstanding. See
 - [x] Production OAuth, live WSS telemetry, all 22 fields and disabled controls verified on 1c6eb41
 - [x] Three-minute hosted observation: 197/197 fresh snapshots, one controller epoch
 - [x] User confirms latest sibling `FanMqtt` source is installed; binary not read back
+- [x] Rain/steam, distance and light sensors work correctly (operator confirmation, September 22)
+- [ ] PIR motion and brief yellow-button response confirmed
+- [x] Temperature and humidity look reasonable on the dashboard (operator confirmation, September 22)
+- [ ] Soil/tank readings confirmed
 - [ ] Several minutes of telemetry correlated with supervised sensor stimuli
 - [x] Local read-only observation made no command publish calls; both live flags false
 
@@ -32,8 +36,13 @@ and [sensor baseline](releases/production-sensors-2026-09-22.json). The baseline
 included transient DHT failure values (-99/-1); physical correlation is not yet
 qualified. The user reported completing light-cover and near/far distance steps,
 but these did not establish a clear light response or intended distance match.
-Manual sensor inspection is pending at the user's request. Command and pump
-flags remain false; do not infer physical acceptance from fresh transport.
+The operator subsequently confirmed that rain/steam, distance and light sensors
+work correctly on September 22. This is manual operator confirmation; the earlier
+recording remains inconclusive for timed stimulus correlation. PIR, button,
+and soil/tank checks remain open. The operator also confirms that displayed
+temperature and humidity look reasonable. This does not erase the brief DHT
+failure readings captured earlier or establish uninterrupted sensor operation.
+Command and pump flags remain false.
 Source hashes taken September 21 (operator-reported installed source):
 
 | File | SHA-256 |
