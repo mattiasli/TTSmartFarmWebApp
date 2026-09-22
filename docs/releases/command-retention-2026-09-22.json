@@ -1,0 +1,21 @@
+{
+  "startedAt": "2026-09-22T08:29:55.518Z",
+  "filters": [
+    "smartfarm/cmd/#",
+    "smartfarm/fan/set",
+    "smartfarm/telemetry"
+  ],
+  "subscribed": true,
+  "commandPublishCalls": 0,
+  "freshTelemetryPackets": 37,
+  "retainedCommands": [],
+  "observedLiveCommands": [],
+  "observationMs": 30000,
+  "noRetainedCommandsObserved": true,
+  "finishedAt": "2026-09-22T08:30:26.316Z",
+  "sourceSha": "1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1",
+  "certificateVerification": true,
+  "sharedCredentialException": "Existing credential reused for read-only subscription audit.",
+  "retainedMessagesCleared": 0,
+  "limitation": "Observed broker delivery during a bounded subscription; not a permanent guarantee or proof that other controllers are stopped."
+}

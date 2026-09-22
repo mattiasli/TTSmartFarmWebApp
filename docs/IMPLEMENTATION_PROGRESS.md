@@ -39,8 +39,15 @@ The user also confirms that displayed temperature and humidity look reasonable;
 the transient DHT failure readings remain recorded separately.
 The user subsequently confirmed motion, yellow button and soil/tank readings.
 Basic sensor checks are now operator-confirmed, alongside the recorded several
-minutes of fresh telemetry. Next: coordinate retained-command audit and
-supervised non-pump checks. Actuator tests have not yet been performed.
+minutes of fresh telemetry. Command-retention audit at 08:29–08:30 UTC found no
+retained or live commands across firmware filters; 37 fresh telemetry packets,
+zero publish calls and zero messages cleared. Evidence:
+`releases/command-retention-2026-09-22.json`. The new audit tool's actual local
+broker test verifies canonical/nested/legacy retained-topic detection and that
+retained messages remain unchanged. Run `node tools/scripts/audit-live-command-retention.mjs`
+for a fresh bounded audit before cutover. Next: confirm current operator
+supervision/controller shutdown and credential choice for the first temporary
+fan on/off test. No actuator tests have yet been performed.
 No hardware commands have been sent. G09/G10 remain open; backup/restore remains
 explicitly deferred, and the shared MQTT credential exception covers initial read-only use.
 

@@ -58,9 +58,19 @@ Record observed fields: `t`, `h`, `dht`, `soil`, `water`, `light`, `steam`, `rai
 
 ## Non-pump controls
 
+- [x] Read-only command-retention audit: no retained/live commands observed across firmware filters in 30 seconds; 37 fresh telemetry packets (September 22)
+- [ ] Confirm current supervision, power interruption access and other controllers stopped before enabling commands
 - [ ] Fan, LED, backlight, beep, feeder, LCD text/status
 - [ ] Master pause / browser close does not stop the server engine
 - [ ] Night-light 2559 vs 3380/3560 classification
+
+Audit evidence: [command retention](releases/command-retention-2026-09-22.json).
+The audit subscribed to `smartfarm/cmd/#`, legacy `smartfarm/fan/set`, and telemetry,
+with verified TLS. It sent no publish packets and cleared nothing. This bounded
+observation does not establish that other controllers are permanently stopped.
+First proposed actuator check: temporarily enable non-pump commands, fan on for
+about two seconds, fan off, then restore commands disabled. Pump remains disabled.
+Await operator readiness and confirmation of credential use before execution.
 
 ## Pump
 
