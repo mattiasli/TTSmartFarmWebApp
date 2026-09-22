@@ -4,6 +4,16 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+The remaining manual distance no-echo/recovery check passed: the operator saw
+Unavailable and then a sensible number. The 11:54–11:57 read-only recording has
+147 snapshots, eight no-echo readings mapped from -1 to null, valid recovery,
+zero request errors and no DHT failure. No other physical sensor failure was
+induced or reported; do not claim those cases passed or ask for powered sensor
+disconnection. Evidence: `releases/production-failure-displays-2026-09-22.json`.
+The requested manual checklist results are recorded; pump-related testing stays
+skipped by request and pump control remains enabled. Remaining project work is
+the final requirement/operations handoff audit with these explicit dispositions.
+
 Latest operator scope change: skip all remaining pump-related tests and keep pump
 control enabled. This overrides the earlier pump-disabled gate and consolidated
 pump checklist. Production API 22ffd13a-395e-4323-9211-364840631131 on source

@@ -1,4 +1,10 @@
-﻿# Remaining manual checks
+# Remaining manual checks
+
+Result (September 22): the operator confirmed Distance showed **Unavailable**
+and then a sensible distance returned. The recording corroborates eight no-echo
+samples and valid recovery. No other sensor failure was induced or reported.
+This distance check is complete and does not need repeating. Evidence:
+[recorded observation](releases/production-failure-displays-2026-09-22.json).
 
 Use https://smartfarm-live.vercel.app. Allow about five minutes. The operator
 explicitly requested skipping all remaining pump-related tests on September 22

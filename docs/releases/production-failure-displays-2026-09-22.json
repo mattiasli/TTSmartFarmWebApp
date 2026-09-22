@@ -1,0 +1,1485 @@
+{
+    "startedAt":  "2026-09-22T11:54:06.844Z",
+    "scope":  "Read-only distance/failure-display observation",
+    "commandRequestsSent":  0,
+    "samples":  [
+                    {
+                        "at":  "2026-09-22T11:54:07.127Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:08.342Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:09.540Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:10.754Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:11.960Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:13.186Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:14.400Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:15.610Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:16.835Z",
+                        "fresh":  true,
+                        "distanceWire":  13,
+                        "distanceCm":  13,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:18.061Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:19.282Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:20.485Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:21.701Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:22.925Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:24.137Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:25.498Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:26.698Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:27.914Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:29.175Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:30.395Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:31.602Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:32.819Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:34.116Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:35.325Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  32,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:36.532Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:37.755Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:38.969Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:40.175Z",
+                        "fresh":  true,
+                        "distanceWire":  11,
+                        "distanceCm":  11,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:41.384Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:42.620Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:44.132Z",
+                        "fresh":  true,
+                        "distanceWire":  11,
+                        "distanceCm":  11,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:45.360Z",
+                        "fresh":  true,
+                        "distanceWire":  11,
+                        "distanceCm":  11,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:46.580Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:47.784Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:49.298Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:50.510Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:51.731Z",
+                        "fresh":  true,
+                        "distanceWire":  14,
+                        "distanceCm":  14,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:52.934Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:54.158Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:55.363Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:56.581Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:57.816Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:54:59.043Z",
+                        "fresh":  true,
+                        "distanceWire":  11,
+                        "distanceCm":  11,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:00.250Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:01.460Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:02.682Z",
+                        "fresh":  true,
+                        "distanceWire":  5,
+                        "distanceCm":  5,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:03.888Z",
+                        "fresh":  true,
+                        "distanceWire":  4,
+                        "distanceCm":  4,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:05.133Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:06.343Z",
+                        "fresh":  true,
+                        "distanceWire":  4,
+                        "distanceCm":  4,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:07.562Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:08.782Z",
+                        "fresh":  true,
+                        "distanceWire":  12,
+                        "distanceCm":  12,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:09.993Z",
+                        "fresh":  true,
+                        "distanceWire":  13,
+                        "distanceCm":  13,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:11.216Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:12.420Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:13.639Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:14.843Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:16.045Z",
+                        "fresh":  true,
+                        "distanceWire":  52,
+                        "distanceCm":  52,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:17.261Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:18.475Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:19.684Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:20.891Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:22.221Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:23.438Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:24.670Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:25.876Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:27.081Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:28.278Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:29.487Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:30.715Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:31.927Z",
+                        "fresh":  true,
+                        "distanceWire":  17,
+                        "distanceCm":  17,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:33.138Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:34.566Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:35.777Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:36.986Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:38.191Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:39.391Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:40.618Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:41.833Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:43.033Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:44.246Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:45.459Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:46.686Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:47.943Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:49.166Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:50.371Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:51.587Z",
+                        "fresh":  true,
+                        "distanceWire":  -1,
+                        "distanceCm":  null,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:52.796Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:54.010Z",
+                        "fresh":  true,
+                        "distanceWire":  0,
+                        "distanceCm":  0,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:55.223Z",
+                        "fresh":  true,
+                        "distanceWire":  2,
+                        "distanceCm":  2,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:56.432Z",
+                        "fresh":  true,
+                        "distanceWire":  7,
+                        "distanceCm":  7,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:57.644Z",
+                        "fresh":  true,
+                        "distanceWire":  0,
+                        "distanceCm":  0,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:55:58.868Z",
+                        "fresh":  true,
+                        "distanceWire":  0,
+                        "distanceCm":  0,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:00.091Z",
+                        "fresh":  true,
+                        "distanceWire":  0,
+                        "distanceCm":  0,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:01.307Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:02.533Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:03.755Z",
+                        "fresh":  true,
+                        "distanceWire":  0,
+                        "distanceCm":  0,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:04.996Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:06.229Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:07.424Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:08.644Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:09.862Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:11.079Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  31,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:12.435Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:13.639Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:14.865Z",
+                        "fresh":  true,
+                        "distanceWire":  4,
+                        "distanceCm":  4,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:16.075Z",
+                        "fresh":  true,
+                        "distanceWire":  54,
+                        "distanceCm":  54,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:17.300Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:18.512Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:19.723Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:20.926Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:22.141Z",
+                        "fresh":  true,
+                        "distanceWire":  -1,
+                        "distanceCm":  null,
+                        "dht":  1,
+                        "temperatureC":  24,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:23.387Z",
+                        "fresh":  true,
+                        "distanceWire":  -1,
+                        "distanceCm":  null,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:24.595Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:25.817Z",
+                        "fresh":  true,
+                        "distanceWire":  8,
+                        "distanceCm":  8,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:27.044Z",
+                        "fresh":  true,
+                        "distanceWire":  38,
+                        "distanceCm":  38,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:28.260Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:29.466Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:30.695Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:31.908Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:33.165Z",
+                        "fresh":  true,
+                        "distanceWire":  -1,
+                        "distanceCm":  null,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:34.375Z",
+                        "fresh":  true,
+                        "distanceWire":  3,
+                        "distanceCm":  3,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:35.589Z",
+                        "fresh":  true,
+                        "distanceWire":  -1,
+                        "distanceCm":  null,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:36.803Z",
+                        "fresh":  true,
+                        "distanceWire":  -1,
+                        "distanceCm":  null,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:38.024Z",
+                        "fresh":  true,
+                        "distanceWire":  -1,
+                        "distanceCm":  null,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:39.231Z",
+                        "fresh":  true,
+                        "distanceWire":  -1,
+                        "distanceCm":  null,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:40.449Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:41.661Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:42.903Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:44.349Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:45.577Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:46.791Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:48.008Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:49.214Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:50.430Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:51.636Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  29,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:52.847Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  29,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:54.054Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  29,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:55.269Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:56.474Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:57.705Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:56:58.940Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  29,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:57:00.160Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  29,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:57:01.373Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  29,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:57:02.584Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  29,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:57:03.801Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:57:05.044Z",
+                        "fresh":  true,
+                        "distanceWire":  10,
+                        "distanceCm":  10,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    },
+                    {
+                        "at":  "2026-09-22T11:57:06.264Z",
+                        "fresh":  true,
+                        "distanceWire":  9,
+                        "distanceCm":  9,
+                        "dht":  1,
+                        "temperatureC":  23,
+                        "humidityPct":  30,
+                        "dhtHealthy":  true
+                    }
+                ],
+    "errors":  [
+
+               ],
+    "physicalReport":  "Operator confirmed Distance displayed Unavailable and then returned to a sensible number. No other sensor failure was reported.",
+    "finishedAt":  "2026-09-22T11:57:07.270Z",
+    "noEchoSamples":  8,
+    "dhtFailureSamples":  0,
+    "qualification":  "Distance no-echo display and recovery passed with operator confirmation and recorded wire/normalized values. Other physical sensor failure cases were not induced; pump tests remain skipped by request."
+}

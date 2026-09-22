@@ -30,7 +30,8 @@ Read-only production is deployed; physical acceptance remains outstanding. See
 - [x] Soil/tank readings confirmed by operator (September 22)
 - [x] Several minutes of fresh telemetry observed; operator confirms sensor responses (timed recording correlation remained inconclusive)
 - [x] Local read-only observation made no command publish calls; both live flags false
-- [ ] Physically verify no-echo/sensor-failure display where safely inducible (plan section 20.1.7)
+- [x] Distance no-echo displays Unavailable and recovers to a plausible value (operator confirmation and trace, September 22)
+- Other physical sensor failure cases were not safely induced; not claimed as tested (plan section 20.1.7).
 
 Evidence: [read-only observation](releases/live-readonly-2026-09-21.json).
 Hosted evidence: [browser verification](releases/production-authenticated-2026-09-22.json)
@@ -184,6 +185,18 @@ snapshots with all 22 fields, no page errors, disabled watering and visible guar
 confirmed for the matched 20/30 pair. Evidence: [alarm checks](releases/production-alarm-2026-09-22.json)
 and [restored dashboard](releases/production-after-alarm-2026-09-22.json).
 Safe no-echo/failure display and pump qualification remain open.
+
+## Sensor failure display result
+
+The remaining manual distance check passed. The operator observed Unavailable
+followed by a sensible distance. A three-minute read-only observation from
+11:54:06 to 11:57:07 UTC recorded 147 snapshots, eight no-echo readings (`dist=-1`,
+normalized distance `null`) and zero request errors. Valid distance readings
+returned in the trace. No DHT failure appeared in this recording and no other
+sensor failure was reported. This does not claim those other physical failures
+were induced. Evidence: [failure display observation](releases/production-failure-displays-2026-09-22.json).
+No commands or settings changes were made by the recorder; pump control stays
+enabled under the operator's separately recorded instruction.
 
 ## Pump
 
