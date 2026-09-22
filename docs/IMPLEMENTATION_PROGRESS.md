@@ -13,8 +13,16 @@ fails closed when a newer dashboard talks to an older API during deployment.
 Validation: type checking and lint passed, all 23 targeted API auth/command tests
 passed, and all twelve isolated local browser tests passed (including false,
 absent and true watering permissions across WebSocket updates).
-This follow-up has not yet been deployed to production; the qualified source below
-remains the live release while the operator performs manual sensor checks.
+This follow-up is deployed to production on 9a42efa2e92400f364b40b75625917407f120de7.
+CI 35715195863, staging 35715501791 and production 35716021873 passed. Release
+manifests: `releases/staging-9a42efa.json` and `releases/production-9a42efa.json`.
+Current API deployment: 6d2c4116-02f5-4875-ba3c-344a9261593b. The authenticated
+browser at 10:32 UTC received six live WebSocket snapshots with all 22 fields,
+verified `canPump=false` through HTTP and WebSocket, the disabled Water briefly
+button, rendered editor, paused automations, outputs off and zero page errors.
+Both live flags remain false. Device guard thresholds remain 8/10, saved settings
+20/30 and guard pending is visible. No hardware commands were sent. Evidence:
+`releases/production-9a42efa-browser.json`. The existing app session was reused.
 
 The operator requested manual testing and reporting in chat instead of further
 automated physical test sequences. Do not enable commands or start an alarm test
@@ -26,11 +34,11 @@ and its dashboard readings are correct. Alarm, protection transitions and
 Beep/Silence remain unverified by that report.
 Lighting evidence commit dae2dfb passed CI 35714178627 and staging 35714484551.
 
-**Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
+**Production read-only: https://smartfarm-live.vercel.app**. Previous release, revision
 d4c956d85fcf79ac03e22bdca1db58a374116576. CI 35710019685, staging release
 35710305487 and production release 35710809568 all passed. Evidence:
-`releases/production-d4c956d.json`. Live API ddb5b48f-ae0f-44e3-bda5-11b71212c599
-reports healthy ownership, live mode and both command flags false.
+`releases/production-d4c956d.json`. Its later API ddb5b48f-ae0f-44e3-bda5-11b71212c599
+reported healthy ownership, live mode and both command flags false.
 Browser verification at 09:38 UTC received seven live WSS snapshots, all 22
 fields, rendered the editor, and confirmed disabled controls and no page errors.
 The mismatched device 8/10 and saved 20/30 thresholds now correctly show

@@ -1,0 +1,70 @@
+{
+  "observedAt": "2026-09-22T10:32:55.258Z",
+  "sourceSha": "9a42efa2e92400f364b40b75625917407f120de7",
+  "actualGithubOAuth": false,
+  "callbackCookie": null,
+  "browser": "chromium",
+  "version": "153.0.8010.12",
+  "appCookie": {
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "Lax",
+    "hostOnly": true,
+    "path": "/"
+  },
+  "authenticated": true,
+  "role": "admin",
+  "noStore": true,
+  "readOnlyControls": true,
+  "wssSnapshots": 6,
+  "liveSnapshots": 6,
+  "fields": [
+    "bl",
+    "btn",
+    "buzz",
+    "dht",
+    "dist",
+    "fan",
+    "feed",
+    "guard",
+    "h",
+    "led",
+    "light",
+    "pir",
+    "pump",
+    "pumpBlocked",
+    "rain",
+    "rssi",
+    "soil",
+    "steam",
+    "t",
+    "tankLow",
+    "tankRecover",
+    "water"
+  ],
+  "editorRendered": true,
+  "pageErrors": 0,
+  "commandRequestsSent": 0,
+  "importedCookies": true,
+  "githubCookiesSaved": false,
+  "physicalSensorStimuliVerified": false,
+  "pumpPermission": {
+    "httpCanPump": false,
+    "wssCanPumpFalseFrames": 6,
+    "waterBrieflyDisabled": true
+  },
+  "guardStatus": {
+    "device": {
+      "tankLow": 8,
+      "tankRecover": 10
+    },
+    "saved": {
+      "tankLow": 20,
+      "tankRecover": 30
+    },
+    "guardConfirmed": false,
+    "pendingTextVisible": true,
+    "automationsPaused": true,
+    "outputsOff": true
+  }
+}

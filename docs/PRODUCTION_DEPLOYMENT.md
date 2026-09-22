@@ -1,11 +1,13 @@
 # P14 production connection
 
 Status: read-only production deployed at https://smartfarm-live.vercel.app on
-d4c956d; CI 35710019685, staging 35710305487 and production 35710809568 passed. See
-[release evidence](releases/production-d4c956d.json). Fresh OAuth was qualified
+9a42efa; CI 35715195863, staging 35715501791 and production 35716021873 passed. See
+[release evidence](releases/production-9a42efa.json). Fresh OAuth was qualified
 on the earlier same-day release; the valid app session verified the new release's
 live WebSocket, all 22 fields, disabled controls and correct pending guard status:
-[browser evidence](releases/production-d4c956d-browser.json).
+[browser evidence](releases/production-9a42efa-browser.json). The separate pumping
+permission is false in HTTP and WebSocket snapshots; Water briefly is disabled.
+Current API deployment: 6d2c4116-02f5-4875-ba3c-344a9261593b. Both live flags are false.
 Supervised physical acceptance remains incomplete.
 G08 simulator qualification is recorded in
 [staging acceptance](STAGING_ACCEPTANCE.md), with backup/restore explicitly
@@ -28,7 +30,7 @@ Commands were restored disabled; pumping remained disabled. See
 LED/backlight/beep/feeder/LCD group also passed on September 22, with operator
 confirmation, seven matched states and commands restored false at 08:57 UTC:
 [output evidence](releases/production-outputs-2026-09-22.json). Production API
-deployment is now 0f0994e1-080a-434c-bb31-e0f187b2f760 on the same source SHA.
+deployment at that point was 0f0994e1-080a-434c-bb31-e0f187b2f760 on the same source SHA.
 Further actuator tests require their own supervised scope.
 
 Cooling/manual takeover/Pause and browser All off also passed at 09:16 UTC:
