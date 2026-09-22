@@ -24,10 +24,10 @@ Read-only production is deployed; physical acceptance remains outstanding. See
 - [x] Three-minute hosted observation: 197/197 fresh snapshots, one controller epoch
 - [x] User confirms latest sibling `FanMqtt` source is installed; binary not read back
 - [x] Rain/steam, distance and light sensors work correctly (operator confirmation, September 22)
-- [ ] PIR motion and brief yellow-button response confirmed
+- [x] PIR motion and brief yellow-button response confirmed by operator (September 22)
 - [x] Temperature and humidity look reasonable on the dashboard (operator confirmation, September 22)
-- [ ] Soil/tank readings confirmed
-- [ ] Several minutes of telemetry correlated with supervised sensor stimuli
+- [x] Soil/tank readings confirmed by operator (September 22)
+- [x] Several minutes of fresh telemetry observed; operator confirms sensor responses (timed recording correlation remained inconclusive)
 - [x] Local read-only observation made no command publish calls; both live flags false
 
 Evidence: [read-only observation](releases/live-readonly-2026-09-21.json).
@@ -38,8 +38,9 @@ qualified. The user reported completing light-cover and near/far distance steps,
 but these did not establish a clear light response or intended distance match.
 The operator subsequently confirmed that rain/steam, distance and light sensors
 work correctly on September 22. This is manual operator confirmation; the earlier
-recording remains inconclusive for timed stimulus correlation. PIR, button,
-and soil/tank checks remain open. The operator also confirms that displayed
+recording remains inconclusive for timed stimulus correlation. The operator
+subsequently confirmed motion, yellow button and soil/tank readings as correct.
+Basic sensor checks are operator-confirmed. The operator also confirms that displayed
 temperature and humidity look reasonable. This does not erase the brief DHT
 failure readings captured earlier or establish uninterrupted sensor operation.
 Command and pump flags remain false.

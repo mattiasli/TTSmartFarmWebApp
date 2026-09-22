@@ -37,8 +37,10 @@ that rain/steam, distance and light sensors work correctly. Record these as
 operator-confirmed checks without rewriting the earlier measured evidence.
 The user also confirms that displayed temperature and humidity look reasonable;
 the transient DHT failure readings remain recorded separately.
-Next: confirm PIR, brief yellow-button response and soil/tank readings; then
-coordinate retained-command audit and supervised non-pump checks.
+The user subsequently confirmed motion, yellow button and soil/tank readings.
+Basic sensor checks are now operator-confirmed, alongside the recorded several
+minutes of fresh telemetry. Next: coordinate retained-command audit and
+supervised non-pump checks. Actuator tests have not yet been performed.
 No hardware commands have been sent. G09/G10 remain open; backup/restore remains
 explicitly deferred, and the shared MQTT credential exception covers initial read-only use.
 
