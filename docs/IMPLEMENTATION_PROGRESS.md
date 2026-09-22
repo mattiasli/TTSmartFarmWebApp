@@ -2,7 +2,26 @@
 
 Do not write secrets, broker passwords, OAuth client secrets, session tokens, or database URLs into this file.
 
-## Current handoff (2026-09-21 17:31 UTC)
+## Current handoff (2026-09-21 18:24 UTC)
+
+**Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
+afc31b1c6fd340bca92cd9c39c5c540aad8295e5. CI 35636526365, staging release
+35636857184 and production release 35637433047 all passed. Evidence:
+`releases/production-afc31b1.json` and `releases/staging-afc31b1.json`.
+Live API 9222e105-f06d-4ff4-b8f5-b67ecf770c3c reports healthy ownership, live mode,
+and both command flags false. Candidate/stable public login and proxy passed.
+Fresh production OAuth and authenticated live telemetry are being checked next;
+supervised sensor stimuli and non-pump acceptance remain. G09/G10 are not passed.
+
+18:32 update: actual production GitHub sign-in as mattiasli and fresh Chromium
+__Host-smartfarm_session attributes passed (Secure, HttpOnly, Lax, host-only, /).
+The initial observer wrongly used staging's cookie name; this was a test helper
+issue, not failed app authentication. Saved app session is `.infra/production-auth.json`;
+do not request another sign-in while valid. The real API returns fresh live samples
+with all 22 fields, and disabled controls render correctly. Hosted browser remains
+on HTTP polling because dashboard API code hardcoded LOCAL_FARM_ID for ticket
+requests. The session-farm fix and two regression tests pass locally; next deploy
+it through CI/staging/production, then run `.infra/check-production-oauth.mjs --reuse`.
 
 Update 18:07 UTC: 03e0edf passed CI 35634180123 and staging release 35634568197.
 Production deployment tokens passed preflight in first live release 35635193382.
@@ -11,8 +30,12 @@ pre-deploy `run-migrate.ts` seeded the default local farm, then the configured
 live farm collided on controller_lock_key=1. No host/remote deployed or commands
 sent. Migration/seed entry points now use the configured farm ID/name/environment,
 matching API startup; an actual PostgreSQL migration-to-startup regression passes.
-Retry requires the new revision's CI/staging qualification and removal of only
-the unused default seed left in the new production database. All live flags stay false.
+The successful retry followed CI/staging qualification and transactional removal
+of the unused default seed: one local farm and its untouched defaults/membership/
+allowlist plus its single automation.config revision-1 event. Inspection verified
+no commands, telemetry, sessions, OAuth flows or WS tickets. All three migrations
+were preserved. Repair used private Railway SSH; temporary key was revoked and
+local key files removed. No public database port was opened.
 
 **Verified coordinated release: 28c8cde67e89f1ef944fa296dec78d4500a3762b.**
 CI 35630085572 and release workflow 35630437207 both succeeded. All six release
@@ -34,7 +57,7 @@ server response. No additional user sign-in is needed for S02.
 
 G08 is qualified for the agreed scope after review of S01–S14. S12 backup/restore
 remains explicitly deferred, never passed. P14 has actual read-only broker evidence;
-hosted live deployment and supervised non-pump acceptance remain. G09/G10 are open.
+hosted live deployment now passed; supervised non-pump acceptance remains. G09/G10 are open.
 
 Subsequent release 35627854052 for documentation/tooling revision 3e431b6 failed
 at the API stage (Railway deployment 7a94d608-9f9c-42f3-b708-ec6dd185397f).
@@ -65,16 +88,15 @@ Production projects, separate Postgres/API services and verified Vercel domains
 are provisioned; IDs are in `tools/deploy/production.json`. API runtime variables
 are configured with APP_ENV=production, FARM_MODE=live and both command flags false.
 The user added separate production GitHub OAuth credentials; presence confirmed.
-No live API has been deployed. The manual read-only production workflow requires
+The live API is deployed. The manual read-only production workflow requires
 exact CI and successful staging release, and leaves OAuth/live-browser/hardware
 qualification explicitly pending after initial public login deployment.
-All four required secret names are now verified in `smartfarm-production` after
-the user added the three deployment tokens. Revision 792223c passed CI 35632974217
-and coordinated staging release 35633226711. Before production activation, the
-subsequent read-only permission fix must pass the same gates: HTTP and WebSocket
+All four production secrets were validated by the successful live release.
+PRODUCTION_READONLY_RELEASE_ENABLED=true. The deployed permission fix ensures
+HTTP and WebSocket
 snapshots preserve disabled control permissions even for operators, the header
 shows Read-only, and live automation starts/resumes and guard sync reject commands.
-Actual token validity will be established by the first production workflow.
+Nine browser tests passed, including the operator WebSocket permission regression.
 See `PRODUCTION_DEPLOYMENT.md` for exact URLs.
 
 All five staging environment secrets are configured and provider access is verified.

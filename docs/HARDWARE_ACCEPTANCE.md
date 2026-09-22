@@ -5,7 +5,7 @@ This file is a template. Fill it during a supervised window. Do not write creden
 Preparation: the live TLS adapter is implemented. The user authorized reuse of
 the existing MQTT credential for the initial read-only observation; it has not
 been reset. This is not evidence of broker-enforced read-only permissions.
-Production provisioning and physical acceptance remain outstanding. See
+Read-only production is deployed; physical acceptance remains outstanding. See
 [production connection](PRODUCTION_DEPLOYMENT.md).
 
 - Date:

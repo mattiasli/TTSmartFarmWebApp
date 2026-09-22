@@ -1,6 +1,9 @@
 # P14 production connection
 
-Status: real broker read-only observation passed; hosted live deployment pending.
+Status: read-only production deployed at https://smartfarm-live.vercel.app on
+afc31b1; CI, staging and production release passed. See
+[release evidence](releases/production-afc31b1.json). Fresh authenticated browser
+verification and supervised physical acceptance remain separate checks.
 G08 simulator qualification is recorded in
 [staging acceptance](STAGING_ACCEPTANCE.md), with backup/restore explicitly
 deferred. Supervised physical acceptance is not yet complete.
@@ -32,7 +35,7 @@ must continue rejecting live services.
 
 The production projects and domains are now reserved; actual IDs are recorded in
 `tools/deploy/production.json`. The API has its separate database reference and
-both live flags false, but has not been deployed. Its OAuth app must use
+both live flags false and is deployed. Its OAuth app uses
 homepage `https://smartfarm-live.vercel.app` and redirect URI
 `https://smartfarm-live.vercel.app/api/auth/github/callback`. Disable wildcard
 matching and device flow; leave user access token expiration enabled. GitHub's
@@ -49,9 +52,9 @@ telemetry for the first operator session. It does not mark G09/G10 passed.
 Deployment secrets belong to GitHub environment `smartfarm-production`:
 `RAILWAY_TOKEN`, `VERCEL_HOST_TOKEN`, `VERCEL_REMOTE_TOKEN`, and
 `VERCEL_HOST_AUTOMATION_BYPASS`. All four secret names are verified after the
-user added the deployment tokens. Their validity awaits the first deployment.
-The repository variable `PRODUCTION_READONLY_RELEASE_ENABLED` remains off until
-the prerequisites are verified. Broker and OAuth credentials stay in Railway.
+user added the deployment tokens; the successful production deployment verified
+their validity. `PRODUCTION_READONLY_RELEASE_ENABLED=true` after successful CI
+and exact staging qualification. Broker and OAuth credentials stay in Railway.
 
 | Backend setting | Initial live value |
 |---|---|
