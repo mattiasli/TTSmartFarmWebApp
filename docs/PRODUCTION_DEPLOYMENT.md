@@ -28,6 +28,13 @@ confirmation, seven matched states and commands restored false at 08:57 UTC:
 [output evidence](releases/production-outputs-2026-09-22.json). Production API
 deployment is now 0f0994e1-080a-434c-bb31-e0f187b2f760 on the same source SHA.
 Further actuator tests require their own supervised scope.
+
+Cooling/manual takeover/Pause and browser All off also passed at 09:16 UTC:
+[cooling evidence](releases/production-cooling-2026-09-22.json). Settings were
+restored and commands disabled at 09:17:26 UTC on deployment
+71875f4a-2e91-4990-9e9a-ce1efeb3e3be, same source 1c6eb41. The observed device
+guard thresholds 8/10 differ from saved app settings 20/30; neither was changed.
+Resolve and supervise matching guard settings as part of pump qualification.
 Save values only in ignored private setup and production backend secret variables,
 never Vercel or GitHub CI. Actual permissions still need verification.
 

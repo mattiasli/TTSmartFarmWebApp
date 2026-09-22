@@ -268,7 +268,7 @@ export class AutomationEngine {
       attempts: this.attempts,
       cooldownRemainingSeconds: Math.max(0, Math.ceil((this.nextWater - this.clock()) / 1000)),
       tankIsLow: this.tankIsLow,
-      guardConfirmed: this.data?.guard === 1,
+      guardConfirmed: this.guardStatus() === 'confirmed',
       alarmActive: this.alarmActive,
     };
   }

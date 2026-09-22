@@ -7,7 +7,7 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 **Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
 1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1. CI 35700323331, staging release
 35701046216 and production release 35701555060 all passed. Evidence:
-`releases/production-1c6eb41.json`. Live API 0f0994e1-080a-434c-bb31-e0f187b2f760
+`releases/production-1c6eb41.json`. Live API 71875f4a-2e91-4990-9e9a-ce1efeb3e3be
 reports healthy ownership, live mode and both command flags false.
 Fresh OAuth at 07:42 UTC verified the original production cookie attributes;
 authenticated browser verification at 07:56 received seven live WSS snapshots,
@@ -73,10 +73,33 @@ controls and no page errors (`releases/production-after-outputs-2026-09-22.json`
 Nine cleanup/schema/scope tests passed for `supervised-output-sequence.test.mjs`.
 Fan evidence commit 0233e96 passed CI 35706695286 and staging release 35706982599.
 Production source remains 1c6eb41.
-Next: arrange supervised all-off, cooling/manual takeover, lighting/motion,
-master/browser-close and low-tank alarm checks. Beep UI animation also remains
-to observe during an actual live browser command. Do not infer these checks from
-manual output tests. No further actuator commands are authorized by this group.
+Cooling/manual takeover/Pause/browser All off passed at 09:16 UTC with operator
+confirmation. The fan held both on and off inside a 22-26 degree hysteresis band
+at 24 degrees C. Pause preserved manual fan ownership and released automatic
+ownership; browser All off stopped the active fan and LED. The test browser was
+closed for 10.234 seconds without test polling: master stayed enabled and fan on,
+but no independent rule transition was observed during that closed interval.
+Settings were restored, automations paused and commands disabled at 09:17:26 UTC.
+Evidence: `releases/production-cooling-2026-09-22.json` and
+`releases/production-after-cooling-2026-09-22.json` (seven live WSS snapshots,
+all 22 fields, disabled controls, no page errors). Pump flag stayed false.
+The device's existing guard thresholds are 8/10; app settings are 20/30. Neither
+was changed. A conservative initial preflight stopped before enablement; code
+review and an actual-engine regression verified that cooling with irrigation off
+and unchanged guard settings emits only fan commands. This mismatch remains
+unresolved for pump qualification.
+
+That investigation found a UI status bug: runtime.guardConfirmed used only the
+firmware support bit, allowing unmatched thresholds to display as confirmed.
+It now uses the existing guardStatus check, which requires matched settings and
+no pending/failed synchronization. The regression covers mismatched/partially
+matched thresholds, absent telemetry, pending settings and confirmation.
+31 targeted tests passed. This correction is prepared for CI and deployment;
+production still runs the previously qualified source listed above.
+Output commit c95cb20 passed CI 35708048925 and staging release 35708360634.
+Next: supervised lighting/motion, low-tank alarm, beep UI and an independent
+automatic state change during browser closure. No further actuator commands
+are authorized by the completed cooling group.
 G09/G10 remain open; backup/restore remains explicitly deferred. The shared MQTT
 credential exception covers initial read-only use and these supervised non-pump tests.
 

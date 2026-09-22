@@ -64,10 +64,13 @@ Record observed fields: `t`, `h`, `dht`, `soil`, `water`, `light`, `steam`, `rai
 - [x] Fan on/off: two-second request interval, both states matched telemetry; operator confirms physical run and stop
 - [x] LED, backlight, short beep, feeder, two-line LCD text/status (operator confirms all five)
 - [x] Maximum 16-character LCD lines displayed; five invalid text cases rejected by production API
-- [ ] All-off physical behavior and beep animation during a live UI request
-- [ ] Cooling hysteresis and manual takeover/resume
+- [x] Browser All off stops the active fan and LED; operator confirms normal behavior
+- [ ] Beep animation during a live UI request
+- [x] Cooling hysteresis in both directions and manual takeover/resume
 - [ ] Low-tank alarm, silence/manual override and protection status without pumping
-- [ ] Master pause / browser close does not stop the server engine
+- [x] Master pause leaves manual fan ownership alone and releases automatic fan ownership
+- [x] Closing the test browser for ten seconds leaves master enabled and fan on
+- [ ] Observe an independent automatic state change during browser closure
 - [ ] Night-light 2559 vs 3380/3560 classification
 
 Audit evidence: [command retention](releases/command-retention-2026-09-22.json).
@@ -92,8 +95,22 @@ returned HTTP 400 VALIDATION with commands disabled. A subsequent browser check
 received six live WSS snapshots with all 22 fields and disabled controls, with
 zero page errors. Evidence: [output tests](releases/production-outputs-2026-09-22.json)
 and [restored dashboard](releases/production-after-outputs-2026-09-22.json).
-All-off and physical automation checks remain outstanding. Arrange their
-supervised scope before sending further actuator commands.
+Cooling and All off completed at 09:16 UTC. At 24 degrees C, on/off settings
+23/21 started the fan, 27/25 stopped it, and 26/22 held both previous states in
+the hysteresis band. Manual off held despite a cooling demand; Pause preserved a
+manual on, while resumed automatic control was released by Pause. The browser's
+All off button stopped the active fan and LED. Seven explicit command records
+reached `state_matched`; the operator confirms normal cycling and final off.
+Closing the test browser for 10.234 seconds without test API polling left master
+enabled and the fan on. This did not observe a new rule transition during closure.
+Original settings were restored, automations paused and commands disabled at
+09:17:26 UTC. Device thresholds stayed 8/10, saved app thresholds stayed 20/30.
+That mismatch is recorded for later pump qualification; no guard synchronization
+was requested and pumping remained disabled. Evidence:
+[cooling and All off](releases/production-cooling-2026-09-22.json) and
+[restored dashboard](releases/production-after-cooling-2026-09-22.json).
+Lighting/motion, low-tank alarm, beep UI and an independent transition during
+browser closure remain outstanding. Arrange their supervised scope before commands.
 
 Tested sequence: `tools/scripts/supervised-output-sequence.mjs` supports
 LED/backlight only, or LED/backlight, one short 880-Hz beep, feeder open/close,

@@ -53,6 +53,21 @@ function farm(
 }
 
 describe('AutomationEngine', () => {
+  it('reports guard confirmation only when device thresholds match saved settings', () => {
+    const empty = new AutomationEngine({ send: () => {} });
+    expect(empty.runtime().guardConfirmed).toBe(false);
+    const f = farm({}, undefined, { ...packet, guard: 1, tankLow: 8, tankRecover: 10 });
+    expect(f.engine.runtime().guardConfirmed).toBe(false);
+    f.step(100, { tankLow: 20 });
+    expect(f.engine.runtime().guardConfirmed).toBe(false);
+    f.step(200, { tankRecover: 30 });
+    expect(f.engine.runtime().guardConfirmed).toBe(true);
+    f.engine.configure({ ...f.engine.settings, tankLow: 21, tankRecover: 31 });
+    expect(f.engine.runtime().guardConfirmed).toBe(false);
+    f.step(500, { tankLow: 21, tankRecover: 31 });
+    expect(f.engine.runtime().guardConfirmed).toBe(true);
+  });
+
   it('starts paused and watering waits, pulses once, then waits from confirmed pump stop', () => {
     const f = farm();
     f.step(1000, { soil: 10 });
