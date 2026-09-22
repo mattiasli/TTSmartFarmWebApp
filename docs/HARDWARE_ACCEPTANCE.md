@@ -187,9 +187,17 @@ Safe no-echo/failure display and pump qualification remain open.
 
 ## Pump
 
-Leave disabled until the freeze investigation and G09 checklist in `IMPLEMENTATION_PLAN.md` §20.3 are complete.
+On September 22 the operator explicitly requested skipping all remaining pump
+tests and keeping pump control enabled, overriding the earlier requirement to
+leave it disabled until plan section 20.3 was complete. Both live flags are now
+true; automations remain paused. No interlocks or bounded-pulse behavior changed.
+The operator independently pressed Water briefly and reported the pump stopped,
+then stated that the pump works. A temporary telemetry gap showed last pump=1;
+fresh telemetry later returned with pump=0. Record physical operation as operator
+confirmation and the remaining pump qualification as skipped, not passed.
+See [pump enablement evidence](releases/production-pump-enabled-2026-09-22.json).
 
-The operator requested all remaining checks in one manual session. Use
+The operator requested the remaining non-pump checks in one manual session. Use
 [the consolidated session checklist](FINAL_MANUAL_SESSION.md), including the
 preparation information, conditional pump steps, interruption checkpoints and
 single report template. Creating the checklist does not enable commands.

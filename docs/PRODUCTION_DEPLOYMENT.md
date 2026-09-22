@@ -1,14 +1,19 @@
 # P14 production connection
 
-Status: read-only production deployed at https://smartfarm-live.vercel.app on
+Status: production control enabled at https://smartfarm-live.vercel.app on
 9a42efa; CI 35715195863, staging 35715501791 and production 35716021873 passed. See
 [release evidence](releases/production-9a42efa.json). Fresh OAuth was qualified
 on the earlier same-day release; the valid app session verified the new release's
 live WebSocket, all 22 fields, disabled controls and correct pending guard status:
 [browser evidence](releases/production-9a42efa-browser.json). The separate pumping
 permission is false in HTTP and WebSocket snapshots; Water briefly is disabled.
-Current API deployment: 4649d8b3-5415-46c2-a438-732a7e4c5350, same 9a42efa source.
-Both live flags are false after completed manual alarm/Beep/Silence checks.
+Current API deployment: 22ffd13a-395e-4323-9211-364840631131, same 9a42efa source.
+Both live flags are true at the operator's explicit request to skip remaining pump
+tests and enable pump control. Master remains paused. Earlier read-only evidence
+below records historical test cleanup, not the current control permissions.
+Current [enablement evidence](releases/production-pump-enabled-2026-09-22.json)
+verifies the live flags, HTTP/WSS permissions and enabled Water briefly/stop
+controls. The operator confirmed actual pump operation and stop separately.
 The operator synchronized tank protection to 20/30; the latest browser check
 verifies matching thresholds and visible guard confirmed, paused automations and
 outputs off: [after-alarm evidence](releases/production-after-alarm-2026-09-22.json).

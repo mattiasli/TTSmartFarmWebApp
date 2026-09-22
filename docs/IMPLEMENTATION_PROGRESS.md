@@ -4,7 +4,26 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
-The operator wants one consolidated manual session for every remaining physical
+Latest operator scope change: skip all remaining pump-related tests and keep pump
+control enabled. This overrides the earlier pump-disabled gate and consolidated
+pump checklist. Production API 22ffd13a-395e-4323-9211-364840631131 on source
+9a42efa now has LIVE_COMMANDS_ENABLED=true and LIVE_PUMP_ENABLED=true. Master
+automations remain paused; saved settings and tank/rain/freshness/uncertainty
+protections are unchanged. The operator independently pressed Water briefly and
+confirmed the pump stopped, then confirmed that it works. Do not run pump tests.
+During enablement verification, telemetry briefly went stale with last pump=1;
+the operator confirmed physical stop, and fresh telemetry subsequently showed
+pump=0. Do not infer uninterrupted reliability from that observation.
+Browser verification at 11:53 UTC confirmed enabled Water briefly, Stop pump and
+All off, canPump=true on HTTP/WSS, fresh readings and no page errors. It sent no
+actuator requests. Remaining manual work is sensor failure/no-echo display only;
+`FINAL_MANUAL_SESSION.md` has been reduced accordingly. Record skipped pump
+qualification as skipped, not passed. Do not restore read-only by default.
+The current production release workflow is explicitly read-only and will reject
+this enabled configuration at preflight; do not switch flags off merely to run it.
+Evidence: `releases/production-pump-enabled-2026-09-22.json`.
+
+Previously, the operator wanted one consolidated manual session for every remaining physical
 check. `FINAL_MANUAL_SESSION.md` now maps plan 20.1.7 and 20.3.1–12 to a single
 ordered checklist/report, including low tank, manual stops, wet soil, cooldown,
 attempt limit, rain, browser closure, backend restart, farm Wi-Fi, broker loss,

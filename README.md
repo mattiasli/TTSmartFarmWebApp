@@ -6,7 +6,7 @@ This folder is the application repository (`https://github.com/mattiasli/TTSmart
 
 ## Status
 
-Local packages **P00–P12** are in `master`. Hosted simulator staging **P13/G08** is qualified for the agreed scope, with backup/restore deferred. GitHub OAuth through Vercel `/api` to Railway, live WebSocket and dashboard UI work. P14 has verified manual outputs, cooling/manual takeover/Pause, All off, lighting and motion hold, including an automatic change with the browser closed. Manual alarm/Beep/Silence checks also passed. Remaining failure-display checks and pump qualification are open. Live commands are restored disabled; pumping remains disabled.
+Local packages **P00–P12** are in `master`. Hosted simulator staging **P13/G08** is qualified for the agreed scope, with backup/restore deferred. GitHub OAuth through Vercel `/api` to Railway, live WebSocket and dashboard UI work. P14 has verified manual outputs, cooling/manual takeover/Pause, All off, lighting and motion hold, including an automatic change with the browser closed. Manual alarm/Beep/Silence checks also passed. Remaining failure-display checks are open. The operator requested skipping remaining pump qualification and enabling pump control; both live flags are now true, with master automations paused.
 
 Recorded verified staging release: `9a42efa`, with all CI checks and the ordered
 API/remote/host release workflow passed. Hosted database outage/recovery, handover,
@@ -18,7 +18,7 @@ See [staging acceptance](docs/STAGING_ACCEPTANCE.md).
 
 P14 progress: the real broker delivered 223 valid samples with all 22 telemetry
 fields over a three-minute read-only observation. No commands were published.
-Read-only production is deployed at [smartfarm-live.vercel.app](https://smartfarm-live.vercel.app)
+Production is deployed at [smartfarm-live.vercel.app](https://smartfarm-live.vercel.app)
 on `9a42efa`. The original GitHub sign-in qualified OAuth; the current release
 passed authenticated live WebSocket, all 22 fields and disabled-control checks
 using that valid session. Guard confirmation now requires matching device/app

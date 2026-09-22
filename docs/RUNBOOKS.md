@@ -2,12 +2,17 @@
 
 Do not put broker passwords, OAuth secrets, session tokens, or database URLs in this file.
 
-Live commands stay disabled (`LIVE_COMMANDS_ENABLED=false`) until a supervised hardware window. Live pumping stays disabled (`LIVE_PUMP_ENABLED=false`) until G09.
+On September 22 the operator explicitly requested skipping remaining pump tests
+and enabling pump control. Production now has `LIVE_COMMANDS_ENABLED=true` and
+`LIVE_PUMP_ENABLED=true`. Master remains paused until the operator presses Start.
+Keep tank, rain, freshness and uncertain-pump protections enforced. This operator
+decision replaces the earlier blanket disablement; skipped qualification is not
+a claim that all hardware tests passed.
 
 The physical farm dashboard is https://smartfarm-live.vercel.app. The separate
 https://smartfarm-host.vercel.app dashboard is simulator staging. Sign in with
-an authorized GitHub account. A Read-only badge and disabled controls are expected
-on the physical farm outside an agreed test window. Sensor, output and cooling
+an authorized GitHub account. Water briefly, Stop pump and All off are available
+to permitted users while connection conditions allow them. Sensor, output and cooling
 test results are recorded in [hardware acceptance](HARDWARE_ACCEPTANCE.md).
 
 ## Health
