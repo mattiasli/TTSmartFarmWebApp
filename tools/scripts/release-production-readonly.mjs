@@ -2,19 +2,21 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { activeDeploymentId, immutableVercelUrl } from './staging-release-policy.mjs';
-import { assertProductionVariables, assertReadOnlyProductionHealth, productionHostConfig } from './production-release-policy.mjs';
+import { assertProductionVariables, assertProductionHealth, productionControlFlags, productionHostConfig } from './production-release-policy.mjs';
 import { checkRemoteRelease } from './check-staging-release-candidate.mjs';
 import { checkProductionLogin } from './check-production-login.mjs';
 
 const target = JSON.parse(await readFile('tools/deploy/production.json', 'utf8'));
 const { project, environment, service, team, hostProject, remoteProject, host, api } = target;
 const sha = process.env.RELEASE_SHA;
+const releaseMode = process.env.PRODUCTION_RELEASE_MODE ?? 'read-only';
+assert.ok(['read-only', 'preserve-control-flags'].includes(releaseMode), 'Unknown production release mode');
 assert.match(sha ?? '', /^[a-f0-9]{40}$/);
 assert.equal(process.env.PRODUCTION_READONLY_RELEASE_ENABLED, 'true');
 for (const name of ['RAILWAY_TOKEN', 'VERCEL_HOST_TOKEN', 'VERCEL_REMOTE_TOKEN', 'VERCEL_HOST_AUTOMATION_BYPASS']) {
   assert.ok(process.env[name], `Missing production deployment secret: ${name}`);
 }
-const evidence = { schemaVersion: 1, environment: 'production', scope: 'read-only', sourceSha: sha,
+const evidence = { schemaVersion: 1, environment: 'production', scope: releaseMode, sourceSha: sha,
   ciRunUrl: process.env.RELEASE_CI_URL, startedAt: new Date().toISOString(), stages: [],
   commandPublishCalls: 0, backupRestoreDisposition: 'Explicitly deferred by user.',
   freshOAuthVerified: false, authenticatedTelemetryVerified: false, hardwareAcceptancePassed: false };
@@ -24,7 +26,7 @@ async function stage(name, action) {
   const entry = { name, startedAt: new Date().toISOString(), status: 'running' };
   evidence.stages.push(entry);
   await save();
-  console.log(`Production read-only release: ${name}`);
+  console.log(`Production release (${releaseMode}): ${name}`);
   try { await action(); entry.status = 'passed'; }
   catch { entry.status = 'failed'; throw new Error(`Production release failed at ${name}; inspect provider state before retrying.`); }
   finally { entry.finishedAt = new Date().toISOString(); await save(); }
@@ -66,13 +68,21 @@ const settingsQuery = `query { serviceInstance(serviceId: "${service}", environm
   activeDeployments { id status } latestDeployment { id status } } }`;
 const deployment = (url, token) => vercel(`/v13/deployments/${new URL(url).hostname}`, token);
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+let controlFlags;
+async function verifyProviderFlags() {
+  const variables = JSON.parse(await cli('railway', ['variables', '--project', project,
+    '--environment', environment, '--service', service, '--json']));
+  assertProductionVariables(variables, target, controlFlags);
+}
 
-await stage('read-only configuration and deployment authority', async () => {
+await stage('control configuration and deployment authority', async () => {
   assert.equal((await cli('git', ['rev-parse', 'HEAD'])).trim(), sha);
   assert.equal((await cli('git', ['status', '--porcelain', '--untracked-files=no'])).trim(), '');
   const variables = JSON.parse(await cli('railway', ['variables', '--project', project,
     '--environment', environment, '--service', service, '--json']));
-  assertProductionVariables(variables, target);
+  controlFlags = productionControlFlags(variables, releaseMode);
+  evidence.controlFlags = controlFlags;
+  assertProductionVariables(variables, target, controlFlags);
   const triggers = await railway(`query { deploymentTriggers(projectId: "${project}", environmentId: "${environment}", serviceId: "${service}", first: 10) { edges { node { id } } } }`);
   assert.equal(triggers.deploymentTriggers.edges.length, 0);
   const settings = (await railway(settingsQuery)).serviceInstance;
@@ -83,7 +93,7 @@ await stage('read-only configuration and deployment authority', async () => {
   assert.ok(settings.preDeployCommand.includes('npm run db:migrate'));
   if (settings.activeDeployments.length) {
     const current = await health();
-    assertReadOnlyProductionHealth(current);
+    assertProductionHealth(current, undefined, controlFlags);
     evidence.previousApi = { sourceSha: current.releaseSha, deploymentId: activeDeploymentId(settings) };
   } else {
     assert.ok(!settings.latestDeployment || ['FAILED', 'REMOVED'].includes(settings.latestDeployment.status));
@@ -97,21 +107,22 @@ await stage('read-only configuration and deployment authority', async () => {
   assert.ok(!remote.ssoProtection, 'Immutable remote assets must be public before deployment');
 });
 
-await stage('API migration and read-only ownership', async () => {
+await stage('API migration and ownership with preserved control flags', async () => {
+  await verifyProviderFlags();
   const original = await readFile('Dockerfile', 'utf8');
   const block = /ARG RAILWAY_GIT_COMMIT_SHA=dev\r?\nENV RELEASE_SHA=\$\{RAILWAY_GIT_COMMIT_SHA\}\r?\nLABEL org\.opencontainers\.image\.revision=\$\{RAILWAY_GIT_COMMIT_SHA\}/;
   assert.match(original, block);
   try {
     await writeFile('Dockerfile', original.replace(block, `ENV RELEASE_SHA=${sha}\nLABEL org.opencontainers.image.revision=${sha}`));
     await cli('railway', ['up', '--project', project, '--environment', environment, '--service', service,
-      '--detach', '--json', '--message', `production-readonly ${sha}`]);
+      '--detach', '--json', '--message', `production-${releaseMode} ${sha}`]);
   } finally { await writeFile('Dockerfile', original); }
   const deadline = Date.now() + 15 * 60_000;
   while (Date.now() < deadline) {
     const settings = (await railway(settingsQuery)).serviceInstance;
     assert.ok(!['FAILED', 'CRASHED', 'REMOVED'].includes(settings.latestDeployment?.status), 'API deployment failed');
     try {
-      assertReadOnlyProductionHealth(await health(), sha);
+      assertProductionHealth(await health(), sha, controlFlags);
       const deploymentId = activeDeploymentId(settings);
       assert.equal(deploymentId, settings.latestDeployment.id);
       evidence.api = { sourceSha: sha, deploymentId, publicOrigin: api };
@@ -147,7 +158,8 @@ await stage('host with production proxy and pinned remote', async () => {
   evidence.candidateSmoke = await checkProductionLogin({ host, candidate, bypass: process.env.VERCEL_HOST_AUTOMATION_BYPASS });
 });
 await stage('promotion and public login verification', async () => {
-  assertReadOnlyProductionHealth(await health(), sha);
+  await verifyProviderFlags();
+  assertProductionHealth(await health(), sha, controlFlags);
   await vercel(`/v10/projects/${hostProject}/promote/${evidence.host.deploymentId}`, process.env.VERCEL_HOST_TOKEN, 'POST', {});
   let promoted = false;
   for (let attempt = 0; attempt < 36; attempt++) {
@@ -157,8 +169,9 @@ await stage('promotion and public login verification', async () => {
   }
   assert.ok(promoted);
   evidence.stableSmoke = await checkProductionLogin({ host, candidate: host });
-  assertReadOnlyProductionHealth(await health(), sha);
+  await verifyProviderFlags();
+  assertProductionHealth(await health(), sha, controlFlags);
 });
 evidence.finishedAt = new Date().toISOString();
-evidence.qualification = 'Read-only hosting deployed. Fresh OAuth, authenticated live telemetry and supervised hardware acceptance still required.';
+evidence.qualification = 'Hosting deployed with verified control flags. OAuth, authenticated telemetry and physical acceptance are recorded separately; this workflow performs no actuator tests.';
 await save();

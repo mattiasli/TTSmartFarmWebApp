@@ -86,8 +86,11 @@ token is used during sign-in; SmartFarm subsequently uses its own session.
 The user has added both OAuth values to the production API; presence is verified.
 The manual `smartfarm-web-production` workflow requires successful CI and a
 successful coordinated staging release for the same SHA. Its initial scope is
-strictly read-only: provider settings and running health must both have live
-commands and pumping disabled. It verifies candidate/stable public login and
+strictly read-only by default: provider settings and running health must both have
+live commands and pumping disabled. The explicit `preserve-control-flags` option
+instead verifies and retains the currently configured flags, without changing
+them or sending actuator commands. Use that option for the enabled farm after
+its exact source passes CI and staging. It verifies candidate/stable public login and
 proxy delivery, then explicitly leaves fresh OAuth and authenticated live
 telemetry for the first operator session. It does not mark G09/G10 passed.
 

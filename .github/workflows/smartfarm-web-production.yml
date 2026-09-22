@@ -7,6 +7,14 @@ on:
         description: Exact 40-character SHA with successful CI and staging release
         required: true
         type: string
+      control_mode:
+        description: Preserve existing live permissions or require read-only configuration; never changes flags
+        required: true
+        default: read-only
+        type: choice
+        options:
+          - read-only
+          - preserve-control-flags
 
 permissions:
   contents: read
@@ -43,11 +51,12 @@ jobs:
       - run: npm ci
       - run: npm install --global @railway/cli@5.58.0 vercel@59.23.2
       - run: npx playwright install --with-deps chromium
-      - name: Deploy read-only production
+      - name: Deploy production with verified control flags
         env:
           RELEASE_SHA: ${{ steps.source.outputs.sha }}
           RELEASE_CI_URL: ${{ steps.source.outputs.ci_url }}
           PRODUCTION_READONLY_RELEASE_ENABLED: ${{ vars.PRODUCTION_READONLY_RELEASE_ENABLED }}
+          PRODUCTION_RELEASE_MODE: ${{ inputs.control_mode || 'read-only' }}
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           VERCEL_HOST_TOKEN: ${{ secrets.VERCEL_HOST_TOKEN }}
           VERCEL_REMOTE_TOKEN: ${{ secrets.VERCEL_REMOTE_TOKEN }}

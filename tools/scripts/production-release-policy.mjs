@@ -1,10 +1,27 @@
 import assert from 'node:assert/strict';
 
-export function assertReadOnlyProductionHealth(health, sha) {
+const readOnlyFlags = Object.freeze({ liveCommandsEnabled: false, livePumpEnabled: false });
+
+export function productionControlFlags(variables, mode = 'read-only') {
+  assert.ok(['read-only', 'preserve-control-flags'].includes(mode), 'Unknown production release mode');
+  for (const key of ['LIVE_COMMANDS_ENABLED', 'LIVE_PUMP_ENABLED']) {
+    assert.ok(['true', 'false'].includes(variables[key]), `Invalid production flag: ${key}`);
+  }
+  const flags = Object.freeze({ liveCommandsEnabled: variables.LIVE_COMMANDS_ENABLED === 'true',
+    livePumpEnabled: variables.LIVE_PUMP_ENABLED === 'true' });
+  if (mode === 'read-only') assert.deepEqual(flags, readOnlyFlags, 'Read-only release requires both flags disabled');
+  return flags;
+}
+
+export function assertProductionHealth(health, sha, flags = readOnlyFlags) {
   for (const [key, value] of Object.entries({ appEnv: 'production', farmMode: 'live',
-    liveCommandsEnabled: false, livePumpEnabled: false, controller: 'owner',
+    liveCommandsEnabled: flags.liveCommandsEnabled, livePumpEnabled: flags.livePumpEnabled, controller: 'owner',
     databaseConfigured: true, githubOAuthConfigured: true })) assert.equal(health[key], value, key);
   if (sha) assert.equal(health.releaseSha, sha);
+}
+
+export function assertReadOnlyProductionHealth(health, sha) {
+  assertProductionHealth(health, sha, readOnlyFlags);
 }
 
 export function productionHostConfig(config, api) {
@@ -15,9 +32,9 @@ export function productionHostConfig(config, api) {
     ? { ...rule, destination: `${api}/api/:path*` } : rule) };
 }
 
-export function assertProductionVariables(variables, expected) {
+export function assertProductionVariables(variables, expected, flags = readOnlyFlags) {
   for (const [name, value] of Object.entries({ APP_ENV: 'production', FARM_MODE: 'live',
-    LIVE_COMMANDS_ENABLED: 'false', LIVE_PUMP_ENABLED: 'false', FARM_ID: expected.farmId,
+    LIVE_COMMANDS_ENABLED: String(flags.liveCommandsEnabled), LIVE_PUMP_ENABLED: String(flags.livePumpEnabled), FARM_ID: expected.farmId,
     PUBLIC_APP_ORIGIN: expected.host, ALLOWED_BROWSER_ORIGINS: expected.host,
     PUBLIC_WS_URL: expected.api.replace('https:', 'wss:') + '/ws' })) {
     // Do not include provider values in assertion diagnostics.

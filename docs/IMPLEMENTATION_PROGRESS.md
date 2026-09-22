@@ -29,8 +29,14 @@ All off, canPump=true on HTTP/WSS, fresh readings and no page errors. It sent no
 actuator requests. Remaining manual work is sensor failure/no-echo display only;
 `FINAL_MANUAL_SESSION.md` has been reduced accordingly. Record skipped pump
 qualification as skipped, not passed. Do not restore read-only by default.
-The current production release workflow is explicitly read-only and will reject
-this enabled configuration at preflight; do not switch flags off merely to run it.
+The handoff review found that the production release workflow only accepted
+read-only flags. It now has an explicit `preserve-control-flags` input that keeps
+the provider's existing pair and verifies it throughout deployment/promotion;
+default read-only behavior remains strict. No flag writes or actuator tests are
+part of either workflow mode. Eight local release-policy tests cover preservation,
+runtime/provider drift, malformed inputs and read-only rejection. This workflow
+update still needs its exact CI/staging/production qualification; the current
+deployed source remains listed above until that release finishes.
 Evidence: `releases/production-pump-enabled-2026-09-22.json`.
 
 Previously, the operator wanted one consolidated manual session for every remaining physical

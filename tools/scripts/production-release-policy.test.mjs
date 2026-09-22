@@ -1,5 +1,31 @@
 import { expect, it } from 'vitest';
-import { assertProductionVariables, assertReadOnlyProductionHealth, productionHostConfig } from './production-release-policy.mjs';
+import { assertProductionVariables, assertProductionHealth, assertReadOnlyProductionHealth, productionControlFlags, productionHostConfig } from './production-release-policy.mjs';
+
+it.each([[false, false], [true, false], [true, true], [false, true]])(
+  'preserves exact control flags %s/%s and rejects runtime drift', (commands, pump) => {
+    const variables = { LIVE_COMMANDS_ENABLED: String(commands), LIVE_PUMP_ENABLED: String(pump) };
+    const flags = productionControlFlags(variables, 'preserve-control-flags');
+    expect(flags).toEqual({ liveCommandsEnabled: commands, livePumpEnabled: pump });
+    const health = { appEnv: 'production', farmMode: 'live', controller: 'owner',
+      databaseConfigured: true, githubOAuthConfigured: true, releaseSha: 'release', ...flags };
+    expect(() => assertProductionHealth(health, 'release', flags)).not.toThrow();
+    for (const patch of [{ liveCommandsEnabled: !commands }, { livePumpEnabled: !pump },
+      { farmMode: 'simulator' }, { controller: 'waiting_for_owner' }, { releaseSha: 'other' }]) {
+      expect(() => assertProductionHealth({ ...health, ...patch }, 'release', flags)).toThrow();
+    }
+    expect(variables).toEqual({ LIVE_COMMANDS_ENABLED: String(commands), LIVE_PUMP_ENABLED: String(pump) });
+    expect(Object.isFrozen(flags)).toBe(true);
+  },
+);
+
+it('requires an explicit preserving mode and rejects missing or malformed flags', () => {
+  const enabled = { LIVE_COMMANDS_ENABLED: 'true', LIVE_PUMP_ENABLED: 'true' };
+  expect(() => productionControlFlags(enabled)).toThrow();
+  expect(() => productionControlFlags(enabled, 'enable-pump')).toThrow();
+  for (const patch of [{ LIVE_PUMP_ENABLED: undefined }, { LIVE_PUMP_ENABLED: 'yes' }, { LIVE_COMMANDS_ENABLED: '' }]) {
+    expect(() => productionControlFlags({ ...enabled, ...patch }, 'preserve-control-flags')).toThrow();
+  }
+});
 
 it('never accepts simulator, writable live mode, missing OAuth or another revision as read-only production', () => {
   const health = { appEnv: 'production', farmMode: 'live', liveCommandsEnabled: false,
@@ -31,6 +57,10 @@ it('rejects unsafe provider configuration without disclosing variable values', (
     HIVEMQ_HOST: 'broker.test', HIVEMQ_USERNAME: 'fixture', HIVEMQ_PASSWORD: 'sensitive-fixture',
     DATABASE_URL: 'sensitive-database', GITHUB_OAUTH_CLIENT_ID: 'fixture', GITHUB_OAUTH_CLIENT_SECRET: 'sensitive-oauth' };
   expect(() => assertProductionVariables(variables, expected)).not.toThrow();
+  const enabled = { ...variables, LIVE_COMMANDS_ENABLED: 'true', LIVE_PUMP_ENABLED: 'true' };
+  const flags = productionControlFlags(enabled, 'preserve-control-flags');
+  expect(() => assertProductionVariables(enabled, expected, flags)).not.toThrow();
+  expect(() => assertProductionVariables({ ...enabled, LIVE_PUMP_ENABLED: 'false' }, expected, flags)).toThrow('LIVE_PUMP_ENABLED');
   expect(() => assertProductionVariables({ ...variables, LIVE_COMMANDS_ENABLED: 'true' }, expected)).toThrow('LIVE_COMMANDS_ENABLED');
   try { assertProductionVariables({ ...variables, FARM_ID: 'sensitive-wrong-value' }, expected); }
   catch (error) { expect(error.message).not.toContain('sensitive'); }

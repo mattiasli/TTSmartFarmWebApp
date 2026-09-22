@@ -2,13 +2,25 @@
 
 Validation CI does not receive provider or farm secrets. The separate staging
 release workflow uses encrypted deployment and app-session secrets in the
-`smartfarm-staging` GitHub environment. Live pump stays disabled.
+`smartfarm-staging` GitHub environment. Simulator staging keeps both live flags disabled.
 
 The separate manual `smartfarm-web-production` workflow is qualified for
-read-only production. It requires the exact source to pass CI and staging,
-uses the `smartfarm-production` environment, and refuses enabled live flags.
+production. It requires the exact source to pass CI and staging and uses the
+`smartfarm-production` environment. Its default `control_mode=read-only` refuses
+enabled live flags. The explicit `preserve-control-flags` option snapshots the
+current provider flags, verifies running health matches them, and retains that
+same pair through deployment and promotion. Neither option changes these flags.
+Provider drift fails verification rather than overwriting the operator's choice.
+The legacy script/artifact/toggle names retain `readonly` for compatibility; the
+manifest's `scope` and `controlFlags` identify the actual release mode.
 It records public login deployment separately from fresh OAuth, authenticated
 real telemetry and physical acceptance. See [production setup](PRODUCTION_DEPLOYMENT.md).
+
+For the currently enabled production farm, select `preserve-control-flags`.
+Coordinate a maintenance interval with automations paused and the pump stopped;
+backend restart begins paused and does not resume automations. Verify the live
+authenticated dashboard after release. Do not issue physical pump tests as a
+deployment smoke check: the operator explicitly skipped them.
 
 ## Local script contract
 
