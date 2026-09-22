@@ -20,7 +20,9 @@ export async function checkProductionLogin({ host, candidate, bypass }) {
     let errors = 0;
     page.on('pageerror', () => { errors++; });
     await page.goto(`${host}/login`);
-    await expect(page.locator('a[href="/api/auth/github/start"]')).toBeVisible();
+    const githubSignIn = page.locator('a').filter({ hasText: 'Sign in with GitHub' });
+    await expect(githubSignIn).toBeVisible();
+    assert.equal(await githubSignIn.evaluate((element) => element.href), `${host}/api/auth/github/start`);
     const session = await page.evaluate(async () => {
       const response = await fetch('/api/v1/session');
       const body = await response.json();
