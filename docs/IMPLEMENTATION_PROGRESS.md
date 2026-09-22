@@ -4,6 +4,28 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+Software follow-up for manual testing: snapshots now expose a separate `canPump`
+permission, respecting both live flags and the session role. The dashboard keeps
+Water briefly disabled when this permission is false or absent, including after
+WebSocket updates, while allowing separately enabled non-pump controls and stops.
+The API continues enforcing command policy independently. This additive field
+fails closed when a newer dashboard talks to an older API during deployment.
+Validation: type checking and lint passed, all 23 targeted API auth/command tests
+passed, and all twelve isolated local browser tests passed (including false,
+absent and true watering permissions across WebSocket updates).
+This follow-up has not yet been deployed to production; the qualified source below
+remains the live release while the operator performs manual sensor checks.
+
+The operator requested manual testing and reporting in chat instead of further
+automated physical test sequences. Do not enable commands or start an alarm test
+based on the earlier readiness question. Tank reading/protection observations can
+be made read-only; app alarm and Beep/Silence checks still require a separately
+arranged command-enabled window. Pumping remains disabled.
+The operator subsequently reconfirmed that the tank water-level sensor works well
+and its dashboard readings are correct. Alarm, protection transitions and
+Beep/Silence remain unverified by that report.
+Lighting evidence commit dae2dfb passed CI 35714178627 and staging 35714484551.
+
 **Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
 d4c956d85fcf79ac03e22bdca1db58a374116576. CI 35710019685, staging release
 35710305487 and production release 35710809568 all passed. Evidence:

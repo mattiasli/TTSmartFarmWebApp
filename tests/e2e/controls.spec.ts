@@ -1,5 +1,36 @@
 import { expect, test } from '@playwright/test';
 
+for (const permission of [false, undefined, true]) {
+  test(`watering permission ${String(permission)} survives WebSocket updates without blocking other controls`, async ({ page }) => {
+    let snapshots = 0;
+    await page.routeWebSocket('ws://127.0.0.1:5173/ws', (socket) => {
+      const server = socket.connectToServer();
+      server.onMessage((message) => {
+        const envelope = JSON.parse(String(message));
+        if (envelope.type === 'snapshot') {
+          snapshots++;
+          envelope.data.permissions.canControl = true;
+          if (permission === undefined) delete envelope.data.permissions.canPump;
+          else envelope.data.permissions.canPump = permission;
+        }
+        socket.send(JSON.stringify(envelope));
+      });
+    });
+    await page.goto('/');
+    await expect.poll(() => snapshots, { timeout: 20_000 }).toBeGreaterThan(1);
+    const watering = page.getByRole('button', { name: 'Water briefly', exact: true });
+    if (permission === true) await expect(watering).toBeEnabled();
+    else {
+      await expect(watering).toBeDisabled();
+      await expect(page.getByText('Watering is disabled. Other controls remain available.', { exact: true })).toBeVisible();
+    }
+    await expect(page.getByRole('switch', { name: 'Fan', exact: true })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Beep', exact: true })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Stop pump', exact: true })).toBeEnabled();
+    await expect(page.getByTestId('start-automations')).toBeEnabled();
+  });
+}
+
 test('WebSocket read-only permissions keep controls disabled for an operator session', async ({ page }) => {
   let snapshots = 0;
   await page.routeWebSocket('ws://127.0.0.1:5173/ws', (socket) => {

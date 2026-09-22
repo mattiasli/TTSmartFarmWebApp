@@ -56,7 +56,8 @@ export type FarmSnapshot = {
   wire: WireTelemetry | null;
   lcd: { line1: string; line2: string; remote: boolean };
   pendingCommands: CommandDto[];
-  permissions: { canControl: boolean; canView: boolean };
+  // Older API releases omit canPump; clients must treat absence as disabled.
+  permissions: { canControl: boolean; canView: boolean; canPump?: boolean };
   automations: {
     revision: number;
     settings: AutomationSettings;

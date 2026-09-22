@@ -147,7 +147,12 @@ export class FarmController {
       wire: latest?.data ?? null,
       lcd: this.link.lcd,
       pendingCommands: [...this.commands.values()].filter(isPendingCommand),
-      permissions: { canControl: this.config.FARM_MODE === 'simulator' || this.config.LIVE_COMMANDS_ENABLED, canView: true },
+      permissions: {
+        canControl: this.config.FARM_MODE === 'simulator' || this.config.LIVE_COMMANDS_ENABLED,
+        canPump: this.config.FARM_MODE === 'simulator'
+          || (this.config.LIVE_COMMANDS_ENABLED && this.config.LIVE_PUMP_ENABLED),
+        canView: true,
+      },
       automations: {
         revision: this.settingsRevision,
         settings: this.engine.settings,

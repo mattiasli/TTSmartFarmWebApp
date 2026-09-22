@@ -41,6 +41,7 @@ export function useFarmLive() {
           permissions: {
             canView: true,
             canControl: snapshot.permissions.canControl && (role === 'operator' || role === 'admin'),
+            canPump: Boolean(snapshot.permissions.canPump) && snapshot.permissions.canControl && (role === 'operator' || role === 'admin'),
           },
         });
       },

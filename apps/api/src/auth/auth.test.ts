@@ -35,7 +35,28 @@ describe('P06 auth gates', () => {
     const { cookie } = await login(app);
     const response = await app.inject({ method: 'GET', url: `/api/v1/farms/${LOCAL_FARM_ID}/snapshot`, headers: { cookie } });
     expect(response.statusCode).toBe(200);
-    expect(response.json().permissions).toEqual({ canView: true, canControl: false });
+    expect(response.json().permissions).toEqual({ canView: true, canControl: false, canPump: false });
+  });
+
+  it.each([
+    { mode: 'live', commands: true, pump: false, role: 'operator', canControl: true, canPump: false },
+    { mode: 'live', commands: false, pump: true, role: 'operator', canControl: false, canPump: false },
+    { mode: 'live', commands: true, pump: true, role: 'operator', canControl: true, canPump: true },
+    { mode: 'simulator', commands: false, pump: false, role: 'operator', canControl: true, canPump: true },
+    { mode: 'simulator', commands: false, pump: false, role: 'viewer', canControl: false, canPump: false },
+  ] as const)('exposes watering permission for $mode / commands=$commands / pump=$pump / $role', async (scenario) => {
+    const config = loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: scenario.mode,
+      LIVE_COMMANDS_ENABLED: String(scenario.commands), LIVE_PUMP_ENABLED: String(scenario.pump) });
+    const controller = new FarmController(config, new ScriptedFarmLink());
+    const memorySessions = new MemorySessionStore();
+    const created = memorySessions.createLocalOperator();
+    created.session.role = scenario.role;
+    const app = await buildApp(config, { controller, memorySessions, store: null, pool: null });
+    apps.push(app);
+    const response = await app.inject({ method: 'GET', url: `/api/v1/farms/${LOCAL_FARM_ID}/snapshot`,
+      headers: { cookie: `smartfarm_session=${created.token}` } });
+    expect(response.statusCode).toBe(200);
+    expect(response.json().permissions).toEqual({ canView: true, canControl: scenario.canControl, canPump: scenario.canPump });
   });
 
   it('T063 rejects a missing CSRF token on commands', async () => {

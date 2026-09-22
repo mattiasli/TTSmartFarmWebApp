@@ -45,6 +45,11 @@ subsequently confirmed motion, yellow button and soil/tank readings as correct.
 Basic sensor checks are operator-confirmed. The operator also confirms that displayed
 temperature and humidity look reasonable. This does not erase the brief DHT
 failure readings captured earlier or establish uninterrupted sensor operation.
+After choosing to perform the remaining sensor checks manually, the operator
+explicitly reconfirmed that the tank water-level sensor works well and the
+dashboard readings are correct. This confirms the sensor/display observation;
+no low-tank alarm, protection-indicator transition, Beep/Silence or pump result
+was reported with this confirmation.
 Command and pump flags remain false.
 Source hashes taken September 21 (operator-reported installed source):
 

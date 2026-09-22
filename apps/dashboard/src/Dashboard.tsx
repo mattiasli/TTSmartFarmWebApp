@@ -81,6 +81,9 @@ export function Dashboard() {
   const canStart = canControl && Boolean(snapshot?.connection.fresh && snapshot.connection.controllerReady && snapshot.connection.brokerReady);
   const banners = useMemo(() => {
     const items: string[] = [];
+    if (snapshot?.permissions.canControl && !snapshot.permissions.canPump) {
+      items.push('Watering is disabled. Other controls remain available.');
+    }
     if (readings?.pumpBlocked === 1) items.push('Tank is low — automatic watering stays blocked.');
     if (readings?.pumpBlocked === 2) items.push('Tank sample is invalid — pump starts stay blocked.');
     if (snapshot && !snapshot.automations.runtime.masterEnabled) {
@@ -217,7 +220,7 @@ export function Dashboard() {
           {pendingAction('lcd.setBacklight') ? ' · turning…' : ''}
         </Text>
         <div className="control-row">
-          <Button appearance="primary" disabled={!canStart} onClick={() => command.mutate({ type: 'pump.pulse' })}>
+          <Button appearance="primary" disabled={!canStart || !snapshot?.permissions.canPump} onClick={() => command.mutate({ type: 'pump.pulse' })}>
             Water briefly
           </Button>
           <Button disabled={!canControl} onClick={() => command.mutate({ type: 'pump.stop' })}>

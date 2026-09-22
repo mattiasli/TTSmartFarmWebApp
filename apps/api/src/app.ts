@@ -183,7 +183,11 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   function withPermissions(snapshot: FarmSnapshot, session: RequestSession): FarmSnapshot {
     return {
       ...snapshot,
-      permissions: { canView: true, canControl: snapshot.permissions.canControl && session.role !== 'viewer' },
+      permissions: {
+        canView: true,
+        canControl: snapshot.permissions.canControl && session.role !== 'viewer',
+        canPump: Boolean(snapshot.permissions.canPump) && snapshot.permissions.canControl && session.role !== 'viewer',
+      },
     };
   }
 
