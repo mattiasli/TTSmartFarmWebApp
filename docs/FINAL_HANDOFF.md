@@ -9,21 +9,25 @@ source-level assertions or the operator's explicit scope decisions.
 - Physical farm: https://smartfarm-live.vercel.app
 - Simulator staging: https://smartfarm-host.vercel.app
 - Production API: https://smartfarm-api-production.up.railway.app
-- Deployed application source: 247b525a45e18d4c061c5aa871bda55ea06831ff.
-  [Release manifest](releases/production-247b525.json) records API
-  5e1b0cbb-c685-4e8d-9253-82f7573108c4 and the immutable host/remote pair.
-- CI [35725070292](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35725070292),
-  staging [35725407854](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35725407854)
-  and production [35726197685](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35726197685)
-  all passed on this exact source.
-- Both live command flags stayed enabled throughout the release. The
-  [authenticated browser verification](releases/production-247b525-browser.json)
-  confirmed fresh MQTT telemetry, enabled HTTP/WSS pumping permissions and
-  Water briefly/Stop pump/All off controls, guard confirmed at 20/30, unchanged
-  settings and no page errors. No actuator commands were sent by that check.
-- [Maintenance](releases/production-maintenance-2026-09-22.json) paused master
-  automations before deployment; they remained paused after restart. Use Start
-  when ready to resume. Manual pump availability is separate from master state.
+- Deployed application source: a39fe4440620f033fdd69c4f282c28656df0b7f1.
+  [Release manifest](releases/production-a39fe44.json) records API
+  07467f5f-3453-407e-b148-bf36bdb629f5 and its immutable frontend pair.
+- CI [35730674619](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35730674619),
+  staging [35731069424](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35731069424)
+  and production [35732203356](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35732203356)
+  passed on this exact source.
+- Admins can create independent user ID/password accounts and assign viewer,
+  operator or admin roles, reset passwords and remove access. Startup no longer
+  restores removed bootstrap access. See [account administration](LOCAL_ACCOUNTS.md).
+- [Hosted account checks](releases/production-a39fe44-accounts.json) passed real
+  admin UI creation, Chromium/WebKit password login, live WebSocket, cookie
+  attributes, viewer restrictions, revocation and all five switch labels.
+  Temporary access was removed; no actuator commands were sent.
+- Both live flags remain enabled. The [control check](releases/production-a39fe44-controls.json)
+  verified fresh telemetry, enabled HTTP/WSS pumping permissions and manual stop
+  controls, unchanged settings and matched 20/30 tank protection.
+- [Maintenance](releases/production-a39fe44-maintenance.json) paused automations;
+  they remain paused after restart. Use Start to resume when ready.
 
 ## Scope decisions that must survive handoff
 
@@ -83,7 +87,7 @@ SHA, and verify the new owner plus enabled manual permissions. Backend startup
 stays paused; the operator explicitly resumes when ready.
 
 For rollback, use a schema-compatible API and its recorded host/remote pair.
-The 9a42efa manifest provides the current compatible pre-update pair; older
+The 247b525 manifest provides the pre-local-account API/frontend pair; its UI lacks password login/management, so retain GitHub admin access for that rollback path. The additive account tables remain in place; older
 manifests retain prior pairs. Preserve current control flags and leave master
 paused. Never restore old command intent or infer a physical stop from a provider
 success status. See RELEASE.md and RUNBOOKS.md for the tested staging procedure.

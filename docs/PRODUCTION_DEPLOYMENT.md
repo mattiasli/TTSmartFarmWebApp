@@ -1,23 +1,20 @@
 # P14 production connection
 
-Status: production is deployed at https://smartfarm-live.vercel.app on
-247b525. CI 35725070292, staging 35725407854 and production 35726197685 passed.
-See [release evidence](releases/production-247b525.json) and
-[final handoff](FINAL_HANDOFF.md) for the exact source, API/host/remote IDs,
-requirement checklist and scope decisions.
+Status: production is deployed at https://smartfarm-live.vercel.app on a39fe44.
+CI 35730674619, staging 35731069424 and production 35732203356 passed.
+See [release evidence](releases/production-a39fe44.json),
+[account/browser checks](releases/production-a39fe44-accounts.json) and
+[current handoff](FINAL_HANDOFF.md).
 
-Both live flags remain true at the operator's request. The post-release
-[authenticated browser check](releases/production-247b525-browser.json) verified
-fresh telemetry, enabled Water briefly/Stop pump/All off, HTTP/WSS canPump=true,
-unchanged settings and guard confirmed at 20/30. Master automations are paused
-after maintenance/restart; the operator can resume with Start. The browser check
-sent no actuator commands. Pump operation and stop were separately confirmed by
-the operator; further pump qualification was explicitly skipped. Requested
-non-pump/manual checks are complete. Other physical sensor failures were not induced.
+Admins can create users in Settings with independent user IDs/passwords and
+viewer/operator/admin roles. No GitHub account is required for those users.
+The automation switches now display their actual On/Off draft state.
+Both live flags remain enabled, with master paused after maintenance/restart;
+use Start when ready. The [control verification](releases/production-a39fe44-controls.json)
+confirmed fresh telemetry, unchanged settings, enabled pump/stop controls and
+matched tank protection without actuator commands. Pump tests remain skipped.
 
-Earlier read-only evidence below describes historical test cleanup, not current
-permissions. Fresh OAuth was qualified on the earlier same-day release; the
-post-release check reused that valid session and does not claim a new sign-in.
+Earlier read-only evidence below records historical cleanup, not current permissions.
 
 G08 simulator qualification is recorded in
 [staging acceptance](STAGING_ACCEPTANCE.md), with backup/restore explicitly

@@ -4,6 +4,23 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+The local-account and switch-label follow-up is deployed on **a39fe44**.
+CI 35730674619, staging 35731069424 and production 35732203356 all passed.
+Both hosted environments passed admin UI account creation, fresh password sign-in
+in Chromium and WebKit, Secure/HttpOnly/Lax response headers, live WebSocket,
+viewer restrictions and removal/revocation. Temporary access was removed.
+The production editor correctly shows Off for the disabled tank alarm and On
+for the four enabled rules. No settings toggles or actuator commands were sent
+by these checks. The Windows WebKit cookie metadata issue was handled by checking
+the original password-login response's Set-Cookie attributes; its metadata still
+reports None. Two earlier instrumentation attempts cleaned up their test users.
+Maintenance paused master automations; both live flags and pump permission remain
+enabled after release. The authenticated control check passed with fresh telemetry,
+unchanged settings and no commands. Use Start to resume when ready.
+See LOCAL_ACCOUNTS.md and releases/production-a39fe44*.json. No additional account
+secrets or external identity-provider setup is required. Earlier entries below
+are historical release records.
+
 Follow-up requested: automation switch labels now follow their draft On/Off state.
 Independent password accounts have been added, with admin create/role/reset/remove
 UI, PostgreSQL credential storage and throttling, shared session/CSRF protections,
