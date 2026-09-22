@@ -5,11 +5,19 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 ## Current handoff (2026-09-22)
 
 **Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
-1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1. CI 35700323331, staging release
-35701046216 and production release 35701555060 all passed. Evidence:
-`releases/production-1c6eb41.json`. Live API 71875f4a-2e91-4990-9e9a-ce1efeb3e3be
+d4c956d85fcf79ac03e22bdca1db58a374116576. CI 35710019685, staging release
+35710305487 and production release 35710809568 all passed. Evidence:
+`releases/production-d4c956d.json`. Live API f37fc3b9-688d-4b84-8837-c6c9548ed114
 reports healthy ownership, live mode and both command flags false.
-Fresh OAuth at 07:42 UTC verified the original production cookie attributes;
+Browser verification at 09:38 UTC received seven live WSS snapshots, all 22
+fields, rendered the editor, and confirmed disabled controls and no page errors.
+The mismatched device 8/10 and saved 20/30 thresholds now correctly show
+`guardConfirmed=false` and visible "guard pending"; automations are paused and
+fan/LED/pump/feeder/buzzer report off. Evidence:
+`releases/production-d4c956d-browser.json`. This reused the valid app session;
+no additional OAuth sign-in or hardware commands were needed for the release.
+
+Earlier fresh OAuth at 07:42 UTC on 1c6eb41 verified the original production cookie attributes;
 authenticated browser verification at 07:56 received seven live WSS snapshots,
 all 22 fields, rendered the editor, verified no-store and disabled controls,
 and observed zero page errors. Evidence: `releases/production-oauth-2026-09-22.json`
@@ -72,7 +80,7 @@ The restored browser passed with six live WSS snapshots, all 22 fields, disabled
 controls and no page errors (`releases/production-after-outputs-2026-09-22.json`).
 Nine cleanup/schema/scope tests passed for `supervised-output-sequence.test.mjs`.
 Fan evidence commit 0233e96 passed CI 35706695286 and staging release 35706982599.
-Production source remains 1c6eb41.
+Those physical tests used 1c6eb41; the current read-only release is listed above.
 Cooling/manual takeover/Pause/browser All off passed at 09:16 UTC with operator
 confirmation. The fan held both on and off inside a 22-26 degree hysteresis band
 at 24 degrees C. Pause preserved manual fan ownership and released automatic
@@ -94,12 +102,22 @@ firmware support bit, allowing unmatched thresholds to display as confirmed.
 It now uses the existing guardStatus check, which requires matched settings and
 no pending/failed synchronization. The regression covers mismatched/partially
 matched thresholds, absent telemetry, pending settings and confirmation.
-31 targeted tests passed. This correction is prepared for CI and deployment;
-production still runs the previously qualified source listed above.
+All 179 unit tests passed with four local workers, plus type checking, lint,
+full CI and exact staging/production release. The initial full local run alongside
+lint/types timed out in three API tests; the bounded-worker full rerun passed.
+The correction is deployed on d4c956d and verified in the actual live editor.
+Before deployment, the same live browser regression reproduced the incorrect
+`guardConfirmed=true`; after deployment it verifies false and "guard pending".
 Output commit c95cb20 passed CI 35708048925 and staging release 35708360634.
 Next: supervised lighting/motion, low-tank alarm, beep UI and an independent
 automatic state change during browser closure. No further actuator commands
 are authorized by the completed cooling group.
+
+The updated operator runbook distinguishes manual/automatic Pause behavior and
+explicitly records the backup/restore deferral. Current release artifacts:
+`releases/staging-d4c956d.json`, `releases/production-d4c956d.json`, and the browser
+proof above. Hardware helpers for future tests must require this qualified source
+and a new supervised scope; historical helpers may still pin the prior source.
 G09/G10 remain open; backup/restore remains explicitly deferred. The shared MQTT
 credential exception covers initial read-only use and these supervised non-pump tests.
 

@@ -4,8 +4,8 @@ Validation CI does not receive provider or farm secrets. The separate staging
 release workflow uses encrypted deployment and app-session secrets in the
 `smartfarm-staging` GitHub environment. Live pump stays disabled.
 
-The separate manual `smartfarm-web-production` workflow is being qualified for
-initial read-only production. It requires the exact source to pass CI and staging,
+The separate manual `smartfarm-web-production` workflow is qualified for
+read-only production. It requires the exact source to pass CI and staging,
 uses the `smartfarm-production` environment, and refuses enabled live flags.
 It records public login deployment separately from fresh OAuth, authenticated
 real telemetry and physical acceptance. See [production setup](PRODUCTION_DEPLOYMENT.md).
@@ -46,7 +46,9 @@ Do not add deploy tokens to repository files.
 First complete ordered release: `79f128b`,
 [workflow run 35626061921](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35626061921).
 The recorded manifest is [staging-79f128b.json](releases/staging-79f128b.json).
-S14 deployment ordering passed; fresh WebKit SameSite qualification remains S02.
+S14 deployment ordering passed; fresh WebKit SameSite qualification subsequently
+passed on September 21. Current agreed G08 scope and the backup/restore deferral
+are recorded in [staging acceptance](STAGING_ACCEPTANCE.md).
 
 `.github/workflows/smartfarm-web-staging.yml` validates the exact master revision
 against all five successful CI jobs, then runs `tools/scripts/release-staging.mjs`.

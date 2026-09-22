@@ -1,9 +1,11 @@
 # P14 production connection
 
 Status: read-only production deployed at https://smartfarm-live.vercel.app on
-1c6eb41; CI, staging and production release passed. See
-[release evidence](releases/production-1c6eb41.json). Fresh OAuth and authenticated
-live WebSocket verification passed with all 22 fields and disabled controls.
+d4c956d; CI 35710019685, staging 35710305487 and production 35710809568 passed. See
+[release evidence](releases/production-d4c956d.json). Fresh OAuth was qualified
+on the earlier same-day release; the valid app session verified the new release's
+live WebSocket, all 22 fields, disabled controls and correct pending guard status:
+[browser evidence](releases/production-d4c956d-browser.json).
 Supervised physical acceptance remains incomplete.
 G08 simulator qualification is recorded in
 [staging acceptance](STAGING_ACCEPTANCE.md), with backup/restore explicitly
@@ -35,6 +37,11 @@ restored and commands disabled at 09:17:26 UTC on deployment
 71875f4a-2e91-4990-9e9a-ce1efeb3e3be, same source 1c6eb41. The observed device
 guard thresholds 8/10 differ from saved app settings 20/30; neither was changed.
 Resolve and supervise matching guard settings as part of pump qualification.
+
+The subsequent read-only d4c956d release fixes guard confirmation to require
+matching device/app thresholds. Current API deployment:
+f37fc3b9-688d-4b84-8837-c6c9548ed114. The frontend visibly reports guard pending for
+the existing mismatch. This release does not change either threshold pair.
 Save values only in ignored private setup and production backend secret variables,
 never Vercel or GitHub CI. Actual permissions still need verification.
 
