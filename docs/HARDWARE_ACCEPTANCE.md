@@ -188,3 +188,8 @@ Safe no-echo/failure display and pump qualification remain open.
 ## Pump
 
 Leave disabled until the freeze investigation and G09 checklist in `IMPLEMENTATION_PLAN.md` §20.3 are complete.
+
+The operator requested all remaining checks in one manual session. Use
+[the consolidated session checklist](FINAL_MANUAL_SESSION.md), including the
+preparation information, conditional pump steps, interruption checkpoints and
+single report template. Creating the checklist does not enable commands.

@@ -4,6 +4,16 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+The operator wants one consolidated manual session for every remaining physical
+check. `FINAL_MANUAL_SESSION.md` now maps plan 20.1.7 and 20.3.1–12 to a single
+ordered checklist/report, including low tank, manual stops, wet soil, cooldown,
+attempt limit, rain, browser closure, backend restart, farm Wi-Fi, broker loss,
+normal power and final restoration. No session was opened by that request.
+Collect the preparation report (prior freeze investigation and actual power
+arrangement) before scheduling pump enablement; do not launch the old alarm helper.
+Backend/broker interruptions require coordinated implementation support during
+the manual session. Uninduced failures stay explicitly open.
+
 Manual alarm/Beep/Silence acceptance is complete with operator confirmation.
 The user performed the steps; the helper only configured the alarm-only window,
 observed snapshots and restored settings. Low-tank warning/beeps, recovery,
@@ -178,8 +188,8 @@ were restored at 09:58:54 UTC. Browser verification at 10:02 received seven live
 snapshots, all 22 fields, no page errors, pending guard, paused automations and
 outputs off (`releases/production-after-lighting-2026-09-22.json`).
 Handoff commit 3e270e0 passed CI 35711597909 and staging 35711899777.
-Next: supervised low-tank alarm, beep UI, safe no-echo/failure-display verification,
-then the separate pump investigation/qualification. The lighting group is complete;
+Next: the consolidated remaining manual session in `FINAL_MANUAL_SESSION.md`.
+Alarm/Beep/Silence subsequently passed as recorded at the top. The lighting group is complete;
 no further actuator commands are authorized by it.
 
 The updated operator runbook distinguishes manual/automatic Pause behavior and
