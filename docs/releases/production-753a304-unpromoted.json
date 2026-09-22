@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "environment": "production",
+  "scope": "preserve-control-flags",
+  "sourceSha": "753a304fa113a6010a1c440957a8073779e5f21f",
+  "ciRunUrl": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35735736484",
+  "startedAt": "2026-09-22T13:58:13.620Z",
+  "stages": [
+    {
+      "name": "control configuration and deployment authority",
+      "startedAt": "2026-09-22T13:58:13.621Z",
+      "status": "passed",
+      "finishedAt": "2026-09-22T13:58:16.269Z"
+    },
+    {
+      "name": "API migration and ownership with preserved control flags",
+      "startedAt": "2026-09-22T13:58:16.270Z",
+      "status": "passed",
+      "finishedAt": "2026-09-22T14:01:15.115Z"
+    },
+    {
+      "name": "public immutable remote",
+      "startedAt": "2026-09-22T14:01:15.116Z",
+      "status": "passed",
+      "finishedAt": "2026-09-22T14:02:00.856Z"
+    },
+    {
+      "name": "host with production proxy and pinned remote",
+      "startedAt": "2026-09-22T14:02:00.857Z",
+      "status": "failed",
+      "finishedAt": "2026-09-22T14:02:47.402Z"
+    }
+  ],
+  "commandPublishCalls": 0,
+  "backupRestoreDisposition": "Explicitly deferred by user.",
+  "freshOAuthVerified": false,
+  "authenticatedTelemetryVerified": false,
+  "hardwareAcceptancePassed": false,
+  "controlFlags": {
+    "liveCommandsEnabled": true,
+    "livePumpEnabled": true
+  },
+  "previousApi": {
+    "sourceSha": "a39fe4440620f033fdd69c4f282c28656df0b7f1",
+    "deploymentId": "04ff3d73-dbe8-4d8a-90fd-a3755ba1f791"
+  },
+  "api": {
+    "sourceSha": "753a304fa113a6010a1c440957a8073779e5f21f",
+    "deploymentId": "a9c305d1-38f3-434f-bda1-b592a8b3f51d",
+    "publicOrigin": "https://smartfarm-api-production.up.railway.app"
+  },
+  "remote": {
+    "sourceSha": "753a304fa113a6010a1c440957a8073779e5f21f",
+    "deploymentId": "dpl_EnqyqdAuuoouWmfnPxLE8noqtDSk",
+    "immutableEntryUrl": "https://smartfarm-live-automations-95uc08h85-mattias-li-s-projects.vercel.app/remoteEntry.js"
+  },
+  "remoteSmoke": {
+    "sourceSha": "753a304fa113a6010a1c440957a8073779e5f21f",
+    "contractMajor": 1,
+    "publicAssets": 9,
+    "missingChunkStatus": 404
+  },
+  "host": {
+    "sourceSha": "753a304fa113a6010a1c440957a8073779e5f21f",
+    "deploymentId": "dpl_9jXd6YCZ44mfVZjhqURGdZE3yNoo",
+    "deploymentUrl": "https://smartfarm-live-qnmpzrxgd-mattias-li-s-projects.vercel.app",
+    "publicOrigin": "https://smartfarm-live.vercel.app"
+  }
+}

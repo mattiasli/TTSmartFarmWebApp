@@ -1,0 +1,29 @@
+{
+  "startedAt": "2026-09-22T14:08:21.012Z",
+  "pumpCommandsSent": 0,
+  "flagsChanged": false,
+  "masterBefore": false,
+  "masterAfter": false,
+  "pumpReportedOff": true,
+  "settings": {
+    "irrigation": true,
+    "alarm": false,
+    "rain": true,
+    "cooling": true,
+    "lighting": true,
+    "soilDry": 35,
+    "cooldown": 30,
+    "maxPulses": 8,
+    "tankLow": 20,
+    "tankRecover": 30,
+    "beepInterval": 10,
+    "rainDelay": 100,
+    "fanOn": 29,
+    "fanOff": 27,
+    "lightOn": 3646,
+    "lightOff": 4095,
+    "motionOnly": false,
+    "motionSeconds": 15
+  },
+  "verifiedAt": "2026-09-22T14:08:22.126Z"
+}

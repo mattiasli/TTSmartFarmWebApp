@@ -4,6 +4,30 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+The custom-domain and Settings follow-up is deployed on **b26f67b**.
+Password users can sign in at https://ttsmartfarm.mattias.li/login. Railway now
+allows this exact origin plus the existing Vercel origin; production release
+policy enforces both. No DNS change or wildcard origin was needed. GitHub sign-in
+starts on its registered Vercel origin to preserve the OAuth binding cookie.
+Settings has responsive member cards and a separate add-user panel, with collapsed
+diagnostics. Long IDs wrap correctly in password-reset forms.
+CI 35737107748, staging 35737539519 and production 35738228290 passed.
+Hosted Chromium/WebKit password sign-in, live WebSocket, cookie attributes,
+viewer permissions and revocation passed on the custom domain. A temporary local
+admin also verified Settings at desktop/mobile widths and an authenticated CSRF
+role change on the custom domain; all temporary access was removed.
+Both live-control flags and pump permission remain enabled. Master automations
+were running at final verification and were left running. No actuator commands were
+sent. See releases/production-b26f67b*.json and LOCAL_ACCOUNTS.md.
+Earlier entries below are historical records.
+
+The initial 753a304 production attempt deployed the API and built the frontend,
+but stopped before promotion because its login smoke check still required a
+relative GitHub URL. b26f67b corrected the check to verify the resolved URL against
+the registered origin. The corrected smoke passed against both hosted staging
+candidate and stable origin before requalification. See the unpromoted manifest.
+
+
 The local-account and switch-label follow-up is deployed on **a39fe44**.
 CI 35730674619, staging 35731069424 and production 35732203356 all passed.
 Both hosted environments passed admin UI account creation, fresh password sign-in

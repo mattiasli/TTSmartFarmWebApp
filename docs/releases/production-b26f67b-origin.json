@@ -1,0 +1,12 @@
+{
+  "origin": "https://ttsmartfarm.mattias.li",
+  "startedAt": "2026-09-22T13:37:42.993Z",
+  "originalSourceSha": "a39fe4440620f033fdd69c4f282c28656df0b7f1",
+  "pumpCommandsSent": 0,
+  "deploymentId": "04ff3d73-dbe8-4d8a-90fd-a3755ba1f791",
+  "verifiedAt": "2026-09-22T13:38:56.814Z",
+  "allowedOrigins": [
+    "https://smartfarm-live.vercel.app",
+    "https://ttsmartfarm.mattias.li"
+  ]
+}

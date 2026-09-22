@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "environment": "production",
+  "scope": "preserve-control-flags",
+  "sourceSha": "b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e",
+  "ciRunUrl": "https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35737107748",
+  "startedAt": "2026-09-22T14:10:16.571Z",
+  "stages": [
+    {
+      "name": "control configuration and deployment authority",
+      "startedAt": "2026-09-22T14:10:16.571Z",
+      "status": "passed",
+      "finishedAt": "2026-09-22T14:10:19.180Z"
+    },
+    {
+      "name": "API migration and ownership with preserved control flags",
+      "startedAt": "2026-09-22T14:10:19.180Z",
+      "status": "passed",
+      "finishedAt": "2026-09-22T14:12:57.970Z"
+    },
+    {
+      "name": "public immutable remote",
+      "startedAt": "2026-09-22T14:12:57.970Z",
+      "status": "passed",
+      "finishedAt": "2026-09-22T14:13:40.457Z"
+    },
+    {
+      "name": "host with production proxy and pinned remote",
+      "startedAt": "2026-09-22T14:13:40.457Z",
+      "status": "passed",
+      "finishedAt": "2026-09-22T14:14:22.074Z"
+    },
+    {
+      "name": "promotion and public login verification",
+      "startedAt": "2026-09-22T14:14:22.074Z",
+      "status": "passed",
+      "finishedAt": "2026-09-22T14:14:31.105Z"
+    }
+  ],
+  "commandPublishCalls": 0,
+  "backupRestoreDisposition": "Explicitly deferred by user.",
+  "freshOAuthVerified": false,
+  "authenticatedTelemetryVerified": false,
+  "hardwareAcceptancePassed": false,
+  "controlFlags": {
+    "liveCommandsEnabled": true,
+    "livePumpEnabled": true
+  },
+  "previousApi": {
+    "sourceSha": "753a304fa113a6010a1c440957a8073779e5f21f",
+    "deploymentId": "a9c305d1-38f3-434f-bda1-b592a8b3f51d"
+  },
+  "api": {
+    "sourceSha": "b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e",
+    "deploymentId": "fac5d680-e9be-45f7-9e02-009da0fac0f7",
+    "publicOrigin": "https://smartfarm-api-production.up.railway.app"
+  },
+  "remote": {
+    "sourceSha": "b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e",
+    "deploymentId": "dpl_24Ysj8Tm7bs3c8NscHr6rs6dscoD",
+    "immutableEntryUrl": "https://smartfarm-live-automations-69dp31j9m-mattias-li-s-projects.vercel.app/remoteEntry.js"
+  },
+  "remoteSmoke": {
+    "sourceSha": "b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e",
+    "contractMajor": 1,
+    "publicAssets": 9,
+    "missingChunkStatus": 404
+  },
+  "host": {
+    "sourceSha": "b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e",
+    "deploymentId": "dpl_H7LwMVD8DurwA11sA4zsu6i7Gm8W",
+    "deploymentUrl": "https://smartfarm-live-y3shxyqhh-mattias-li-s-projects.vercel.app",
+    "publicOrigin": "https://smartfarm-live.vercel.app"
+  },
+  "candidateSmoke": {
+    "browser": "153.0.8010.12",
+    "actualHostProxy": true,
+    "loginRendered": true,
+    "freshOAuthVerified": false,
+    "authenticatedTelemetryVerified": false
+  },
+  "stableSmoke": {
+    "browser": "153.0.8010.12",
+    "actualHostProxy": true,
+    "loginRendered": true,
+    "freshOAuthVerified": false,
+    "authenticatedTelemetryVerified": false
+  },
+  "finishedAt": "2026-09-22T14:14:31.106Z",
+  "qualification": "Hosting deployed with verified control flags. OAuth, authenticated telemetry and physical acceptance are recorded separately; this workflow performs no actuator tests."
+}

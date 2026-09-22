@@ -1,0 +1,81 @@
+{
+  "environment": "production",
+  "loginHost": "https://ttsmartfarm.mattias.li",
+  "sourceSha": "b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e",
+  "startedAt": "2026-09-22T14:14:59.451Z",
+  "actuatorRequests": 0,
+  "browsers": [
+    {
+      "browser": "chromium",
+      "passwordSignIn": true,
+      "secureHttpOnlyLaxCookie": true,
+      "cookieEvidenceSource": "Original browser password-login response",
+      "browserSameSiteReported": "Lax",
+      "liveSocket": true,
+      "viewerPermissions": true,
+      "noHorizontalOverflow": true,
+      "pageErrors": 0
+    },
+    {
+      "browser": "webkit",
+      "passwordSignIn": true,
+      "secureHttpOnlyLaxCookie": true,
+      "cookieEvidenceSource": "Original browser password-login response",
+      "browserSameSiteReported": "None",
+      "liveSocket": true,
+      "viewerPermissions": true,
+      "noHorizontalOverflow": true,
+      "pageErrors": 0
+    }
+  ],
+  "adminUiCreation": true,
+  "labels": [
+    {
+      "name": "Water thirsty soil",
+      "checked": true,
+      "label": "On"
+    },
+    {
+      "name": "Watch the water tank",
+      "checked": false,
+      "label": "Off"
+    },
+    {
+      "name": "Wait out the rain",
+      "checked": true,
+      "label": "On"
+    },
+    {
+      "name": "A cooling breeze",
+      "checked": true,
+      "label": "On"
+    },
+    {
+      "name": "A cozy night light",
+      "checked": true,
+      "label": "On"
+    }
+  ],
+  "customDomainAdmin": {
+    "passwordLogin": true,
+    "settingsResponsive": true,
+    "roleChangeWithCsrf": true,
+    "revocation": true,
+    "githubStartsOnRegisteredOrigin": true
+  },
+  "lastCookieMetadata": {
+    "browser": "webkit",
+    "present": true,
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "None",
+    "path": "/"
+  },
+  "lastViewport": {
+    "scrollWidth": 390,
+    "innerWidth": 390
+  },
+  "revocationVerified": true,
+  "temporaryAccessRemoved": true,
+  "finishedAt": "2026-09-22T14:15:24.073Z"
+}

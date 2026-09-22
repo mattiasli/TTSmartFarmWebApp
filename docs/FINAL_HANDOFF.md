@@ -6,28 +6,27 @@ source-level assertions or the operator's explicit scope decisions.
 
 ## Current release
 
-- Physical farm: https://smartfarm-live.vercel.app
+- Physical farm/password sign-in: https://ttsmartfarm.mattias.li
+- Registered GitHub sign-in origin: https://smartfarm-live.vercel.app
 - Simulator staging: https://smartfarm-host.vercel.app
 - Production API: https://smartfarm-api-production.up.railway.app
-- Deployed application source: a39fe4440620f033fdd69c4f282c28656df0b7f1.
-  [Release manifest](releases/production-a39fe44.json) records API
-  07467f5f-3453-407e-b148-bf36bdb629f5 and its immutable frontend pair.
-- CI [35730674619](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35730674619),
-  staging [35731069424](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35731069424)
-  and production [35732203356](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35732203356)
-  passed on this exact source.
-- Admins can create independent user ID/password accounts and assign viewer,
-  operator or admin roles, reset passwords and remove access. Startup no longer
-  restores removed bootstrap access. See [account administration](LOCAL_ACCOUNTS.md).
-- [Hosted account checks](releases/production-a39fe44-accounts.json) passed real
-  admin UI creation, Chromium/WebKit password login, live WebSocket, cookie
-  attributes, viewer restrictions, revocation and all five switch labels.
-  Temporary access was removed; no actuator commands were sent.
-- Both live flags remain enabled. The [control check](releases/production-a39fe44-controls.json)
-  verified fresh telemetry, enabled HTTP/WSS pumping permissions and manual stop
-  controls, unchanged settings and matched 20/30 tank protection.
-- [Maintenance](releases/production-a39fe44-maintenance.json) paused automations;
-  they remain paused after restart. Use Start to resume when ready.
+- Deployed application source: b26f67bbe1a907ad0a3051bbfd46bf10c2bfa92e.
+  [Release manifest](releases/production-b26f67b.json).
+- CI [35737107748](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35737107748),
+  staging [35737539519](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35737539519)
+  and production [35738228290](https://github.com/mattiasli/TTSmartFarmWebApp/actions/runs/35738228290) passed.
+- [Account administration](LOCAL_ACCOUNTS.md) supports independent user IDs/passwords,
+  roles, password resets and removal. Settings now separates members and account creation.
+- [Custom-domain account checks](releases/production-b26f67b-accounts.json) passed
+  actual Chromium/WebKit login and live updates, role enforcement, CSRF-protected
+  administration, cookie attributes, revocation and responsive Settings. Temporary
+  accounts were removed. No actuator commands were sent.
+- [Control verification](releases/production-b26f67b-controls.json) confirms enabled
+  live flags and pump permission. [Maintenance](releases/production-b26f67b-maintenance.json)
+  paused automations before deployment. At final verification they were running;
+  verification preserved that state. The first post-release check stopped on its
+  paused-state assumption; the subsequent read-only check observed the current
+  running state and passed without changing it.
 
 ## Scope decisions that must survive handoff
 

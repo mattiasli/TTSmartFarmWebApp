@@ -1,16 +1,16 @@
 # P14 production connection
 
-Status: production is deployed at https://smartfarm-live.vercel.app on a39fe44.
-CI 35730674619, staging 35731069424 and production 35732203356 passed.
-See [release evidence](releases/production-a39fe44.json),
-[account/browser checks](releases/production-a39fe44-accounts.json) and
+Status: production is deployed at https://ttsmartfarm.mattias.li on b26f67b.
+CI 35737107748, staging 35737539519 and production 35738228290 passed.
+See [release evidence](releases/production-b26f67b.json),
+[account/browser checks](releases/production-b26f67b-accounts.json) and
 [current handoff](FINAL_HANDOFF.md).
 
 Admins can create users in Settings with independent user IDs/passwords and
 viewer/operator/admin roles. No GitHub account is required for those users.
 The automation switches now display their actual On/Off draft state.
-Both live flags remain enabled, with master paused after maintenance/restart;
-use Start when ready. The [control verification](releases/production-a39fe44-controls.json)
+Both live flags remain enabled. Maintenance paused automations before deployment;
+final verification found them running and preserved that state. The [control verification](releases/production-b26f67b-controls.json)
 confirmed fresh telemetry, unchanged settings, enabled pump/stop controls and
 matched tank protection without actuator commands. Pump tests remain skipped.
 
@@ -108,7 +108,8 @@ and exact staging qualification. Broker and OAuth credentials stay in Railway.
 | `HIVEMQ_USERNAME`, `HIVEMQ_PASSWORD` | Existing credential for initial read-only connection; secrets only |
 | `DATABASE_URL` | Separate live database reference |
 | `FARM_ID`, `FARM_NAME` | Recorded live farm identity |
-| `PUBLIC_APP_ORIGIN`, `ALLOWED_BROWSER_ORIGINS` | Actual live host HTTPS origin |
+| `PUBLIC_APP_ORIGIN` | `https://smartfarm-live.vercel.app` (registered GitHub origin) |
+| `ALLOWED_BROWSER_ORIGINS` | `https://smartfarm-live.vercel.app,https://ttsmartfarm.mattias.li` (exact release-configured origins) |
 | `PUBLIC_WS_URL` | Actual live API WSS URL |
 | `GITHUB_OAUTH_CLIENT_ID`, `GITHUB_OAUTH_CLIENT_SECRET` | OAuth app for the live host callback |
 | `BOOTSTRAP_ADMIN_GITHUB_ID`, `BOOTSTRAP_ADMIN_USERNAME` | Verified owner identity |
