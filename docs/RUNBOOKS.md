@@ -25,9 +25,11 @@ Expected after every backend start, MQTT reconnect, ownership handover, or lost 
 Start is available only when commands are enabled and the controller has fresh
 readings. Pause releases outputs owned by automation; a manually switched-on fan
 can stay on. Use its manual Off control or All off to stop it. This ownership
-behavior was physically verified on September 22. Closing a test browser for ten
-seconds also left the fan on and master enabled; independent rule transitions
-during browser closure still need their physical check.
+behavior was physically verified on September 22. A subsequent lighting check
+recorded a matched automatic LED-off command during twelve seconds with the test
+browser closed and no test API polling. The user confirmed closing the other farm
+tabs and seeing the LED turn off while the sensor remained covered. Closing a
+farm tab is not a stop control. See [lighting evidence](releases/production-lighting-2026-09-22.json).
 
 ## Command result is uncertain
 

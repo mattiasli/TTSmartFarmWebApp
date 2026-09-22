@@ -39,9 +39,16 @@ guard thresholds 8/10 differ from saved app settings 20/30; neither was changed.
 Resolve and supervise matching guard settings as part of pump qualification.
 
 The subsequent read-only d4c956d release fixes guard confirmation to require
-matching device/app thresholds. Current API deployment:
+matching device/app thresholds. That release initially used API deployment:
 f37fc3b9-688d-4b84-8837-c6c9548ed114. The frontend visibly reports guard pending for
 the existing mismatch. This release does not change either threshold pair.
+
+Later supervised lighting/motion checks used the same d4c956d source. Settings
+were restored and commands disabled at 09:58:54 UTC on current API deployment
+ddb5b48f-ae0f-44e3-bda5-11b71212c599. A persisted, matched LED-off command occurred
+inside the verified closed-browser/no-request interval, and the operator confirmed
+the physical result. See [lighting evidence](releases/production-lighting-2026-09-22.json)
+and [restored browser](releases/production-after-lighting-2026-09-22.json).
 Save values only in ignored private setup and production backend secret variables,
 never Vercel or GitHub CI. Actual permissions still need verification.
 

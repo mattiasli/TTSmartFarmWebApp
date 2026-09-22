@@ -1,0 +1,680 @@
+{
+  "schemaVersion": 1,
+  "environment": "production",
+  "sourceSha": "d4c956d85fcf79ac03e22bdca1db58a374116576",
+  "farmId": "cad2a8fd-265e-491d-a768-b4372580b55e",
+  "qualification": {
+    "nightLight": true,
+    "motionHold": true,
+    "automaticChangeWithTestBrowserClosed": true,
+    "operatorConfirmedCoveredOnUncoveredOff": true,
+    "operatorConfirmedMotionOffWhileCovered": true,
+    "otherFarmDashboardTabsClosed": "Operator confirmed",
+    "fullG09": false
+  },
+  "thresholds": {
+    "lightOn": 2800,
+    "lightOff": 3200,
+    "motionSeconds": 8,
+    "referenceClassification": {
+      "2559": "dark",
+      "3380": "bright",
+      "3560": "bright"
+    }
+  },
+  "firstAttempt": {
+    "startedAt": "2026-09-22T09:45:08.366Z",
+    "finishedAt": "2026-09-22T09:51:13.102Z",
+    "scriptCompleted": false,
+    "failure": "Stay out of PIR range; keep the light sensor covered: observation timed out",
+    "phases": [
+      {
+        "name": "Cover the light sensor and keep it covered",
+        "startedAt": "2026-09-22T09:45:52.771Z",
+        "completedAt": "2026-09-22T09:46:17.827Z",
+        "light": 2007,
+        "pir": 1,
+        "led": 1
+      },
+      {
+        "name": "Uncover the light sensor",
+        "startedAt": "2026-09-22T09:46:20.847Z",
+        "completedAt": "2026-09-22T09:46:22.063Z",
+        "light": 3515,
+        "pir": 0,
+        "led": 0
+      },
+      {
+        "name": "Cover the light sensor again, then step out of PIR range",
+        "startedAt": "2026-09-22T09:46:22.459Z",
+        "completedAt": "2026-09-22T09:46:29.237Z",
+        "light": 2128,
+        "pir": 0,
+        "led": 0
+      },
+      {
+        "name": "Close other farm dashboard tabs; trigger motion once, then step away; keep the light sensor covered",
+        "startedAt": "2026-09-22T09:46:32.470Z",
+        "completedAt": "2026-09-22T09:48:19.690Z",
+        "light": 1434,
+        "pir": 1,
+        "led": 1
+      },
+      {
+        "name": "Stay out of PIR range; keep the light sensor covered",
+        "startedAt": "2026-09-22T09:48:19.693Z"
+      }
+    ],
+    "trace": [
+      {
+        "at": "2026-09-22T09:45:09.294Z",
+        "light": 3523,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": false,
+        "epoch": "f7efc198-f5ff-48f8-b4c3-3394e99541b3"
+      },
+      {
+        "at": "2026-09-22T09:45:51.727Z",
+        "light": 3529,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": false,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:45:52.771Z",
+        "light": 3559,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:46:17.318Z",
+        "light": 2489,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:46:17.827Z",
+        "light": 2007,
+        "pir": 1,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:46:21.049Z",
+        "light": 3531,
+        "pir": 0,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:46:22.062Z",
+        "light": 3515,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:46:29.237Z",
+        "light": 2128,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:46:32.668Z",
+        "light": 3541,
+        "pir": 1,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:46:33.177Z",
+        "light": 3530,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:16.004Z",
+        "light": 3031,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:16.628Z",
+        "light": 1197,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:19.190Z",
+        "light": 1420,
+        "pir": 1,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:19.690Z",
+        "light": 1434,
+        "pir": 1,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:21.371Z",
+        "light": 3543,
+        "pir": 1,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:22.375Z",
+        "light": 3550,
+        "pir": 1,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:23.883Z",
+        "light": 2739,
+        "pir": 1,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:24.878Z",
+        "light": 2474,
+        "pir": 1,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:25.378Z",
+        "light": 3508,
+        "pir": 1,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:26.386Z",
+        "light": 3520,
+        "pir": 1,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:29.417Z",
+        "light": 1363,
+        "pir": 1,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:30.413Z",
+        "light": 1235,
+        "pir": 1,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:30.933Z",
+        "light": 3514,
+        "pir": 1,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:32.106Z",
+        "light": 3518,
+        "pir": 1,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:48:34.172Z",
+        "light": 3537,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:50:15.250Z",
+        "light": 2954,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:50:16.245Z",
+        "light": 2064,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:50:20.755Z",
+        "light": 1617,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": false,
+        "epoch": "c3421b58-fdb2-4d14-9133-4d90eedeca39"
+      },
+      {
+        "at": "2026-09-22T09:51:12.981Z",
+        "light": 225,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": false,
+        "epoch": "87e8bfef-0cd5-4c3d-ab5b-93215e022396"
+      }
+    ],
+    "readOnlyRestoredAt": "2026-09-22T09:51:12.981Z",
+    "interpretation": "Uncover predicate advanced before its prompt; not timed operator correlation. User subsequently confirmed both physical directions. Unstable cover prevented the initial motion isolation; retry used a fixed cover and explicit prompt release."
+  },
+  "retry": {
+    "startedAt": "2026-09-22T09:55:15.652Z",
+    "finishedAt": "2026-09-22T09:58:54.118Z",
+    "scriptCompleted": false,
+    "scriptFailure": "No automatic lighting command persisted during closed-browser interval",
+    "phases": [
+      {
+        "id": 1,
+        "name": "Close other farm dashboard tabs; trigger motion once, then step away; keep the light sensor covered",
+        "startedAt": "2026-09-22T09:56:04.083Z",
+        "needsPrompt": true,
+        "promptReleasedAt": "2026-09-22T09:56:52.361Z",
+        "completedAt": "2026-09-22T09:57:54.149Z",
+        "light": 453,
+        "pir": 1,
+        "led": 1
+      },
+      {
+        "id": 2,
+        "name": "Stay out of PIR range; keep the light sensor covered",
+        "startedAt": "2026-09-22T09:57:54.152Z",
+        "needsPrompt": false,
+        "completedAt": "2026-09-22T09:57:58.922Z",
+        "light": 483,
+        "pir": 0,
+        "led": 1
+      }
+    ],
+    "trace": [
+      {
+        "at": "2026-09-22T09:55:16.522Z",
+        "light": 626,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": false,
+        "epoch": "87e8bfef-0cd5-4c3d-ab5b-93215e022396"
+      },
+      {
+        "at": "2026-09-22T09:55:58.202Z",
+        "light": 592,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": false,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:55:59.183Z",
+        "light": 587,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:56:00.226Z",
+        "light": 575,
+        "pir": 0,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:56:01.812Z",
+        "light": 575,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:57:52.620Z",
+        "light": 445,
+        "pir": 1,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:57:53.139Z",
+        "light": 464,
+        "pir": 1,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:57:57.419Z",
+        "light": 486,
+        "pir": 0,
+        "led": 1,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:58:11.223Z",
+        "light": 494,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": true,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:58:12.229Z",
+        "light": 484,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": false,
+        "epoch": "4b125cec-0783-4893-9c94-3af3cff23192"
+      },
+      {
+        "at": "2026-09-22T09:58:54.115Z",
+        "light": 477,
+        "pir": 0,
+        "led": 0,
+        "pump": 0,
+        "tankLow": 8,
+        "tankRecover": 10,
+        "masterEnabled": false,
+        "epoch": "af83b761-4803-4f32-a55b-728c83bc038b"
+      }
+    ],
+    "closedBrowser": {
+      "startedAt": "2026-09-22T09:57:59.008Z",
+      "testBrowserClosed": true,
+      "otherFarmDashboardsClosed": "Operator confirmed",
+      "ledBefore": 1,
+      "guaranteedNoPollingMs": 12000,
+      "earliestNextRequestAt": "2026-09-22T09:58:11.008Z",
+      "observedAfterAt": "2026-09-22T09:58:11.223Z",
+      "ledAfter": 0,
+      "masterEnabledAfter": true,
+      "commands": [
+        {
+          "id": "1e91a2cb-df46-443d-ab7f-9c72cf596bc6",
+          "createdAt": "2026-09-22T09:58:04.152Z",
+          "action": "light.set",
+          "status": "state_matched",
+          "sentAt": "2026-09-22T09:58:04.162Z",
+          "stateMatchedAt": "2026-09-22T09:58:05.120Z"
+        }
+      ],
+      "initiatorEvidence": "API omits actor scope. Automatic origin inferred from the configured motion rule, operator-closed dashboards and no test requests during this interval."
+    },
+    "evidenceRecovery": {
+      "recordedAt": "2026-09-22T10:01:16.292Z",
+      "readOnly": true,
+      "reason": "Original helper incorrectly filtered on actorScope, which the public event DTO omits. Recovered existing event and matched command without repeating hardware test."
+    },
+    "deployments": [
+      {
+        "at": "2026-09-22T09:55:20.629Z",
+        "enabled": true,
+        "id": "81ad453f-738e-4252-b211-fd651731d7d4"
+      },
+      {
+        "at": "2026-09-22T09:58:18.713Z",
+        "enabled": false,
+        "id": "ddb5b48f-ae0f-44e3-bda5-11b71212c599"
+      }
+    ],
+    "settingsChanges": [
+      {
+        "at": "2026-09-22T09:55:58.594Z",
+        "revision": 11,
+        "settings": {
+          "irrigation": false,
+          "alarm": false,
+          "rain": false,
+          "cooling": false,
+          "lighting": true,
+          "soilDry": 35,
+          "cooldown": 30,
+          "maxPulses": 3,
+          "tankLow": 20,
+          "tankRecover": 30,
+          "beepInterval": 10,
+          "rainDelay": 10,
+          "fanOn": 29,
+          "fanOff": 27,
+          "lightOn": 2800,
+          "lightOff": 3200,
+          "motionOnly": false,
+          "motionSeconds": 8
+        }
+      },
+      {
+        "at": "2026-09-22T09:56:00.606Z",
+        "revision": 12,
+        "settings": {
+          "irrigation": false,
+          "alarm": false,
+          "rain": false,
+          "cooling": false,
+          "lighting": true,
+          "soilDry": 35,
+          "cooldown": 30,
+          "maxPulses": 3,
+          "tankLow": 20,
+          "tankRecover": 30,
+          "beepInterval": 10,
+          "rainDelay": 10,
+          "fanOn": 29,
+          "fanOff": 27,
+          "lightOn": 2800,
+          "lightOff": 3200,
+          "motionOnly": true,
+          "motionSeconds": 8
+        }
+      },
+      {
+        "at": "2026-09-22T09:58:12.816Z",
+        "revision": 13,
+        "settings": {
+          "irrigation": true,
+          "alarm": true,
+          "rain": true,
+          "cooling": true,
+          "lighting": true,
+          "soilDry": 35,
+          "cooldown": 30,
+          "maxPulses": 3,
+          "tankLow": 20,
+          "tankRecover": 30,
+          "beepInterval": 10,
+          "rainDelay": 10,
+          "fanOn": 29,
+          "fanOff": 27,
+          "lightOn": 1500,
+          "lightOff": 2000,
+          "motionOnly": false,
+          "motionSeconds": 15
+        }
+      }
+    ],
+    "originalSettings": {
+      "irrigation": true,
+      "alarm": true,
+      "rain": true,
+      "cooling": true,
+      "lighting": true,
+      "soilDry": 35,
+      "cooldown": 30,
+      "maxPulses": 3,
+      "tankLow": 20,
+      "tankRecover": 30,
+      "beepInterval": 10,
+      "rainDelay": 10,
+      "fanOn": 29,
+      "fanOff": 27,
+      "lightOn": 1500,
+      "lightOff": 2000,
+      "motionOnly": false,
+      "motionSeconds": 15
+    },
+    "settingsRestored": true,
+    "readOnlyRestoredAt": "2026-09-22T09:58:54.115Z"
+  },
+  "disposition": "Physical checks qualified from observed transitions, persisted command and operator confirmation. Original script failures preserved; no hardware repeat was used to recover the event record. Pump remained disabled and no guard thresholds changed."
+}

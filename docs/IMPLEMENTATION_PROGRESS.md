@@ -7,7 +7,7 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 **Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
 d4c956d85fcf79ac03e22bdca1db58a374116576. CI 35710019685, staging release
 35710305487 and production release 35710809568 all passed. Evidence:
-`releases/production-d4c956d.json`. Live API f37fc3b9-688d-4b84-8837-c6c9548ed114
+`releases/production-d4c956d.json`. Live API ddb5b48f-ae0f-44e3-bda5-11b71212c599
 reports healthy ownership, live mode and both command flags false.
 Browser verification at 09:38 UTC received seven live WSS snapshots, all 22
 fields, rendered the editor, and confirmed disabled controls and no page errors.
@@ -109,9 +109,29 @@ The correction is deployed on d4c956d and verified in the actual live editor.
 Before deployment, the same live browser regression reproduced the incorrect
 `guardConfirmed=true`; after deployment it verifies false and "guard pending".
 Output commit c95cb20 passed CI 35708048925 and staging release 35708360634.
-Next: supervised lighting/motion, low-tank alarm, beep UI and an independent
-automatic state change during browser closure. No further actuator commands
-are authorized by the completed cooling group.
+Lighting/motion and an independent change during browser closure subsequently
+passed with operator confirmation. Thresholds 2800/3200 and an eight-second hold
+were used; 2559 classifies dark, 3380/3560 bright. The operator confirms both
+cover/uncover directions and motion-triggered LED expiry while covered. During
+the test's twelve-second no-API interval beginning 09:57:59.008, persisted command
+1e91a2cb-df46-443d-ab7f-9c72cf596bc6 was created at 09:58:04.152 and matched at
+09:58:05.120. Later telemetry was dark (494), PIR=0, LED=0, master enabled.
+Other farm dashboard tabs were confirmed closed. The public event DTO omits actor
+scope; automatic origin is inferred from the active rule and absence of clients.
+
+First-attempt cover instability and an unprompted predicate transition remain
+documented. The retry added explicit prompt gating. It physically succeeded but
+the helper incorrectly filtered history on missing actorScope; read-only recovery
+found the existing record, avoiding repeated hardware work. Do not hide these
+script failures or confuse them with the independently qualified observations.
+Evidence: `releases/production-lighting-2026-09-22.json`. Settings and read-only
+were restored at 09:58:54 UTC. Browser verification at 10:02 received seven live
+snapshots, all 22 fields, no page errors, pending guard, paused automations and
+outputs off (`releases/production-after-lighting-2026-09-22.json`).
+Handoff commit 3e270e0 passed CI 35711597909 and staging 35711899777.
+Next: supervised low-tank alarm, beep UI, safe no-echo/failure-display verification,
+then the separate pump investigation/qualification. The lighting group is complete;
+no further actuator commands are authorized by it.
 
 The updated operator runbook distinguishes manual/automatic Pause behavior and
 explicitly records the backup/restore deferral. Current release artifacts:

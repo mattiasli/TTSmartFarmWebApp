@@ -30,6 +30,7 @@ Read-only production is deployed; physical acceptance remains outstanding. See
 - [x] Soil/tank readings confirmed by operator (September 22)
 - [x] Several minutes of fresh telemetry observed; operator confirms sensor responses (timed recording correlation remained inconclusive)
 - [x] Local read-only observation made no command publish calls; both live flags false
+- [ ] Physically verify no-echo/sensor-failure display where safely inducible (plan section 20.1.7)
 
 Evidence: [read-only observation](releases/live-readonly-2026-09-21.json).
 Hosted evidence: [browser verification](releases/production-authenticated-2026-09-22.json)
@@ -70,8 +71,8 @@ Record observed fields: `t`, `h`, `dht`, `soil`, `water`, `light`, `steam`, `rai
 - [ ] Low-tank alarm, silence/manual override and protection status without pumping
 - [x] Master pause leaves manual fan ownership alone and releases automatic fan ownership
 - [x] Closing the test browser for ten seconds leaves master enabled and fan on
-- [ ] Observe an independent automatic state change during browser closure
-- [ ] Night-light 2559 vs 3380/3560 classification
+- [x] Observe an independent automatic state change during browser closure (persisted LED-off command in a twelve-second no-request interval)
+- [x] Night-light classification: thresholds 2800/3200 make 2559 dark and 3380/3560 bright; actual cover/uncover and motion hold verified
 
 Audit evidence: [command retention](releases/command-retention-2026-09-22.json).
 The audit subscribed to `smartfarm/cmd/#`, legacy `smartfarm/fan/set`, and telemetry,
@@ -109,8 +110,29 @@ That mismatch is recorded for later pump qualification; no guard synchronization
 was requested and pumping remained disabled. Evidence:
 [cooling and All off](releases/production-cooling-2026-09-22.json) and
 [restored dashboard](releases/production-after-cooling-2026-09-22.json).
-Lighting/motion, low-tank alarm, beep UI and an independent transition during
-browser closure remain outstanding. Arrange their supervised scope before commands.
+Lighting/motion was subsequently verified at 09:58 UTC using light thresholds
+2800/3200 and an eight-second motion hold. The operator confirms covered -> LED
+on, uncovered -> off, and off after stepping away while a fixed cover remained.
+With other farm tabs confirmed closed, the test browser closed at 09:57:59.008.
+No test API requests occurred for at least twelve seconds. Command
+1e91a2cb-df46-443d-ab7f-9c72cf596bc6 was created at 09:58:04.152 and matched telemetry
+at 09:58:05.120; the first later snapshot showed LED off, PIR zero, light 494 and
+master still enabled. Automatic origin is inferred from the active motion rule
+and absent client requests; the public event DTO does not expose the actor.
+
+The first attempt had an unstable cover and an uncover predicate advancing before
+its prompt, so it did not establish timed operator correlation. The retry used a
+fixed cover and explicit prompt release. Its history check initially failed due
+to an incorrect helper assumption about an actorScope field; a read-only history
+lookup recovered the existing matched command without another hardware attempt.
+Original script failures remain in [lighting evidence](releases/production-lighting-2026-09-22.json).
+Operator confirmations and recovered records qualify the physical checks, not a
+claim that those original scripts completed without errors.
+Settings were restored, automations paused and commands disabled at 09:58:54 UTC.
+The [restored browser](releases/production-after-lighting-2026-09-22.json) passed
+with seven live snapshots, all 22 fields, disabled controls and outputs off.
+Low-tank alarm, beep UI and safe no-echo/failure-display checks remain outstanding,
+alongside pump qualification. Arrange their supervised scope before commands.
 
 Tested sequence: `tools/scripts/supervised-output-sequence.mjs` supports
 LED/backlight only, or LED/backlight, one short 880-Hz beep, feeder open/close,
