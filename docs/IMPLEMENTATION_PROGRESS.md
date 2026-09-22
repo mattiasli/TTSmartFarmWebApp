@@ -13,8 +13,11 @@ The initial broader DB run had 36 passes and one opt-in skip; the
 bootstrap child-process test passed outside the Windows sandbox after userInfo
 failed there. An initially incorrect ticket assertion was replaced with actual
 WebSocket rejection verification; two browser setup timeouts passed on rerun.
-CI and hosted qualification of this follow-up are pending; the previously deployed
-release is recorded below.
+Commit 0783cdb passed all CI jobs (35729876383). Final review also corrected startup
+seeding: creating the initial farm/admin is atomic, and restarts cannot reinstate
+removed bootstrap access. All 21 account/repository/bootstrap tests, typecheck and
+lint passed after that correction. Its exact CI/staging/production qualification
+is pending; the previously deployed production release is recorded below.
 
 P15/G10 handoff is complete for the agreed scope. Production source 247b525
 passed CI 35725070292, staging 35725407854 and production 35726197685. Both live

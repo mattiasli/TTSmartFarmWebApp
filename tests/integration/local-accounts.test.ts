@@ -127,5 +127,8 @@ describe('Independent password accounts', () => {
     await app.close();
     app = await buildApp(loadConfig({ NODE_ENV: 'test', APP_ENV: 'local', FARM_MODE: 'simulator', SIMULATOR_TRANSPORT: 'memory', DATABASE_URL: db.url, ALLOWED_BROWSER_ORIGINS: origin }));
     expect((await login('unknown.limit', password)).statusCode).toBe(429);
+    const admins = await db.pool.query(`SELECT u.username FROM farm_memberships m JOIN users u ON u.id=m.user_id
+      WHERE m.farm_id=$1 AND m.role='admin'`, [LOCAL_FARM_ID]);
+    expect(admins.rows.map((r) => r.username)).toEqual(['role.admin']);
   });
 });

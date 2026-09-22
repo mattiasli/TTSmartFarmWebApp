@@ -18,6 +18,8 @@ active sockets. The last active administrator cannot be demoted or removed.
 Removing local access frees the login ID when the account has no other farm
 membership; historical user records remain. GitHub and password identities are
 separate even when their displayed names match.
+The configured bootstrap GitHub admin is seeded only for a new farm; restarting
+an existing farm does not recreate removed access.
 
 ## Storage and session protection
 
