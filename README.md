@@ -6,6 +6,9 @@ This folder is the application repository (`https://github.com/mattiasli/TTSmart
 
 ## Status
 
+Admins can add independent user ID/password accounts in Settings and assign
+viewer, operator or admin access. See [account administration](docs/LOCAL_ACCOUNTS.md).
+
 The web app is implemented and deployed at [smartfarm-live.vercel.app](https://smartfarm-live.vercel.app). Local packages **P00–P12**, hosted simulator **P13/G08**, and the requested non-pump hardware checks are complete for the agreed scope. Manual outputs, cooling, lighting/motion, alarm/Beep/Silence and distance Unavailable/recovery passed. The operator confirmed pump operation and stop, requested enabled pump control, and skipped further pump qualification. Backup/restore is deferred.
 
 See the [current release and final checklist](docs/FINAL_HANDOFF.md) for source and

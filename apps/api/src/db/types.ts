@@ -4,7 +4,7 @@ export type FarmRole = 'viewer' | 'operator' | 'admin';
 
 export type UserRecord = {
   id: string;
-  githubId: string;
+  githubId: string | null;
   username: string;
   displayName: string | null;
   disabledAt: Date | null;

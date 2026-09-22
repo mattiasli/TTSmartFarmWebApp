@@ -198,7 +198,8 @@ export function AutomationPanel(props: Props) {
                   <Switch
                     checked={Boolean(draft[card.rule])}
                     disabled={!canEdit || busy}
-                    label="On"
+                    label={draft[card.rule] ? 'On' : 'Off'}
+                    aria-label={card.title}
                     onChange={(_, data) => setDraft({ ...draft, [card.rule]: data.checked })}
                   />
                 </div>

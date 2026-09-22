@@ -14,6 +14,10 @@ The remote receives props and callbacks only. It must not open MQTT, WebSockets,
 
 ## HTTP
 
+Independent username/password accounts and their admin endpoints are documented
+in [local accounts](LOCAL_ACCOUNTS.md). Member identifiers now include a user UUID;
+GitHub identity is nullable for local users.
+
 | Method | Path | Notes |
 |---|---|---|
 | GET | `/health/live` | Process up. |

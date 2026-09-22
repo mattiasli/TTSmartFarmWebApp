@@ -15,6 +15,7 @@ import {
 } from '@smartfarm/contracts';
 import { CommandPolicyError, SCENARIO_NAMES, type ScenarioName } from '@smartfarm/domain';
 import { registerGithubOAuth } from './auth/oauth';
+import { registerLocalAccounts } from './auth/local-accounts';
 import { RealtimeHub, registerRealtime } from './auth/realtime';
 import { clearSessionCookie } from './auth/cookies';
 import { SessionService, type RequestSession } from './auth/session';
@@ -107,6 +108,8 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
         'req.headers.authorization',
         'req.headers.cookie',
         'password',
+        'req.body.password',
+        'password_hash',
         'HIVEMQ_PASSWORD',
         'GITHUB_OAUTH_CLIENT_SECRET',
       ],
@@ -168,6 +171,7 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
           role: session.role,
           username: session.username,
           githubLoginEnabled: Boolean(config.GITHUB_OAUTH_CLIENT_ID && store),
+          passwordLoginEnabled: Boolean(store),
         }
       : {
           authenticated: false,
@@ -177,6 +181,7 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
           role: null,
           username: null,
           githubLoginEnabled: Boolean(config.GITHUB_OAUTH_CLIENT_ID && store),
+          passwordLoginEnabled: Boolean(store),
         };
   }
 
@@ -293,6 +298,8 @@ export async function buildApp(config: AppConfig = loadConfig(), deps?: AppDeps)
   });
 
   registerGithubOAuth(app, config, sessions, store, resolved.githubFetch);
+  registerLocalAccounts(app, { store, config, requireRole, sessionDto,
+    dropUserSessions: (userId) => hub.dropUserSessions(userId) });
   await registerRealtime(app, hub, sessions, store, config, origins, memorySessions);
 
   app.get('/api/v1/session', async (request) => sessionDto(await currentSession(request)));

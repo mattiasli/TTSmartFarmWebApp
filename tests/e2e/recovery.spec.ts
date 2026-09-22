@@ -57,6 +57,21 @@ test.afterEach(async ({ page }) => {
   await resetSimulator(page);
 });
 
+test('automation switch labels follow the draft and Cancel restores the saved state', async ({ page }) => {
+  await openEditor(page);
+  for (const title of ['Water thirsty soil', 'Watch the water tank', 'Wait out the rain', 'A cooling breeze', 'A cozy night light']) {
+    const toggle = page.getByRole('switch', { name: title, exact: true });
+    const checked = await toggle.isChecked();
+    const wrapper = toggle.locator('..');
+    await expect(wrapper.getByText(checked ? 'On' : 'Off', { exact: true })).toBeVisible();
+    await toggle.click();
+    await expect(wrapper.getByText(checked ? 'Off' : 'On', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await expect(toggle).toBeChecked({ checked });
+    await expect(wrapper.getByText(checked ? 'On' : 'Off', { exact: true })).toBeVisible();
+  }
+});
+
 test('stale telemetry disables starts while stop actions remain available', async ({ page }) => {
   const session = await (await page.request.get('/api/v1/session')).json();
   const post = (path: string, data: unknown) => page.request.post(`${farm}/${path}`, {

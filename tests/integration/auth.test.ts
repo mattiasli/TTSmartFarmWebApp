@@ -142,7 +142,7 @@ describe('P06 postgres auth', () => {
     const admins = [];
     for (const member of members) {
       if (member.role !== 'admin') continue;
-      const user = await store.getUserByGithubId(member.githubId);
+      const user = await store.getUserById(member.userId);
       if (user) admins.push(user);
     }
     expect(admins.length).toBeGreaterThan(0);

@@ -82,7 +82,7 @@ export class FarmStore {
     username: string;
     displayName?: string | null;
     id?: string;
-  }): Promise<UserRecord> {
+  }): Promise<UserRecord & { githubId: string }> {
     const result = await this.pool.query(
       `INSERT INTO users (id, github_id, username, display_name, last_login_at)
        VALUES ($1, $2, $3, $4, now())
@@ -93,12 +93,12 @@ export class FarmStore {
        RETURNING *`,
       [input.id ?? randomUUID(), input.githubId, input.username, input.displayName ?? null],
     );
-    return mapUser(asRow(result.rows[0]));
+    return { ...mapUser(asRow(result.rows[0])), githubId: input.githubId };
   }
 
-  async getUserByGithubId(githubId: string): Promise<UserRecord | null> {
+  async getUserByGithubId(githubId: string): Promise<(UserRecord & { githubId: string }) | null> {
     const result = await this.pool.query('SELECT * FROM users WHERE github_id = $1', [githubId]);
-    return result.rows[0] ? mapUser(asRow(result.rows[0])) : null;
+    return result.rows[0] ? { ...mapUser(asRow(result.rows[0])), githubId } : null;
   }
 
   async getUserById(userId: string): Promise<UserRecord | null> {
@@ -113,7 +113,9 @@ export class FarmStore {
 
   async listFarmAccess(farmId: string): Promise<
     Array<{
-      githubId: string;
+      userId: string;
+      githubId: string | null;
+      loginType: 'password' | 'github';
       username: string;
       displayName: string | null;
       role: FarmRole;
@@ -122,7 +124,7 @@ export class FarmStore {
     }>
   > {
     const result = await this.pool.query(
-      `SELECT u.github_id, u.username, u.display_name, m.role, u.disabled_at,
+      `SELECT u.id, u.github_id, u.username, u.display_name, m.role, u.disabled_at,
               EXISTS (
                 SELECT 1 FROM login_allowlist a
                 WHERE a.github_id = u.github_id AND a.farm_id = m.farm_id AND a.revoked_at IS NULL
@@ -134,7 +136,9 @@ export class FarmStore {
       [farmId],
     );
     return result.rows.map((row) => ({
-      githubId: String(row.github_id),
+      userId: String(row.id),
+      githubId: row.github_id == null ? null : String(row.github_id),
+      loginType: row.github_id == null ? 'password' : 'github',
       username: String(row.username),
       displayName: row.display_name == null ? null : String(row.display_name),
       role: row.role as FarmRole,

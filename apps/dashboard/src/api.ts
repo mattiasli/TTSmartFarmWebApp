@@ -40,12 +40,22 @@ export async function ensureSession(): Promise<SessionDto> {
     return session;
   }
   sessionFarmId = null;
+  csrfToken = null;
   if (session.localLogin) {
     const login = await request<SessionDto>('/api/v1/local/login', { method: 'POST' });
     csrfToken = login.csrfToken;
     sessionFarmId = login.farmId;
     return login;
   }
+  return session;
+}
+
+export async function passwordLogin(userId: string, password: string) {
+  const session = await request<SessionDto>('/api/v1/auth/password/login', {
+    method: 'POST', body: JSON.stringify({ userId, password }),
+  });
+  csrfToken = session.csrfToken;
+  sessionFarmId = session.farmId;
   return session;
 }
 
@@ -140,7 +150,7 @@ export async function fetchEvents(cursor?: string | null) {
 
 export async function fetchMembers() {
   return request<{
-    members: Array<{ githubId: string; username: string; role: string; allowlisted: boolean }>;
+    members: Array<{ userId: string; githubId: string | null; loginType: 'password' | 'github'; username: string; role: 'viewer' | 'operator' | 'admin'; allowlisted: boolean }>;
   }>(`/api/v1/farms/${encodeURIComponent(await currentFarmId())}/members`);
 }
 
@@ -158,5 +168,18 @@ export async function setMemberRole(githubId: string, role: 'viewer' | 'operator
 export async function removeMember(githubId: string) {
   return request(`/api/v1/farms/${encodeURIComponent(await currentFarmId())}/members/${encodeURIComponent(githubId)}`, {
     method: 'DELETE',
+  });
+}
+
+export async function createAccount(userId: string, password: string, role: 'viewer' | 'operator' | 'admin') {
+  return request(`/api/v1/farms/${encodeURIComponent(await currentFarmId())}/accounts`, {
+    method: 'POST', body: JSON.stringify({ userId, password, role }),
+  });
+}
+
+export async function changeAccount(userId: string, action: 'role' | 'remove' | 'password', value?: string) {
+  return request(`/api/v1/farms/${encodeURIComponent(await currentFarmId())}/accounts/${encodeURIComponent(userId)}${action === 'password' ? '/password' : ''}`, {
+    method: action === 'remove' ? 'DELETE' : action === 'role' ? 'PUT' : 'POST',
+    ...(action === 'remove' ? {} : { body: JSON.stringify({ [action]: value }) }),
   });
 }

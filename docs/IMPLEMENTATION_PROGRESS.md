@@ -4,6 +4,18 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+Follow-up requested: automation switch labels now follow their draft On/Off state.
+Independent password accounts have been added, with admin create/role/reset/remove
+UI, PostgreSQL credential storage and throttling, shared session/CSRF protections,
+and last-admin protection. See LOCAL_ACCOUNTS.md. Local validation: typecheck/lint,
+189 unit tests, six new account integration tests and all 14 browser tests pass.
+The initial broader DB run had 36 passes and one opt-in skip; the
+bootstrap child-process test passed outside the Windows sandbox after userInfo
+failed there. An initially incorrect ticket assertion was replaced with actual
+WebSocket rejection verification; two browser setup timeouts passed on rerun.
+CI and hosted qualification of this follow-up are pending; the previously deployed
+release is recorded below.
+
 P15/G10 handoff is complete for the agreed scope. Production source 247b525
 passed CI 35725070292, staging 35725407854 and production 35726197685. Both live
 flags stayed true; authenticated live HTTP/WSS and enabled controls passed after

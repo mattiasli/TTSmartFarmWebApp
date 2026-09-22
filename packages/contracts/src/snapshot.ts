@@ -73,6 +73,7 @@ export type SessionDto = {
   role: 'viewer' | 'operator' | 'admin' | null;
   username: string | null;
   githubLoginEnabled: boolean;
+  passwordLoginEnabled?: boolean;
 };
 
 export type HistorySeriesPointDto = {

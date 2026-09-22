@@ -30,7 +30,7 @@ function asDateOrNull(value: unknown): Date | null {
 export function mapUser(row: Record<string, unknown>): UserRecord {
   return {
     id: String(row.id),
-    githubId: String(row.github_id),
+    githubId: row.github_id == null ? null : String(row.github_id),
     username: String(row.username),
     displayName: row.display_name == null ? null : String(row.display_name),
     disabledAt: asDateOrNull(row.disabled_at),
