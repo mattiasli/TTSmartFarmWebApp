@@ -6,7 +6,7 @@ This folder is the application repository (`https://github.com/mattiasli/TTSmart
 
 ## Status
 
-Local packages **P00–P12** are in `master`. Hosted simulator staging **P13/G08** is qualified for the agreed scope, with backup/restore deferred. GitHub OAuth through Vercel `/api` to Railway, live WebSocket and dashboard UI work. P14 production has operator-confirmed sensors and a passed supervised fan on/off test. Remaining hardware acceptance is open. Live commands are restored disabled; pumping remains disabled.
+Local packages **P00–P12** are in `master`. Hosted simulator staging **P13/G08** is qualified for the agreed scope, with backup/restore deferred. GitHub OAuth through Vercel `/api` to Railway, live WebSocket and dashboard UI work. P14 production has operator-confirmed sensors and passed supervised fan, LED, backlight, beep, feeder and LCD tests. Physical automation and remaining hardware acceptance are open. Live commands are restored disabled; pumping remains disabled.
 
 Recorded verified staging release: `1c6eb41`, with all CI checks and the ordered
 API/remote/host release workflow passed. Hosted database outage/recovery, handover,

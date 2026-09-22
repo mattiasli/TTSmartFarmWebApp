@@ -1,21 +1,21 @@
 # Hardware acceptance
 
-This file is a template. Fill it during a supervised window. Do not write credentials.
+This file records supervised acceptance and remaining checks. Do not write credentials.
 
 Preparation: the live TLS adapter is implemented. The user authorized reuse of
 the existing MQTT credential for the initial read-only observation and explicitly
-extended that exception to the supervised fan test on September 22; it has not
+extended that exception to supervised non-pump tests on September 22; it has not
 been reset. This is not evidence of broker-enforced read-only permissions.
 Read-only production is deployed; physical acceptance remains outstanding. See
 [production connection](PRODUCTION_DEPLOYMENT.md).
 
-- Date:
-- Operator:
-- Firmware identifier:
-- Backend SHA:
-- Power source:
-- `LIVE_COMMANDS_ENABLED`:
-- `LIVE_PUMP_ENABLED`:
+- Date: 2026-09-22
+- Operator: user, confirming physical observations in this session
+- Firmware identifier: latest sibling FanMqtt source, operator-reported; hashes below
+- Backend SHA: 1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1
+- Power source: USB plus another power supply (operator report); external supply ratings not recorded
+- `LIVE_COMMANDS_ENABLED`: temporarily true in authorized windows, restored false
+- `LIVE_PUMP_ENABLED`: false throughout
 
 ## Read-only
 
@@ -62,7 +62,11 @@ Record observed fields: `t`, `h`, `dht`, `soil`, `water`, `light`, `steam`, `rai
 - [x] Read-only command-retention audit: no retained/live commands observed across firmware filters in 30 seconds; 37 fresh telemetry packets (September 22)
 - [x] Operator confirmed supervision, power interruption access and other controllers stopped for September 22 fan test
 - [x] Fan on/off: two-second request interval, both states matched telemetry; operator confirms physical run and stop
-- [ ] Fan, LED, backlight, beep, feeder, LCD text/status
+- [x] LED, backlight, short beep, feeder, two-line LCD text/status (operator confirms all five)
+- [x] Maximum 16-character LCD lines displayed; five invalid text cases rejected by production API
+- [ ] All-off physical behavior and beep animation during a live UI request
+- [ ] Cooling hysteresis and manual takeover/resume
+- [ ] Low-tank alarm, silence/manual override and protection status without pumping
 - [ ] Master pause / browser close does not stop the server engine
 - [ ] Night-light 2559 vs 3380/3560 classification
 
@@ -77,8 +81,30 @@ at 08:42:10 UTC; pumping remained disabled throughout. The original qualified
 source SHA 1c6eb41 was redeployed for each configuration change. Evidence:
 [fan test](releases/production-fan-2026-09-22.json) and
 [restored dashboard](releases/production-after-fan-2026-09-22.json).
-LED, backlight, beep, feeder, LCD and automation checks remain outstanding.
-Arrange a new supervised scope before sending further actuator commands.
+The second group completed at 08:56 UTC. The operator confirmed LED on/off,
+backlight off/on, one short beep, feeder open/close, and two 16-character LCD
+lines followed by status mode. All seven state-reported commands reached
+`state_matched`; beep and LCD text/status correctly remained `sent/not_reported`.
+The operator supplies their physical confirmation. Commands were restored false
+at 08:57:15 UTC on API deployment 0f0994e1-080a-434c-bb31-e0f187b2f760.
+Five invalid LCD requests (overlong line 1/2, Unicode, separator and newline)
+returned HTTP 400 VALIDATION with commands disabled. A subsequent browser check
+received six live WSS snapshots with all 22 fields and disabled controls, with
+zero page errors. Evidence: [output tests](releases/production-outputs-2026-09-22.json)
+and [restored dashboard](releases/production-after-outputs-2026-09-22.json).
+All-off and physical automation checks remain outstanding. Arrange their
+supervised scope before sending further actuator commands.
+
+Tested sequence: `tools/scripts/supervised-output-sequence.mjs` supports
+LED/backlight only, or LED/backlight, one short 880-Hz beep, feeder open/close,
+and two 16-character LCD lines followed by status mode. It contains no provider
+access or pump commands. The caller must enforce request/observation timeouts,
+verify the initial outputs and paused automation state, and restore the command
+flag even on failure. The sequence restores each attempted output before moving
+on and stops the group after uncertainty. Beep and LCD text require physical
+observation; feeder telemetry confirms the commanded state, not measured angle.
+Nine local tests verify command schema compatibility, scope restrictions,
+cleanup and stopping after uncertainty; actual physical evidence is linked above.
 
 ## Pump
 

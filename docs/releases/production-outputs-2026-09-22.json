@@ -1,0 +1,401 @@
+{
+  "startedAt": "2026-09-22T08:55:25.202Z",
+  "sourceSha": "1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1",
+  "farmId": "cad2a8fd-265e-491d-a768-b4372580b55e",
+  "scope": "outputs",
+  "authorization": "Operator explicitly ready for LED/backlight/beep/feeder/LCD group; feeder clear and other controllers closed.",
+  "commands": [
+    {
+      "name": "LED",
+      "request": {
+        "type": "light.set",
+        "on": true
+      },
+      "requestedAt": "2026-09-22T08:56:18.085Z",
+      "httpStatus": 202,
+      "id": "352e2b27-ed16-4470-bea1-adc74b4db6d8",
+      "status": "sent",
+      "confirmationMode": "state_match",
+      "responseAt": "2026-09-22T08:56:18.313Z",
+      "finalStatus": "state_matched",
+      "sentAt": "2026-09-22T08:56:18.190Z",
+      "stateMatchedAt": "2026-09-22T08:56:18.567Z"
+    },
+    {
+      "name": "LED restore",
+      "request": {
+        "type": "light.set",
+        "on": false
+      },
+      "requestedAt": "2026-09-22T08:56:20.687Z",
+      "httpStatus": 202,
+      "id": "82b558d6-9cb6-46c1-b3ee-bfd2d3adcc22",
+      "status": "sent",
+      "confirmationMode": "state_match",
+      "responseAt": "2026-09-22T08:56:20.970Z",
+      "finalStatus": "state_matched",
+      "sentAt": "2026-09-22T08:56:20.848Z",
+      "stateMatchedAt": "2026-09-22T08:56:21.820Z"
+    },
+    {
+      "name": "LCD backlight",
+      "request": {
+        "type": "lcd.setBacklight",
+        "on": false
+      },
+      "requestedAt": "2026-09-22T08:56:22.077Z",
+      "httpStatus": 202,
+      "id": "6ba4508d-d235-431c-beb1-2800f5e79e86",
+      "status": "sent",
+      "confirmationMode": "state_match",
+      "responseAt": "2026-09-22T08:56:22.286Z",
+      "finalStatus": "state_matched",
+      "sentAt": "2026-09-22T08:56:22.169Z",
+      "stateMatchedAt": "2026-09-22T08:56:22.821Z"
+    },
+    {
+      "name": "LCD backlight restore",
+      "request": {
+        "type": "lcd.setBacklight",
+        "on": true
+      },
+      "requestedAt": "2026-09-22T08:56:24.549Z",
+      "httpStatus": 202,
+      "id": "8da6db5a-192c-4bc3-a9b3-c9d6bf523bb2",
+      "status": "sent",
+      "confirmationMode": "state_match",
+      "responseAt": "2026-09-22T08:56:24.803Z",
+      "finalStatus": "state_matched",
+      "sentAt": "2026-09-22T08:56:24.658Z",
+      "stateMatchedAt": "2026-09-22T08:56:25.028Z"
+    },
+    {
+      "name": "Short beep",
+      "request": {
+        "type": "buzzer.beep",
+        "frequencyHz": 880
+      },
+      "requestedAt": "2026-09-22T08:56:25.155Z",
+      "httpStatus": 202,
+      "id": "c1c26bc3-8c5d-4839-bcd0-3af474b650d4",
+      "status": "sent",
+      "confirmationMode": "not_reported",
+      "responseAt": "2026-09-22T08:56:25.373Z",
+      "finalStatus": "sent",
+      "sentAt": "2026-09-22T08:56:25.247Z",
+      "stateMatchedAt": null
+    },
+    {
+      "name": "Short beep restore",
+      "request": {
+        "type": "buzzer.stop"
+      },
+      "requestedAt": "2026-09-22T08:56:26.378Z",
+      "httpStatus": 202,
+      "id": "8399ce4d-1bc7-4a6c-9319-4dc52770fbf3",
+      "status": "sent",
+      "confirmationMode": "state_match",
+      "responseAt": "2026-09-22T08:56:26.592Z",
+      "finalStatus": "state_matched",
+      "sentAt": "2026-09-22T08:56:26.465Z",
+      "stateMatchedAt": "2026-09-22T08:56:26.674Z"
+    },
+    {
+      "name": "Feeder",
+      "request": {
+        "type": "feeder.set",
+        "open": true
+      },
+      "requestedAt": "2026-09-22T08:56:26.793Z",
+      "httpStatus": 202,
+      "id": "29cbd74d-81a1-4dec-a3e9-a8f21caede2d",
+      "status": "sent",
+      "confirmationMode": "state_match",
+      "responseAt": "2026-09-22T08:56:26.999Z",
+      "finalStatus": "state_matched",
+      "sentAt": "2026-09-22T08:56:26.880Z",
+      "stateMatchedAt": "2026-09-22T08:56:27.579Z"
+    },
+    {
+      "name": "Feeder restore",
+      "request": {
+        "type": "feeder.set",
+        "open": false
+      },
+      "requestedAt": "2026-09-22T08:56:29.217Z",
+      "httpStatus": 202,
+      "id": "e08a1761-7582-4dc0-80f2-b3fa9e69454f",
+      "status": "sent",
+      "confirmationMode": "state_match",
+      "responseAt": "2026-09-22T08:56:29.430Z",
+      "finalStatus": "state_matched",
+      "sentAt": "2026-09-22T08:56:29.312Z",
+      "stateMatchedAt": "2026-09-22T08:56:29.959Z"
+    },
+    {
+      "name": "LCD text",
+      "request": {
+        "type": "lcd.setText",
+        "line1": "SMARTFARM TEST 1",
+        "line2": "1234567890123456"
+      },
+      "requestedAt": "2026-09-22T08:56:30.073Z",
+      "httpStatus": 202,
+      "id": "55b02edf-8940-425e-98d2-d140e51bb44d",
+      "status": "sent",
+      "confirmationMode": "not_reported",
+      "responseAt": "2026-09-22T08:56:30.288Z",
+      "finalStatus": "sent",
+      "sentAt": "2026-09-22T08:56:30.160Z",
+      "stateMatchedAt": null
+    },
+    {
+      "name": "LCD text restore",
+      "request": {
+        "type": "lcd.showStatus"
+      },
+      "requestedAt": "2026-09-22T08:56:35.298Z",
+      "httpStatus": 202,
+      "id": "f48e6dce-28a5-4a69-bb10-4b8cb4014524",
+      "status": "sent",
+      "confirmationMode": "not_reported",
+      "responseAt": "2026-09-22T08:56:35.538Z",
+      "finalStatus": "sent",
+      "sentAt": "2026-09-22T08:56:35.421Z",
+      "stateMatchedAt": null
+    }
+  ],
+  "deployments": [
+    {
+      "at": "2026-09-22T08:55:31.327Z",
+      "enabled": true,
+      "id": "25470093-d074-47c7-b6a4-442fcdb5f3d1"
+    },
+    {
+      "at": "2026-09-22T08:56:42.229Z",
+      "enabled": false,
+      "id": "0f0994e1-080a-434c-bb31-e0f187b2f760"
+    }
+  ],
+  "samples": [
+    {
+      "at": "2026-09-22T08:55:26.346Z",
+      "enabled": false,
+      "epoch": "fb9c4e24-8ced-4dc0-83a1-a30c4cd19ff1",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:17.716Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:18.085Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:20.687Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 1,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:21.170Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 1,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:21.631Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 1,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:22.077Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:24.549Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 0,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:25.155Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:26.793Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:29.217Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 1,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:29.629Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 1,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:56:30.073Z",
+      "enabled": true,
+      "epoch": "e898d85c-fef5-4a22-a559-82e56d7d36e3",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:57:15.388Z",
+      "enabled": false,
+      "epoch": "eec593ea-0110-4f9e-b338-3a00deef4626",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    },
+    {
+      "at": "2026-09-22T08:57:15.761Z",
+      "enabled": false,
+      "epoch": "eec593ea-0110-4f9e-b338-3a00deef4626",
+      "fresh": true,
+      "fan": 0,
+      "pump": 0,
+      "led": 0,
+      "bl": 1,
+      "feed": 0,
+      "buzz": 0
+    }
+  ],
+  "pumpEnabled": false,
+  "physicalObservation": "Operator confirms: All five worked (LED, backlight, beep, feeder, LCD text/status).",
+  "powerSource": "USB and another power supply, as reported by operator; external supply ratings not recorded.",
+  "readOnlyRestoredAt": "2026-09-22T08:57:15.388Z",
+  "completed": true,
+  "finishedAt": "2026-09-22T08:57:15.761Z",
+  "lcdValidation": {
+    "observedAt": "2026-09-22T08:58:05.038Z",
+    "liveCommandsEnabled": false,
+    "cases": [
+      {
+        "name": "overlong first line",
+        "httpStatus": 400,
+        "code": "VALIDATION"
+      },
+      {
+        "name": "overlong second line",
+        "httpStatus": 400,
+        "code": "VALIDATION"
+      },
+      {
+        "name": "unsupported Unicode",
+        "httpStatus": 400,
+        "code": "VALIDATION"
+      },
+      {
+        "name": "MQTT separator",
+        "httpStatus": 400,
+        "code": "VALIDATION"
+      },
+      {
+        "name": "control character",
+        "httpStatus": 400,
+        "code": "VALIDATION"
+      }
+    ],
+    "acceptedCommands": 0,
+    "interpretation": "HTTP 400 VALIDATION before controller dispatch; MQTT publish count was not instrumented in this check."
+  }
+}

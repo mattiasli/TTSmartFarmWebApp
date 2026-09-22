@@ -7,7 +7,7 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 **Production read-only is deployed: https://smartfarm-live.vercel.app**, revision
 1c6eb418fd26e33f1cf556890a0ad0cc76bc2fa1. CI 35700323331, staging release
 35701046216 and production release 35701555060 all passed. Evidence:
-`releases/production-1c6eb41.json`. Live API 5720a640-198e-478b-acb2-71eacc89c1f0
+`releases/production-1c6eb41.json`. Live API 0f0994e1-080a-434c-bb31-e0f187b2f760
 reports healthy ownership, live mode and both command flags false.
 Fresh OAuth at 07:42 UTC verified the original production cookie attributes;
 authenticated browser verification at 07:56 received seven live WSS snapshots,
@@ -59,10 +59,26 @@ disabled controls and zero page errors (`releases/production-after-fan-2026-09-2
 This reused the valid app session, not a new OAuth sign-in. Local cleanup tests
 cover ambiguous enable/on errors, failed off/observation and restoration failures:
 `npm run test:unit -- tools/scripts/supervised-fan-window.test.mjs` (7 passed).
-Next: arrange a supervised scope for remaining LED/backlight/beep/feeder/LCD and
-automation checks. No further actuator commands are authorized by the fan test.
+The next separately authorized group passed at 08:56 UTC: LED/backlight,
+one short beep, feeder open/close and two 16-character LCD lines/status. The user
+confirms all five worked; power is USB plus another supply (ratings unknown).
+Seven state-reported commands reached `state_matched`; beep and LCD text/status
+remain `sent/not_reported`, with operator confirmation rather than fictitious
+device acknowledgements. All ten requests and telemetry observations are in
+`releases/production-outputs-2026-09-22.json`. Commands were restored false at
+08:57:15 UTC, pump flag stayed false, and all outputs returned to their baseline.
+Five invalid LCD payloads were rejected with HTTP 400 VALIDATION while read-only.
+The restored browser passed with six live WSS snapshots, all 22 fields, disabled
+controls and no page errors (`releases/production-after-outputs-2026-09-22.json`).
+Nine cleanup/schema/scope tests passed for `supervised-output-sequence.test.mjs`.
+Fan evidence commit 0233e96 passed CI 35706695286 and staging release 35706982599.
+Production source remains 1c6eb41.
+Next: arrange supervised all-off, cooling/manual takeover, lighting/motion,
+master/browser-close and low-tank alarm checks. Beep UI animation also remains
+to observe during an actual live browser command. Do not infer these checks from
+manual output tests. No further actuator commands are authorized by this group.
 G09/G10 remain open; backup/restore remains explicitly deferred. The shared MQTT
-credential exception covers initial read-only use and this supervised fan test.
+credential exception covers initial read-only use and these supervised non-pump tests.
 
 ## Earlier release notes
 

@@ -22,8 +22,12 @@ the shared credential is not claimed to have a broker-enforced publish denial.
 On September 22 the user explicitly extended reuse to the supervised two-second
 fan test. Both fan states matched telemetry and the operator confirmed run/stop.
 Commands were restored disabled; pumping remained disabled. See
-[fan evidence](releases/production-fan-2026-09-22.json). Further actuator tests
-require their own supervised scope.
+[fan evidence](releases/production-fan-2026-09-22.json). A separately authorized
+LED/backlight/beep/feeder/LCD group also passed on September 22, with operator
+confirmation, seven matched states and commands restored false at 08:57 UTC:
+[output evidence](releases/production-outputs-2026-09-22.json). Production API
+deployment is now 0f0994e1-080a-434c-bb31-e0f187b2f760 on the same source SHA.
+Further actuator tests require their own supervised scope.
 Save values only in ignored private setup and production backend secret variables,
 never Vercel or GitHub CI. Actual permissions still need verification.
 
