@@ -4,6 +4,25 @@ Do not write secrets, broker passwords, OAuth client secrets, session tokens, or
 
 ## Current handoff (2026-09-22)
 
+Manual alarm/Beep/Silence acceptance is complete with operator confirmation.
+The user performed the steps; the helper only configured the alarm-only window,
+observed snapshots and restored settings. Low-tank warning/beeps, recovery,
+Silence/manual override and Pause worked; Beep returned to normal without stuck
+pending. Original settings and read-only were restored at 11:36:19 UTC on API
+4649d8b3-5415-46c2-a438-732a7e4c5350, source 9a42efa. Both live flags are false.
+The operator pressed Sync tank protection during the first attempt: device
+thresholds now match saved 20/30, and guard confirmation is true. The first helper
+stopped on this change and its strict assertion interfered with settings cleanup;
+a separate restoration completed before the resumed test. Preserve that failure
+in `releases/production-alarm-2026-09-22.json`, alongside the successful window.
+The helper now allows cleanup after a device guard change while still forbidding
+saved guard-pair changes during restoration. The 11:36 browser check passed seven
+live snapshots, all 22 fields, confirmed guard text, disabled watering, paused
+master, outputs off and no page errors (`releases/production-after-alarm-2026-09-22.json`).
+No further alarm retest is needed. Remaining physical checks: safe no-echo/failure
+display and separate pump investigation/qualification. Do not start another
+hardware window without the operator's applicable supervision.
+
 Software follow-up for manual testing: snapshots now expose a separate `canPump`
 permission, respecting both live flags and the session role. The dashboard keeps
 Water briefly disabled when this permission is false or absent, including after
@@ -16,12 +35,12 @@ absent and true watering permissions across WebSocket updates).
 This follow-up is deployed to production on 9a42efa2e92400f364b40b75625917407f120de7.
 CI 35715195863, staging 35715501791 and production 35716021873 passed. Release
 manifests: `releases/staging-9a42efa.json` and `releases/production-9a42efa.json`.
-Current API deployment: 6d2c4116-02f5-4875-ba3c-344a9261593b. The authenticated
+Initial release API deployment: 6d2c4116-02f5-4875-ba3c-344a9261593b. The authenticated
 browser at 10:32 UTC received six live WebSocket snapshots with all 22 fields,
 verified `canPump=false` through HTTP and WebSocket, the disabled Water briefly
 button, rendered editor, paused automations, outputs off and zero page errors.
-Both live flags remain false. Device guard thresholds remain 8/10, saved settings
-20/30 and guard pending is visible. No hardware commands were sent. Evidence:
+Both live flags were false. Device guard thresholds were then 8/10, saved settings
+20/30 and guard pending was visible. No hardware commands were sent. Evidence:
 `releases/production-9a42efa-browser.json`. The existing app session was reused.
 
 The operator requested manual testing and reporting in chat instead of further

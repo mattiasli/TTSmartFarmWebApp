@@ -7,7 +7,11 @@ on the earlier same-day release; the valid app session verified the new release'
 live WebSocket, all 22 fields, disabled controls and correct pending guard status:
 [browser evidence](releases/production-9a42efa-browser.json). The separate pumping
 permission is false in HTTP and WebSocket snapshots; Water briefly is disabled.
-Current API deployment: 6d2c4116-02f5-4875-ba3c-344a9261593b. Both live flags are false.
+Current API deployment: 4649d8b3-5415-46c2-a438-732a7e4c5350, same 9a42efa source.
+Both live flags are false after completed manual alarm/Beep/Silence checks.
+The operator synchronized tank protection to 20/30; the latest browser check
+verifies matching thresholds and visible guard confirmed, paused automations and
+outputs off: [after-alarm evidence](releases/production-after-alarm-2026-09-22.json).
 Supervised physical acceptance remains incomplete.
 G08 simulator qualification is recorded in
 [staging acceptance](STAGING_ACCEPTANCE.md), with backup/restore explicitly

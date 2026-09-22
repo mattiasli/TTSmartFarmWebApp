@@ -1,0 +1,233 @@
+{
+  "sourceSha": "9a42efa2e92400f364b40b75625917407f120de7",
+  "scope": "Operator-driven non-pump alarm and Beep/Silence",
+  "operatorReports": {
+    "manualBeepAudible": true,
+    "beepReturnedToNormalWithoutStuckPending": true,
+    "lowTankLcdWarningAndApproximatelyTenSecondBeeps": true,
+    "recoveryAtThirtyPercentStoppedWarningAndBeeps": true,
+    "silenceStoppedBeepsDuringFifteenSecondObservation": true,
+    "sensorReturnedAndPausePressed": true,
+    "basis": "Operator confirmed Beep, all four remaining manual steps, and separately confirmed no stuck pending indicator."
+  },
+  "firstAttempt": {
+    "startedAt": "2026-09-22T11:21:59.545Z",
+    "readyAt": "2026-09-22T11:22:50.248Z",
+    "failure": [
+      "Device guard threshold changed during cooling test\n\n20 !== 8\n",
+      "Device guard threshold changed during cooling test\n\n20 !== 8\n",
+      "Deployment did not become healthy with flag false"
+    ],
+    "operatorAction": "Operator confirmed pressing Sync tank protection; firmware pair changed from 8/10 to saved 20/30.",
+    "helperLimitation": "Unchanged-guard assertion stopped the window and prevented original rule restoration; it also misreported disabled deployment readiness.",
+    "deployments": [
+      {
+        "at": "2026-09-22T11:22:07.955Z",
+        "enabled": true,
+        "id": "b707a805-3f58-4b21-bac0-a8cc392faff9"
+      },
+      {
+        "at": "2026-09-22T11:25:23.745Z",
+        "enabled": false,
+        "id": "a89a67fb-1d71-4971-b383-5f73a708bc25"
+      }
+    ],
+    "separateRestoration": {
+      "restored": true,
+      "finishedAt": "2026-09-22T11:32:29.178Z",
+      "deployments": [
+        {
+          "at": "2026-09-22T11:30:46.453Z",
+          "enabled": true,
+          "id": "6d8a0f14-0aad-43f5-8dfe-b0a3a1620257"
+        },
+        {
+          "at": "2026-09-22T11:31:36.219Z",
+          "enabled": false,
+          "id": "3c02574c-0f75-477d-a527-9e5f624b2521"
+        }
+      ],
+      "deviceGuardThresholds": {
+        "tankLow": 20,
+        "tankRecover": 30
+      }
+    }
+  },
+  "successfulWindow": {
+    "startedAt": "2026-09-22T11:32:45.469Z",
+    "readyAt": "2026-09-22T11:33:22.324Z",
+    "restoredAt": "2026-09-22T11:36:19.529Z",
+    "endReason": "Operator finished",
+    "samples": 66,
+    "transitions": [
+      {
+        "state": "paused",
+        "at": "2026-09-22T11:33:22.520Z",
+        "water": 48,
+        "pumpBlocked": 0,
+        "alarmMessage": "Paused after backend start. Resume explicitly.",
+        "manual": [],
+        "masterEnabled": false
+      },
+      {
+        "state": "low",
+        "at": "2026-09-22T11:34:09.510Z",
+        "water": 0,
+        "pumpBlocked": 1,
+        "alarmMessage": "Tank low — 0%. Pump locked until 30%.",
+        "manual": [],
+        "masterEnabled": true
+      },
+      {
+        "state": "recovered",
+        "at": "2026-09-22T11:34:22.808Z",
+        "water": 78,
+        "pumpBlocked": 0,
+        "alarmMessage": "Tank OK — 78%.",
+        "manual": [],
+        "masterEnabled": true
+      },
+      {
+        "state": "low",
+        "at": "2026-09-22T11:34:31.662Z",
+        "water": 4,
+        "pumpBlocked": 1,
+        "alarmMessage": "Tank low — 4%. Pump locked until 30%.",
+        "manual": [],
+        "masterEnabled": true
+      },
+      {
+        "state": "manual",
+        "at": "2026-09-22T11:34:36.219Z",
+        "water": 0,
+        "pumpBlocked": 1,
+        "alarmMessage": "Manual — resume automatic when ready.",
+        "manual": [
+          "alarm"
+        ],
+        "masterEnabled": true
+      },
+      {
+        "state": "paused",
+        "at": "2026-09-22T11:35:20.774Z",
+        "water": 74,
+        "pumpBlocked": 0,
+        "alarmMessage": "Paused by you",
+        "manual": [
+          "alarm"
+        ],
+        "masterEnabled": false
+      }
+    ],
+    "deviceGuardThresholds": {
+      "tankLow": 20,
+      "tankRecover": 30
+    },
+    "originalSettings": {
+      "irrigation": true,
+      "alarm": true,
+      "rain": true,
+      "cooling": true,
+      "lighting": true,
+      "soilDry": 35,
+      "cooldown": 30,
+      "maxPulses": 3,
+      "tankLow": 20,
+      "tankRecover": 30,
+      "beepInterval": 10,
+      "rainDelay": 10,
+      "fanOn": 29,
+      "fanOff": 27,
+      "lightOn": 1500,
+      "lightOff": 2000,
+      "motionOnly": false,
+      "motionSeconds": 15
+    },
+    "settingsChanges": [
+      {
+        "at": "2026-09-22T11:33:22.322Z",
+        "revision": 16,
+        "settings": {
+          "irrigation": false,
+          "alarm": true,
+          "rain": false,
+          "cooling": false,
+          "lighting": false,
+          "soilDry": 35,
+          "cooldown": 30,
+          "maxPulses": 3,
+          "tankLow": 20,
+          "tankRecover": 30,
+          "beepInterval": 10,
+          "rainDelay": 10,
+          "fanOn": 29,
+          "fanOff": 27,
+          "lightOn": 1500,
+          "lightOff": 2000,
+          "motionOnly": false,
+          "motionSeconds": 15
+        }
+      },
+      {
+        "at": "2026-09-22T11:35:37.013Z",
+        "revision": 17,
+        "settings": {
+          "irrigation": true,
+          "alarm": true,
+          "rain": true,
+          "cooling": true,
+          "lighting": true,
+          "soilDry": 35,
+          "cooldown": 30,
+          "maxPulses": 3,
+          "tankLow": 20,
+          "tankRecover": 30,
+          "beepInterval": 10,
+          "rainDelay": 10,
+          "fanOn": 29,
+          "fanOff": 27,
+          "lightOn": 1500,
+          "lightOff": 2000,
+          "motionOnly": false,
+          "motionSeconds": 15
+        }
+      }
+    ],
+    "deployments": [
+      {
+        "at": "2026-09-22T11:32:50.831Z",
+        "enabled": true,
+        "id": "00ea6607-232d-4e05-8080-3a510bf496ca"
+      },
+      {
+        "at": "2026-09-22T11:35:41.694Z",
+        "enabled": false,
+        "id": "4649d8b3-5415-46c2-a438-732a7e4c5350"
+      }
+    ],
+    "helperCommands": [
+      {
+        "name": "End manual test: All off",
+        "request": {
+          "type": "farm.allOff"
+        },
+        "requestedAt": "2026-09-22T11:35:36.368Z",
+        "id": "81ff561a-00bd-4fdd-963a-3dd49ae1c2b5",
+        "status": "state_matched",
+        "confirmationMode": "state_match",
+        "sentAt": "2026-09-22T11:35:36.475Z"
+      }
+    ],
+    "allSampledPumpStatesOff": true,
+    "settingsRestored": true,
+    "finalMasterPaused": true,
+    "finalLiveCommandsEnabled": false,
+    "livePumpEnabledThroughout": false
+  },
+  "limitations": [
+    "Physical warning text and audible behavior are operator observations, not firmware acknowledgements.",
+    "The snapshot trace corroborates low/recovered/manual/paused states; it does not measure audible beep timing.",
+    "Guard synchronization is not pump qualification. No pump pulse was requested.",
+    "Safe no-echo/failure-display checks and physical pump qualification remain open."
+  ]
+}

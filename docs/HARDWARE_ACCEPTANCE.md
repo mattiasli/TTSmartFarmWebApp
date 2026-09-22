@@ -71,9 +71,9 @@ Record observed fields: `t`, `h`, `dht`, `soil`, `water`, `light`, `steam`, `rai
 - [x] LED, backlight, short beep, feeder, two-line LCD text/status (operator confirms all five)
 - [x] Maximum 16-character LCD lines displayed; five invalid text cases rejected by production API
 - [x] Browser All off stops the active fan and LED; operator confirms normal behavior
-- [ ] Beep animation during a live UI request
+- [x] Manual Beep audible; operator confirms button returned to normal without stuck pending/animation
 - [x] Cooling hysteresis in both directions and manual takeover/resume
-- [ ] Low-tank alarm, silence/manual override and protection status without pumping
+- [x] Low-tank alarm, silence/manual override and protection status without pumping
 - [x] Master pause leaves manual fan ownership alone and releases automatic fan ownership
 - [x] Closing the test browser for ten seconds leaves master enabled and fan on
 - [x] Observe an independent automatic state change during browser closure (persisted LED-off command in a twelve-second no-request interval)
@@ -136,8 +136,8 @@ claim that those original scripts completed without errors.
 Settings were restored, automations paused and commands disabled at 09:58:54 UTC.
 The [restored browser](releases/production-after-lighting-2026-09-22.json) passed
 with seven live snapshots, all 22 fields, disabled controls and outputs off.
-Low-tank alarm, beep UI and safe no-echo/failure-display checks remain outstanding,
-alongside pump qualification. Arrange their supervised scope before commands.
+At that stage low-tank alarm, beep UI and safe no-echo/failure-display checks were
+outstanding, alongside pump qualification. The later alarm results are below.
 
 Tested sequence: `tools/scripts/supervised-output-sequence.mjs` supports
 LED/backlight only, or LED/backlight, one short 880-Hz beep, feeder open/close,
@@ -149,6 +149,41 @@ on and stops the group after uncertainty. Beep and LCD text require physical
 observation; feeder telemetry confirms the commanded state, not measured angle.
 Nine local tests verify command schema compatibility, scope restrictions,
 cleanup and stopping after uncertainty; actual physical evidence is linked above.
+
+### Manual alarm attempt (September 22)
+
+The operator requested manual dashboard testing. On source 9a42efa, the first
+manual window opened at 11:22:50 UTC with only the alarm configured, master paused
+and pumping disabled. The operator subsequently confirmed Beep worked. Whether
+the UI pending indicator cleared was not reported, so that checkbox remains open.
+The trace observed master enabled, tank 0% and a low-tank alarm message, but this
+does not establish physical warning/beep/recovery/Silence results.
+
+The operator pressed Sync tank protection, applying the already saved 20/30 pair
+to the device (previously 8/10). The helper's unchanged-threshold assertion ended
+the window and also incorrectly prevented restoring the original rule toggles.
+Commands were disabled, leaving the dashboard read-only and paused after restart.
+A separate cleanup restored the original settings, verified all outputs off and
+master paused, and disabled both live flags. The synchronized 20/30 device pair
+was preserved; this is not pump qualification. The helper now permits cleanup
+after an observed guard change while still forbidding changes to the saved guard
+pair during restoration.
+
+The resumed manual window opened at 11:33:22 UTC. The operator confirmed LCD
+warning text and beeps about ten seconds apart at low tank, recovery stopping the
+warning/beeps at 30% or above, Silence stopping beeps through a fifteen-second
+observation, returning the sensor and pressing Pause. They separately confirmed
+the earlier Beep button returned to normal without stuck pending or animation.
+The snapshot trace corroborates low tank/protection active, recovered tank/block
+cleared, manual alarm override and operator Pause. Audible timing and physical
+LCD behavior remain operator observations, not inferred acknowledgements.
+Original settings were restored at 11:36:19 UTC; outputs were off, master paused
+and both live flags false. API deployment 4649d8b3-5415-46c2-a438-732a7e4c5350
+uses the same 9a42efa source. The subsequent browser check received seven live
+snapshots with all 22 fields, no page errors, disabled watering and visible guard
+confirmed for the matched 20/30 pair. Evidence: [alarm checks](releases/production-alarm-2026-09-22.json)
+and [restored dashboard](releases/production-after-alarm-2026-09-22.json).
+Safe no-echo/failure display and pump qualification remain open.
 
 ## Pump
 
