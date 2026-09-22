@@ -129,13 +129,27 @@ body {
 .account-details[open] .account-form { margin-top: 16px; }
 .settings-diagnostics { display: block; }
 .settings-diagnostics[open] > p { margin-top: 16px; }
-.login-page { max-width: 440px; padding-top: 64px; }
-.login-panel { padding: 24px; border: 1px solid var(--colorNeutralStroke2, #e0e0e0); border-radius: 8px; gap: 20px; }
+.login-page { box-sizing: border-box; width: 100%; max-width: 1080px; gap: 28px; }
+.login-panel { width: 100%; max-width: 440px; gap: 0; }
+.login-panel h1 { margin: 0 0 22px; font-size: 32px; line-height: 1.25; font-weight: 600; }
+.login-panel .login-intro { margin: 0 0 28px; }
+.login-panel .fui-Input { min-height: 36px; box-sizing: border-box; }
+.login-panel .fui-Button { min-height: 34px; }
+.login-panel > .fui-Button { margin-top: 12px; }
+.login-technologies { max-width: 760px; }
+.login-technologies h2 { margin: 0 0 16px; font-size: 14px; line-height: 1.5; font-weight: 400; color: var(--colorNeutralForeground2, #616161); }
+.login-technologies ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 16px 24px; }
+.login-technologies li { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 12px; color: var(--colorNeutralForeground2, #424242); }
+.login-technologies img { object-fit: contain; flex-shrink: 0; }
+.login-credit { margin: 0; font-size: 12px; color: var(--colorNeutralForeground2, #616161); }
+@media (prefers-color-scheme: dark) {
+  .technology-monochrome { filter: invert(1); }
+}
 @media (max-width: 760px) {
   .settings-grid { grid-template-columns: minmax(0, 1fr); }
   .settings-panel { padding: 16px; }
-  .login-page { padding-top: 24px; }
-  .login-panel { padding: 20px; }
+  .login-page { padding-top: 16px; }
+  .login-technologies ul { gap: 14px 20px; }
 }
 
 .lcd-preview {

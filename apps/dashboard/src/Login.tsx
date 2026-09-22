@@ -1,8 +1,9 @@
-import { Button, Field, Input, Text, Title1 } from '@fluentui/react-components';
+import { Button, Field, Input, Text } from '@fluentui/react-components';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Navigate } from 'react-router';
 import { ensureSession, passwordLogin } from './api';
+import { LoginCredits } from './LoginCredits';
 
 export function Login() {
   const session = useQuery({ queryKey: ['session'], queryFn: ensureSession, retry: 0 });
@@ -16,8 +17,8 @@ export function Login() {
   return (
     <main className="page login-page">
       <section className="section login-panel">
-        <Title1>TT SmartFarm</Title1>
-        <Text as="p">Sign in with an account added by your farm administrator.</Text>
+        <h1>TT SmartFarm</h1>
+        <Text as="p" className="login-intro">Sign in with an account added by your farm administrator.</Text>
         {session.data?.passwordLoginEnabled ? (
           <form className="account-form" onSubmit={(event) => {
             event.preventDefault(); if (!login.isPending) login.mutate();
@@ -39,6 +40,7 @@ export function Login() {
         ) : null}
         {session.isError ? <Text role="alert">Unable to load sign-in. Please refresh to try again.</Text> : null}
       </section>
+      <LoginCredits />
     </main>
   );
 }
